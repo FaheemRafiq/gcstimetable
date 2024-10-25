@@ -40,7 +40,7 @@ class AllocationPolicy
      */
     public function update(User $user, Allocation $allocation): Response
     {
-        return $user->can(PermissionEnum::EDIT_ALLOCATION->vlaue)
+        return $user->can(PermissionEnum::EDIT_ALLOCATION->value)
             ? Response::allow() :
             Response::deny(config('providers.permission_error_msg'));
     }

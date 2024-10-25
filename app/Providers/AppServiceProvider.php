@@ -22,8 +22,6 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::unguard();
 
-        Allocation::observe(\App\Observers\AllocationObserver::class);
-
         JsonResource::withoutWrapping();
     }
 }

@@ -56,18 +56,23 @@
         --card-primary: 280 100% 22%;
         --card-primary-foreground: 0 0% 100%;
 
-        --card-monday: 210 80% 60%;
-        --card-monday-foreground: 0 0% 0%;
-        --card-tuesday: 30 90% 70%;
-        --card-tuesday-foreground: 0 0% 20%;
-        --card-wednesday: 120 80% 50%;
-        --card-wednesday-foreground: 0 0% 0%;
-        --card-thursday: 300 70% 60%;
-        --card-thursday-foreground: 0 0% 20%;
-        --card-friday: 280 100% 60%;
-        --card-friday-foreground: 0 0% 0%;
-        --card-saturday: 0 80% 80%;
-        --card-saturday-foreground: 0 0% 20%;
+        --card-monday: 210 80% 30%;
+        --card-monday-foreground: 0 0% 100%;
+
+        --card-tuesday: 30 90% 50%;
+        --card-tuesday-foreground: 0 0% 100%;
+
+        --card-wednesday: 120 80% 25%;
+        --card-wednesday-foreground: 0 0% 100%;
+
+        --card-thursday: 300 70% 35%;
+        --card-thursday-foreground: 0 0% 100%;
+
+        --card-friday: 280 100% 22%;
+        --card-friday-foreground: 0 0% 100%;
+        
+        --card-saturday: 0 80% 50%;
+        --card-saturday-foreground: 0 0% 100%;
     }
 
     .dark {
@@ -115,19 +120,19 @@
         --card-monday-foreground: 0 0% 100%;
 
         --card-tuesday: 30 90% 40%;
-        --card-tuesday-foreground: 0 0% 80%;
+        --card-tuesday-foreground: 0 0% 100%;
 
         --card-wednesday: 120 80% 25%;
         --card-wednesday-foreground: 0 0% 100%;
 
         --card-thursday: 300 70% 35%;
-        --card-thursday-foreground: 0 0% 80%;
+        --card-thursday-foreground: 0 0% 100%;
 
         --card-friday: 280 100% 22%;
         --card-friday-foreground: 0 0% 100%;
         
         --card-saturday: 0 80% 50%;
-        --card-saturday-foreground: 0 0% 80%;
+        --card-saturday-foreground: 0 0% 100%;
     }
 }
 

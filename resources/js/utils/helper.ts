@@ -41,3 +41,8 @@ export function formatTime(timeStr: string) {
         "h:mm A"
     );
 }
+
+export function sortByDays(a: string, b: string) {
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    return days.indexOf(a) - days.indexOf(b);
+}

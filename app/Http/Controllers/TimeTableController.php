@@ -88,7 +88,7 @@ class TimeTableController extends Controller
 
     public function addAllocations($timetable)
     {
-        $timetable   = TimeTable::where('id', $timetable)->with(['shift.slots', 'allocations'])->firstOrFail();
+        $timetable   = TimeTable::where('id', $timetable)->with(['shift.slots', 'allocations' => fn($q) => $q->withAll()])->firstOrFail();
         $sections    = [];
 
         if ($timetable->allocations) {

@@ -2,51 +2,41 @@
 
 namespace App\Models;
 
+use App\Observers\AllocationObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/*
+*   Allocation Observer
+*/
+#[ObservedBy(AllocationObserver::class)]
+
+/*
+*   Allocation Model
+*/
 class Allocation extends Model
 {
     use HasFactory;
 
-    protected $with = [
-        'course', 
-        'teacher',
-        'room', 
-        'slot', 
-        'day', 
-        'section.semester'
-    ];
+    // Custom Methods
 
-    protected static function booted()
-    {
-        static::addGlobalScope('teacher', function ($builder) {
-            $builder->with(['teacher' => function ($query) {
-                $query->select('id', 'name', 'email');
-            }]);
-        });
-    }
-
-    // create a function hasTeacher if teacher id is not null then return true else false
     public function hasTeacher(): bool
     {
         return (bool) $this->teacher_id;
     }
 
-    // create a function hasCourse if course id is not null then return true else false
     public function hasCourse(): bool
     {
         return (bool) $this->course_id;
     }
 
-    // create a function hasRoom if room id is not null then return true else false
     public function hasRoom(): bool
     {
         return (bool) $this->room_id;
     }
 
-    // create a function has Section if section id is not null then return true else false
     public function hasSection(): bool
     {
         return (bool) $this->section_id;
@@ -62,32 +52,27 @@ class Allocation extends Model
         return (bool) $this->slot_id;
     }
 
-    public function getExistingAllocation($fields): object
+    public function shouldCheckDuplicate()
     {
-        $query = self::query();
-        foreach ($fields as $key => $value) {
-            $query->where($key, $value);
-        }
-
-        return $query->first();
+        return $this->hasDay() && $this->hasSlot() && $this->hasTeacher() && $this->hasCourse();
     }
 
-    // create a function doesExists that accepts the array of fields like day_id , slot_id , teacher_id , room_id , course_id , section_id
-    // and check if the allocation is unique or not
-    // the parameter list is dynamic and where query should be updated accordingly
+    // Scopes
 
-    public function doesExist(array $fields): bool
+    public function scopeWithAll($query)
     {
-        $query = self::query();
-        foreach ($fields as $key => $value) {
-            $query->where($key, $value);
-        }
-
-        return $query->exists();
+        return $query->with(['course', 'teacher:id,name,email', 'room', 'slot', 'day', 'section.semester']);
     }
 
-    // create dynamic queryscope complete  on passing the boolean true  it returns the complete allocations and vice verca
-    // and by default its true
+    public function scopeDuplicate($query)
+    {
+        return $query
+            ->where('day_id', $this->day_id)
+            ->where('slot_id', $this->slot_id)
+            ->where('teacher_id', $this->teacher_id)
+            ->where('course_id', $this->course_id);
+    }
+
     public function scopeComplete($query, $complete = true)
     {
         if ($complete) {
@@ -107,43 +92,38 @@ class Allocation extends Model
             ->orWhereNull('section_id');
     }
 
-    // courses
+    // Relationships
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class, 'course_id');
     }
 
-    // teachers
     public function teacher(): BelongsTo
     {
         return $this->belongsTo(Teacher::class, 'teacher_id');
     }
 
-    // rooms
     public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class, 'room_id');
     }
 
-    // slots
     public function slot(): BelongsTo
     {
         return $this->belongsTo(Slot::class, 'slot_id');
     }
 
-    // days
     public function day(): BelongsTo
     {
         return $this->belongsTo(Day::class, 'day_id');
     }
 
-    // sections
     public function section(): BelongsTo
     {
         return $this->belongsTo(Section::class, 'section_id');
     }
 
-    public function timetable() : BelongsTo
+    public function timetable(): BelongsTo
     {
         return $this->belongsTo(TimeTable::class);
     }

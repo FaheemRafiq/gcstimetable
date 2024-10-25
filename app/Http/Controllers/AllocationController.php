@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Gate;
 use App\Exceptions\AllocationException;
 use Illuminate\Database\QueryException;
 use App\Http\Repositories\SectionRepository;
@@ -87,7 +88,7 @@ class AllocationController extends Controller
 
             $allocations = [];
             if ($request->has('section_id')) {
-                $allocations = Allocation::where(['time_table_id' => $timetable->id, 'slot_id' => $request->slot_id, 'section_id' => $request->section_id])->latest()->get();
+                $allocations = Allocation::where(['time_table_id' => $timetable->id, 'slot_id' => $request->slot_id, 'section_id' => $request->section_id])->withAll()->latest()->get();
             }
 
             // Remove the semesters relationship from the timetable object
@@ -116,29 +117,25 @@ class AllocationController extends Controller
      */
     public function store(StoreAllocationRequest $request)
     {
-        $attributes = $request->validated();
-        Log::channel('allocations')->info('CreateAllocation_Request', $attributes);
 
+        $attributes = $request->validated();
+        $response   = Gate::inspect('update', Allocation::class);
         $message    = '';
         try {
 
-            $allocation = Allocation::create($attributes);
+            if ($response->allowed()) {
+                Allocation::create($attributes);
 
-            return redirect()->route('allocations.create', [
-                'time_table_id' => $allocation->time_table_id,
-                'section_id' => $allocation->section_id,
-                'slot_id' => $allocation->slot_id
-            ])->with('success', 'Resource successfully created');
+                return back()->with('success', 'Resource successfully created');
+            } else {
+                $message = $response->message();
+            }
 
         } catch (AllocationException $exception) {
             $message = 'Constraint violation 👉 '.$exception->getMessage();
         } catch (QueryException $exception) {
             $message = 'Database error 👉 '.$exception->getMessage();
-        } catch (Exception $exception) {
-            $message = 'Something went wrong! Please contact Support.';
         }
-
-        Log::channel('allocations')->info($message);
 
         return back()->with('error', $message);
     }
@@ -168,10 +165,20 @@ class AllocationController extends Controller
      */
     public function update(UpdateAllocationRequest $request, Allocation $allocation)
     {
-        try {
-            $allocation->update($request->all());
+        $attributes = $request->validated();
 
-            return back()->with('success', 'Resource successfully updated');
+        $response = Gate::inspect('update', $allocation);
+
+        try {
+            if ($response->allowed()) {
+
+                $allocation->update($attributes);
+
+                return back()->with('success', 'Resource successfully updated');
+
+            } else {
+                $message = $response->message();
+            }
 
         } catch (AllocationException $exception) {
             $message = 'Constraint violation 👉 '.$exception->getMessage();

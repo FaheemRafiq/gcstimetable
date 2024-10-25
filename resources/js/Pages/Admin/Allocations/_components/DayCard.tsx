@@ -25,7 +25,7 @@ const DayCard: React.FC<DayCardProps> = ({
                 `relative text-center min-h-[120px] h-full overflow-hidden border rounded-lg transition-all duration-300`,
                 className,
                 getBorderColor(day.name),
-                selected && `scale-110 shadow-sm ${getShadowColor(day.name)}`,
+                selected && `scale-110 shadow-md ${getShadowColor(day.name)}`,
             )}
         >
             <div

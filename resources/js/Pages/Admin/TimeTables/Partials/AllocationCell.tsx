@@ -1,5 +1,7 @@
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Allocation } from "@/types/database";
+import { getBackgroundColor } from "@/utils/dayHelper";
 
 export function AllocationCell({
     allocation,
@@ -17,7 +19,20 @@ export function AllocationCell({
                 <span> - {allocation?.teacher?.name}</span>
             )}
             {allocation?.room?.name && <span> - {allocation?.room?.name}</span>}
-            {allocation && <span> - {allocation?.day?.name}</span>}
+            {allocation.day?.name && (
+                <>
+                    -{" "}
+                    <Badge
+                        asChild
+                        className={cn(
+                            "pointer-events-none",
+                            getBackgroundColor(allocation.day?.name)
+                        )}
+                    >
+                        <span>{allocation.day?.name}</span>
+                    </Badge>
+                </>
+            )}
         </span>
     );
 }

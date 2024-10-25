@@ -170,7 +170,7 @@ export default function CreateAllocation({
     }
 
     function getSectionLabel(section: ModifiedSection) {
-        return `${getNumberWithOrdinal(section.SemesterNo)} - ${section.name} - ${section.SemesterName}`;
+        return `${section?.SemesterNo ? getNumberWithOrdinal(section.SemesterNo) : ''} - ${section?.name ?? ''} - ${section?.SemesterName ?? ''}`;
     }
 
     const filteredCourse: Course[] | [] = useMemo(() => {
@@ -241,8 +241,8 @@ export default function CreateAllocation({
             <Head title="Create Allocation" />
             <div className="bg-card text-card-foreground border border-border sm:rounded-lg">
                 <div className="p-2 md:p-6 space-y-4 flex flex-col">
-                    {/* Show Allocations */}
 
+                    {/* Show Allocations */}
                     <div className="order-2 md:order-1 w-full shadow-md rounded-lg bg-background px-6 py-4 border border-border">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
                             {/* Time Slot Row */}
@@ -398,6 +398,7 @@ export default function CreateAllocation({
                                         <InputLabel
                                             htmlFor="section"
                                             value="Section"
+                                            className="mb-1"
                                         />
                                         <AutoCompleteSelect
                                             label="Select Section"
@@ -436,7 +437,7 @@ export default function CreateAllocation({
 
                                 {/* Rooms */}
                                 <div className="col-span-12 md:col-span-6">
-                                    <InputLabel htmlFor="room" value="Room" />
+                                    <InputLabel htmlFor="room" value="Room" className="mb-1" />
                                     <AutoCompleteSelect
                                         label="Select Room"
                                         disabled={filteredRooms.length === 0}
@@ -464,6 +465,7 @@ export default function CreateAllocation({
                                     <InputLabel
                                         htmlFor="teacher"
                                         value="Teacher"
+                                        className="mb-1"
                                     />
                                     <AutoCompleteSelect
                                         label="Select Teacher"
@@ -489,12 +491,13 @@ export default function CreateAllocation({
                                     />
                                     <InputError message={errors.teacher_id} />
                                 </div>
-                                {/* Course Id */}
 
+                                {/* Course Id */}
                                 <div className="col-span-12 md:col-span-6">
                                     <InputLabel
                                         htmlFor="course"
                                         value="Course"
+                                        className="mb-1"
                                     />
 
                                     <AutoCompleteSelect

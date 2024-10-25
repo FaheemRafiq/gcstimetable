@@ -38,11 +38,17 @@ export default function AddAllocationsTimeTable({
     }, [timetable]);
 
     function getAllocations(slotId: number, sectionId: number) {
-        return allocations.filter(
+        let arrayOfAllocations = allocations.filter(
             (allocation) =>
                 allocation.slot_id === slotId &&
                 allocation.section_id === sectionId
         );
+
+        if(arrayOfAllocations.length > 0) {
+            arrayOfAllocations.sort((acc, curr) => Number(acc.day?.number) - Number(curr.day?.number));
+        }
+
+        return arrayOfAllocations;
     }
 
     function handleCreateAllocation(slot_id: number, section_id = null as any) {
@@ -100,10 +106,10 @@ export default function AddAllocationsTimeTable({
                         </Link>
                     </div>
 
-                    <div className="my-8" />
+                    <div className="my-4" />
 
                     {/* Timetable Grid */}
-                    <div className="overflow-x-auto overflow-y-auto">
+                    <div className="overflow-x-auto overflow-y-auto bg-background text-foreground rounded-lg p-3 shadow-md">
                         <div className="grid grid-cols-12 gap-2">
                             {/* Shift Slots Header */}
                             <div className="col-span-12 flex h-10">
@@ -113,7 +119,7 @@ export default function AddAllocationsTimeTable({
                                 {timetable.shift?.slots?.map((slot, index) => (
                                     <p
                                         key={`period-${index}`}
-                                        className="flex-1 font-bold text-card-foreground dark:text-foreground text-center h-[50px] w-[150px] min-w-[200px] flex items-center justify-center border-l border-t"
+                                        className="flex-1 font-bold text-card-foreground dark:text-foreground text-center h-[50px] w-[150px] min-w-[300px] flex items-center justify-center border-l border-t"
                                     >
                                         {getRomanNumber(index + 1)}
                                     </p>
@@ -128,7 +134,7 @@ export default function AddAllocationsTimeTable({
                                 {timetable.shift?.slots?.map((slot) => (
                                     <p
                                         key={slot.id}
-                                        className="flex-1 font-bold text-card-foreground dark:text-foreground text-center h-[50px] w-[150px] min-w-[200px] flex items-center justify-center border-l"
+                                        className="flex-1 font-bold text-card-foreground dark:text-foreground text-center h-[50px] w-[150px] min-w-[300px] flex items-center justify-center border-l"
                                     >
                                         {slot.name}
                                     </p>
@@ -159,7 +165,7 @@ export default function AddAllocationsTimeTable({
                                             return allocs.length > 0 ? (
                                                 <p
                                                     key={slot.id}
-                                                    className="flex-1 text-center h-auto min-h-[100px] w-[150px] min-w-[200px] flex flex-col items-center justify-center border-l py-5 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                                                    className="flex-1 text-center h-auto min-h-[100px] w-[150px] min-w-[300px] flex flex-col items-center justify-center border-l py-5 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                                                     onClick={() =>
                                                         editTimeTableCell(
                                                             slot.id,
@@ -177,7 +183,7 @@ export default function AddAllocationsTimeTable({
                                             ) : (
                                                 <p
                                                     key={slot.id}
-                                                    className="flex-1 text-center h-auto min-h-[100px] w-[150px] min-w-[200px] flex items-center justify-center border-l"
+                                                    className="flex-1 text-center h-auto min-h-[100px] w-[150px] min-w-[300px] flex items-center justify-center border-l"
                                                 >
                                                     <Tooltip title="Add Allocation">
                                                         <Button
@@ -204,7 +210,7 @@ export default function AddAllocationsTimeTable({
                                 {timetable.shift?.slots?.map((slot) => (
                                     <p
                                         key={slot.id}
-                                        className="flex-1 text-center h-auto min-h-[100px] w-[150px] min-w-[200px] flex items-center justify-center border-l"
+                                        className="flex-1 text-center h-auto min-h-[100px] w-[150px] min-w-[300px] flex items-center justify-center border-l"
                                     >
                                         <Tooltip title="Add Allocation">
                                             <Button
