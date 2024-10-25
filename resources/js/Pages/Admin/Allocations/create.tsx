@@ -38,8 +38,12 @@ import { AllocationCell } from "../TimeTables/Partials/AllocationCell";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useBreadcrumb } from "@/components/providers/breadcrum-provider";
-import { ArrowBigDown, Group, Table, TimerIcon } from "lucide-react";
+import { ArrowBigDown, CalendarDays, Group, Table, TimerIcon } from "lucide-react";
 import { Book, User, MapPin, Calendar, MoveDown } from "lucide-react";
+import DayCard from "./_components/DayCard";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { getBackgroundColor } from "@/utils/dayHelper";
 
 interface FormProps {
     time_table_id: number;
@@ -102,7 +106,7 @@ export default function CreateAllocation({
     // State
     const { setBreadcrumb } = useBreadcrumb();
     const [selectedAllocation, setSelectedAllocation] = useState<Allocation>(
-        props.allocations[0] ?? EmptyAllocation
+        props.allocations[0] ?? getDefaultAllocation()
     );
 
     const { data, setData, post, put, errors, processing, reset } =
@@ -150,6 +154,14 @@ export default function CreateAllocation({
         return value === 0 ? null : value;
     }
 
+    function getDefaultAllocation() {
+        const monday = props?.timetable?.shift?.institution?.days?.find(
+            (day) => day.name === "Monday"
+        );
+
+        return { ...EmptyAllocation, day_id: monday?.id ?? 0 };
+    }
+
     const filteredCourse: Course[] | [] = useMemo(() => {
         if (data.section_id) {
             let semester = props?.sections?.find(
@@ -179,6 +191,12 @@ export default function CreateAllocation({
         return [];
     }, [data.section_id]);
 
+    const selectedDay = useMemo(() => {
+        return props?.timetable?.shift?.institution?.days?.find(
+            (day) => day.id === selectedAllocation.day_id
+        );
+    }, [selectedAllocation]);
+
     // Submit Form
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -187,7 +205,7 @@ export default function CreateAllocation({
             // Create New Allocation
             post(route("allocations.store"), {
                 onSuccess: () => {
-                    reset("day_id", "room_id", "teacher_id", "course_id");
+                    reset("room_id", "teacher_id", "course_id");
                     setSelectedAllocation(EmptyAllocation);
                 },
             });
@@ -211,11 +229,11 @@ export default function CreateAllocation({
         <AuthenticatedLayout user={auth.user}>
             <Head title="Create Allocation" />
             <div className="bg-card text-card-foreground border border-border sm:rounded-lg">
-                <div className="p-6 space-y-4">
+                <div className="p-6 space-y-4 flex flex-col">
                     {/* Show Allocations */}
 
-                    <div className="w-full shadow-md rounded-lg bg-background px-6 py-4 border border-border">
-                        <div className="grid grid-cols-7 gap-4">
+                    <div className="order-2 md:order-1 w-full shadow-md rounded-lg bg-background px-6 py-4 border border-border">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
                             {/* Time Slot Row */}
                             <div className="font-bold min-h-[100px] flex flex-col justify-center items-center">
                                 <div>{formatTime(props?.slot?.start_time)}</div>
@@ -231,41 +249,25 @@ export default function CreateAllocation({
 
                                     if (allocation) {
                                         return (
-                                            <div
+                                            <DayCard
                                                 key={day.id}
-                                                className="text-center min-h-[100px] h-full overflow-hidden"
+                                                day={day}
+                                                selected={
+                                                    selectedAllocation.day_id ===
+                                                        day.id &&
+                                                    selectedAllocation.id ===
+                                                        allocation.id
+                                                }
+                                                onClick={() =>
+                                                    setSelectedAllocation(
+                                                        allocation
+                                                    )
+                                                }
                                             >
                                                 <div
                                                     className={cn(
-                                                        "text-center font-semibold bg-card-primary text-card-primary-foreground rounded-t-lg",
-                                                        {
-                                                            "bg-primary text-primary-foreground":
-                                                                selectedAllocation.day_id ===
-                                                                    day.id &&
-                                                                selectedAllocation.id ===
-                                                                    allocation.id,
-                                                        }
+                                                        "flex items-start justify-center h-full cursor-pointer"
                                                     )}
-                                                >
-                                                    {day.name}
-                                                </div>
-
-                                                <div
-                                                    className={cn(
-                                                        "flex items-start justify-center border border-card-primary h-full cursor-pointer",
-                                                        {
-                                                            "border-primary":
-                                                                selectedAllocation.day_id ===
-                                                                    day.id &&
-                                                                selectedAllocation.id ===
-                                                                    allocation.id,
-                                                        }
-                                                    )}
-                                                    onClick={() =>
-                                                        setSelectedAllocation(
-                                                            allocation
-                                                        )
-                                                    }
                                                 >
                                                     <div className="flex flex-col mt-2">
                                                         <div className="text-sm flex items-center space-x-2">
@@ -300,56 +302,30 @@ export default function CreateAllocation({
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </DayCard>
                                         );
                                     }
 
                                     return (
-                                        <div
+                                        <DayCard
                                             key={day.id}
-                                            className="text-center min-h-[100px] h-full overflow-hidden"
+                                            day={day}
+                                            selected={
+                                                selectedAllocation.day_id ===
+                                                day.id
+                                            }
+                                            onClick={() =>
+                                                setSelectedAllocation({
+                                                    ...EmptyAllocation,
+                                                    day_id: day.id,
+                                                    slot_id: props.slot.id,
+                                                    time_table_id:
+                                                        props.timetable.id,
+                                                })
+                                            }
                                         >
-                                            <div
-                                                className={cn(
-                                                    "text-center font-semibold bg-card-primary text-card-primary-foreground rounded-t-lg",
-                                                    {
-                                                        "bg-primary text-primary-foreground":
-                                                            selectedAllocation.day_id ===
-                                                            day.id,
-                                                    }
-                                                )}
-                                            >
-                                                {day.name}
-                                            </div>
-                                            <div
-                                                className={cn(
-                                                    "flex items-start justify-center border border-card-primary h-full",
-                                                    {
-                                                        "border-primary":
-                                                            selectedAllocation.day_id ===
-                                                            day.id,
-                                                    }
-                                                )}
-                                            >
-                                                <Button
-                                                    size={"sm"}
-                                                    className="mt-5"
-                                                    onClick={() =>
-                                                        setSelectedAllocation({
-                                                            ...EmptyAllocation,
-                                                            day_id: day.id,
-                                                            slot_id:
-                                                                props.slot.id,
-                                                            time_table_id:
-                                                                props.timetable
-                                                                    .id,
-                                                        })
-                                                    }
-                                                >
-                                                    Add
-                                                </Button>
-                                            </div>
-                                        </div>
+                                            Empty
+                                        </DayCard>
                                     );
                                 }
                             )}
@@ -357,46 +333,63 @@ export default function CreateAllocation({
                     </div>
 
                     {/* Create Allocation */}
-                    <Card className="w-full bg-white shadow-md rounded-lg dark:bg-background border border-border">
+                    <Card className="order-1 md:order-2 w-full bg-white shadow-md rounded-lg dark:bg-background border border-border">
                         <CardHeader className="flex items-center space-x-4">
                             <CardTitle>Create Allocation</CardTitle>
                         </CardHeader>
 
                         <CardContent className="mt-4">
-                            <div className="mb-4 flex">
-                                <span className="font-bold w-2/12 flex items-center">
-                                    <Table size={18} className="mr-1" />
-                                    TimeTable:{" "}
-                                </span>
-                                <span className="flex-1">
-                                    {props?.timetable?.title}
-                                </span>
-                            </div>
-                            <div className="mb-4 flex">
-                                <span className="font-bold w-2/12 flex items-center">
-                                    <TimerIcon size={18} className="mr-1" />
-                                    Time Slot:{" "}
-                                </span>
-                                <span className="flex-1">
-                                    {props?.slot?.name}
-                                </span>
-                            </div>
-
-                            {props.haveSection === true ? (
+                            <div className="columns-2">
                                 <div className="mb-4 flex">
                                     <span className="font-bold w-2/12 flex items-center">
-                                        <Group size={18} className="mr-1" />
-                                        Section:{" "}
+                                        <Table size={18} className="mr-1" />
+                                        TimeTable:{" "}
                                     </span>
                                     <span className="flex-1">
-                                        {props.sections[0]?.name} -{" "}
-                                        {getNumberWithOrdinal(
-                                            props.sections[0]?.SemesterNo
-                                        )}{" "}
-                                        - {props.sections[0]?.SemesterName}
+                                        {props?.timetable?.title}
                                     </span>
                                 </div>
-                            ) : null}
+                                <div className="mb-4 flex">
+                                    <span className="font-bold w-2/12 flex items-center">
+                                        <TimerIcon size={18} className="mr-1" />
+                                        Time Slot:{" "}
+                                    </span>
+                                    <span className="flex-1">
+                                        {props?.slot?.name}
+                                    </span>
+                                </div>
+                                {props.haveSection === true ? (
+                                    <div className="mb-4 flex">
+                                        <span className="font-bold w-2/12 flex items-center">
+                                            <Group size={18} className="mr-1" />
+                                            Section:{" "}
+                                        </span>
+                                        <span className="flex-1">
+                                            {props.sections[0]?.name} -{" "}
+                                            {getNumberWithOrdinal(
+                                                props.sections[0]?.SemesterNo
+                                            )}{" "}
+                                            - {props.sections[0]?.SemesterName}
+                                        </span>
+                                    </div>
+                                ) : null}
+
+                                {(selectedDay && selectedDay.name) ? (
+                                    <div className="mb-4 flex">
+                                        <span className="font-bold w-2/12 flex items-center">
+                                            <CalendarDays size={18} className="mr-1" />
+                                            Day:{" "}
+                                        </span>
+                                        <span className="flex-1">
+                                            <Badge className={cn("pointer-events-none", getBackgroundColor(selectedDay.name))}>
+                                                {selectedDay.name}
+                                            </Badge>
+                                        </span>
+                                    </div>
+                                ) : null}
+                            </div>
+
+                            <Separator className="my-4" />
 
                             <div className="grid grid-cols-12 gap-4">
                                 {props.haveSection === false ? (

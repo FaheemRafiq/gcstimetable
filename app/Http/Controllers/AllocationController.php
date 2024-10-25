@@ -87,7 +87,7 @@ class AllocationController extends Controller
 
             $allocations = [];
             if ($request->has('section_id')) {
-                $allocations = Allocation::where(['time_table_id' => $timetable->id, 'slot_id' => $request->slot_id, 'section_id' => $request->section_id])->get();
+                $allocations = Allocation::where(['time_table_id' => $timetable->id, 'slot_id' => $request->slot_id, 'section_id' => $request->section_id])->latest()->get();
             }
 
             // Remove the semesters relationship from the timetable object

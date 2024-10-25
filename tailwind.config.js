@@ -35,6 +35,30 @@ export default {
 					primary: {
 						DEFAULT: 'hsl(var(--card-primary))',
 						foreground: 'hsl(var(--card-primary-foreground))'
+					},
+					monday: {
+						DEFAULT: 'hsl(var(--card-monday))',
+						foreground: 'hsl(var(--card-monday-foreground))'
+					},
+					tuesday: {
+						DEFAULT: 'hsl(var(--card-tuesday))',
+						foreground: 'hsl(var(--card-tuesday-foreground))'
+					},
+					wednesday: {
+						DEFAULT: 'hsl(var(--card-wednesday))',
+						foreground: 'hsl(var(--card-wednesday-foreground))'
+					},
+					thursday: {
+						DEFAULT: 'hsl(var(--card-thursday))',
+						foreground: 'hsl(var(--card-thursday-foreground))'
+					},	
+					friday: {
+						DEFAULT: 'hsl(var(--card-friday))',
+						foreground: 'hsl(var(--card-friday-foreground))'
+					},
+					saturday: {
+						DEFAULT: 'hsl(var(--card-saturday))',
+						foreground: 'hsl(var(--card-saturday-foreground))'
 					}
     			},
     			popover: {

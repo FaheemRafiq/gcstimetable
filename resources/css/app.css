@@ -26,7 +26,7 @@
         --card-foreground: 20 51% 3%;
         --border: 240 15% 94%;
         --input: 240 15% 94%;
-        --primary: 224.3 76.3% 48%;
+        --primary: 240 100% 40%;
         --primary-foreground: 0 0% 100%;
         --secondary: 240 12% 92%;
         --secondary-foreground: 240 12% 32%;
@@ -36,7 +36,7 @@
         --destructive-foreground: 0 0% 100%;
         --success: 120 100% 50%;
         --success-foreground: 120 100% 100%;
-        --ring: 224.3 76.3% 48%;
+        --ring: 240 100% 40%;
         --radius: 0.5rem;
         --chart-1: 12 76% 61%;
         --chart-2: 173 58% 39%;
@@ -44,41 +44,30 @@
         --chart-4: 43 74% 66%;
         --chart-5: 27 87% 67%;
 
-        /* SideBar */
         --sidebar-background: 240 5.9% 10%;
         --sidebar-foreground: 240 4.8% 95.9%;
-        --sidebar-primary: 224.3 76.3% 48%;
+        --sidebar-primary: 240 100% 40%;
         --sidebar-primary-foreground: 0 0% 100%;
         --sidebar-accent: 240 3.7% 15.9%;
         --sidebar-accent-foreground: 240 4.8% 95.9%;
         --sidebar-border: 240 3.7% 15.9%;
         --sidebar-ring: 217.2 91.2% 59.8%;
 
-        /* Table Cards */
         --card-primary: 280 100% 22%;
         --card-primary-foreground: 0 0% 100%;
 
-        /* Light Mode Colors */
         --card-monday: 210 80% 60%;
         --card-monday-foreground: 0 0% 0%;
-
         --card-tuesday: 30 90% 70%;
         --card-tuesday-foreground: 0 0% 20%;
-
         --card-wednesday: 120 80% 50%;
         --card-wednesday-foreground: 0 0% 0%;
-
         --card-thursday: 300 70% 60%;
         --card-thursday-foreground: 0 0% 20%;
-
-        --card-friday: 60 95% 65%;
+        --card-friday: 280 100% 60%;
         --card-friday-foreground: 0 0% 0%;
-
-        --card-saturday: 240 100% 40%;
-        --card-saturday-foreground: 0 0% 100%;
-
-        --card-sunday: 0 80% 80%;
-        --card-sunday-foreground: 0 0% 20%;
+        --card-saturday: 0 80% 80%;
+        --card-saturday-foreground: 0 0% 20%;
     }
 
     .dark {
@@ -93,7 +82,7 @@
         --card-foreground: 253 31% 99%;
         --border: 215 27.9% 16.9%;
         --input: 215 27.9% 16.9%;
-        --primary: 224.3 76.3% 48%;
+        --primary: 240 100% 40%;
         --primary-foreground: 0 0% 100%;
         --secondary: 253 7% 9%;
         --secondary-foreground: 253 7% 69%;
@@ -103,28 +92,25 @@
         --destructive-foreground: 0 0% 100%;
         --success: 120 100% 50%;
         --success-foreground: 120 100% 100%;
-        --ring: 224.3 76.3% 48%;
+        --ring: 240 100% 40%;
         --chart-1: 220 70% 50%;
         --chart-2: 160 60% 45%;
         --chart-3: 30 80% 55%;
         --chart-4: 280 65% 60%;
         --chart-5: 340 75% 55%;
 
-        /* SideBar */
         --sidebar-background: 240 5.9% 10%;
         --sidebar-foreground: 240 4.8% 95.9%;
-        --sidebar-primary: 224.3 76.3% 48%;
+        --sidebar-primary: 240 100% 40%;
         --sidebar-primary-foreground: 0 0% 100%;
         --sidebar-accent: 240 3.7% 15.9%;
         --sidebar-accent-foreground: 240 4.8% 95.9%;
         --sidebar-border: 240 3.7% 15.9%;
         --sidebar-ring: 217.2 91.2% 59.8%;
 
-        /* Table Cards */
         --card-primary: 280 100% 22%;
         --card-primary-foreground: 0 0% 100%;
 
-        /* Dark Mode Colors */
         --card-monday: 210 80% 30%;
         --card-monday-foreground: 0 0% 100%;
 
@@ -137,14 +123,11 @@
         --card-thursday: 300 70% 35%;
         --card-thursday-foreground: 0 0% 80%;
 
-        --card-friday: 60 95% 45%;
+        --card-friday: 280 100% 22%;
         --card-friday-foreground: 0 0% 100%;
-
-        --card-saturday: 240 100% 20%;
-        --card-saturday-foreground: 0 0% 100%;
-
-        --card-sunday: 0 80% 50%;
-        --card-sunday-foreground: 0 0% 80%;
+        
+        --card-saturday: 0 80% 50%;
+        --card-saturday-foreground: 0 0% 80%;
     }
 }
 
