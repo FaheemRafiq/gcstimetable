@@ -38,12 +38,19 @@ import { AllocationCell } from "../TimeTables/Partials/AllocationCell";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useBreadcrumb } from "@/components/providers/breadcrum-provider";
-import { ArrowBigDown, CalendarDays, Group, Table, TimerIcon } from "lucide-react";
+import {
+    ArrowBigDown,
+    CalendarDays,
+    Group,
+    Table,
+    TimerIcon,
+} from "lucide-react";
 import { Book, User, MapPin, Calendar, MoveDown } from "lucide-react";
 import DayCard from "./_components/DayCard";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { getBackgroundColor } from "@/utils/dayHelper";
+import Information from "./_components/Information";
 
 interface FormProps {
     time_table_id: number;
@@ -162,6 +169,10 @@ export default function CreateAllocation({
         return { ...EmptyAllocation, day_id: monday?.id ?? 0 };
     }
 
+    function getSectionLabel(section: ModifiedSection) {
+        return `${getNumberWithOrdinal(section.SemesterNo)} - ${section.name} - ${section.SemesterName}`;
+    }
+
     const filteredCourse: Course[] | [] = useMemo(() => {
         if (data.section_id) {
             let semester = props?.sections?.find(
@@ -229,7 +240,7 @@ export default function CreateAllocation({
         <AuthenticatedLayout user={auth.user}>
             <Head title="Create Allocation" />
             <div className="bg-card text-card-foreground border border-border sm:rounded-lg">
-                <div className="p-6 space-y-4 flex flex-col">
+                <div className="p-2 md:p-6 space-y-4 flex flex-col">
                     {/* Show Allocations */}
 
                     <div className="order-2 md:order-1 w-full shadow-md rounded-lg bg-background px-6 py-4 border border-border">
@@ -339,53 +350,43 @@ export default function CreateAllocation({
                         </CardHeader>
 
                         <CardContent className="mt-4">
-                            <div className="columns-2">
-                                <div className="mb-4 flex">
-                                    <span className="font-bold w-2/12 flex items-center">
-                                        <Table size={18} className="mr-1" />
-                                        TimeTable:{" "}
-                                    </span>
-                                    <span className="flex-1">
-                                        {props?.timetable?.title}
-                                    </span>
-                                </div>
-                                <div className="mb-4 flex">
-                                    <span className="font-bold w-2/12 flex items-center">
-                                        <TimerIcon size={18} className="mr-1" />
-                                        Time Slot:{" "}
-                                    </span>
-                                    <span className="flex-1">
-                                        {props?.slot?.name}
-                                    </span>
-                                </div>
+                            <div className="columns-1 lg:columns-2">
+                                <Information
+                                    icon={Table}
+                                    title="Time Table"
+                                    value={props?.timetable?.title}
+                                />
+                                <Information
+                                    icon={TimerIcon}
+                                    title="Time Slot"
+                                    value={props?.slot?.name}
+                                />
                                 {props.haveSection === true ? (
-                                    <div className="mb-4 flex">
-                                        <span className="font-bold w-2/12 flex items-center">
-                                            <Group size={18} className="mr-1" />
-                                            Section:{" "}
-                                        </span>
-                                        <span className="flex-1">
-                                            {props.sections[0]?.name} -{" "}
-                                            {getNumberWithOrdinal(
-                                                props.sections[0]?.SemesterNo
-                                            )}{" "}
-                                            - {props.sections[0]?.SemesterName}
-                                        </span>
-                                    </div>
+                                    <Information
+                                        icon={Group}
+                                        title="Section"
+                                        value={getSectionLabel(props.sections[0])}
+                                    />
                                 ) : null}
 
-                                {(selectedDay && selectedDay.name) ? (
-                                    <div className="mb-4 flex">
-                                        <span className="font-bold w-2/12 flex items-center">
-                                            <CalendarDays size={18} className="mr-1" />
-                                            Day:{" "}
-                                        </span>
-                                        <span className="flex-1">
-                                            <Badge className={cn("pointer-events-none", getBackgroundColor(selectedDay.name))}>
+                                {selectedDay && selectedDay.name ? (
+                                    <Information
+                                        icon={CalendarDays}
+                                        title="Day"
+                                        value={selectedDay.name}
+                                        jsxValue={
+                                            <Badge
+                                                className={cn(
+                                                    "pointer-events-none",
+                                                    getBackgroundColor(
+                                                        selectedDay.name
+                                                    )
+                                                )}
+                                            >
                                                 {selectedDay.name}
                                             </Badge>
-                                        </span>
-                                    </div>
+                                        }
+                                    />
                                 ) : null}
                             </div>
 
