@@ -123,9 +123,13 @@ class AllocationController extends Controller
         try {
 
             if ($response->allowed()) {
-                Allocation::create($attributes);
+                $allocation = Allocation::create($attributes);
 
-                return back()->with('success', 'Resource successfully created');
+                return redirect()->route('allocations.create', [
+                    'time_table_id' => $allocation->time_table_id,
+                    'section_id' => $allocation->section_id,
+                    'slot_id' => $allocation->slot_id
+                ])->with('success', 'Resource successfully created');
             } else {
                 $message = $response->message();
             }
@@ -136,7 +140,7 @@ class AllocationController extends Controller
             $message = 'Database error 👉 '.$exception->getMessage();
         }
 
-        return back()->with('error', $message);
+        return back()->withErrors('error', $message);
     }
 
     /**

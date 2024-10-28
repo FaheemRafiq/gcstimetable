@@ -219,9 +219,9 @@ export default function CreateAllocation({
 
             // Create New Allocation
             post(route("allocations.store"), {
+                preserveState: true,
                 onSuccess: () => {
-                    reset("room_id", "teacher_id", "course_id");
-                    setSelectedAllocation(EmptyAllocation);
+                    setSelectedAllocation(getDefaultAllocation());
                 },
             });
         }
@@ -458,6 +458,7 @@ export default function CreateAllocation({
                                                 };
                                             }) ?? []
                                         }
+                                        isError={Boolean(errors.room_id)}
                                     />
                                     <InputError message={errors.room_id} />
                                 </div>
@@ -490,6 +491,7 @@ export default function CreateAllocation({
                                                 }
                                             ) ?? []
                                         }
+                                        isError={Boolean(errors.teacher_id)}
                                     />
                                     <InputError message={errors.teacher_id} />
                                 </div>
@@ -522,6 +524,7 @@ export default function CreateAllocation({
                                                 };
                                             }) ?? []
                                         }
+                                        isError={Boolean(errors.course_id)}
                                     />
                                 </div>
                             </div>
