@@ -13,7 +13,7 @@ class TruncateDBTables extends Command
      *
      * @var string
      */
-    protected $signature = 'db:truncate';
+    protected $signature = 'db:truncate {--model=}';
 
     /**
      * The console command description.
@@ -33,22 +33,40 @@ class TruncateDBTables extends Command
         }
 
         $this->truncateAllTables();
-
-        $this->info('All tables truncated successfully.');
     }
 
     public function truncateAllTables()
     {
         Schema::disableForeignKeyConstraints();
 
+        $modelName      = $this->option('model');
+        $modelClass     = sprintf("App\\Models\\%s", $modelName);
+        $modelInstance  = null;
+        
+        if($modelName){
+            if (class_exists($modelClass)) {
+                $modelInstance = resolve($modelClass);
+            } else {
+                $this->fail("Model {$modelName} does not exist.");
+            }
+        }
+        $singleTable    = $modelInstance?->getTable();
+
         $tables = DB::select('SHOW TABLES');
         $tableKey = 'Tables_in_' . env('DB_DATABASE');
 
         foreach ($tables as $table) {
             $tableName = $table->$tableKey;
+
+            if ($singleTable && $singleTable !== $tableName) {
+                continue;
+            }
+
             DB::table($tableName)->truncate();
         }
 
         Schema::enableForeignKeyConstraints();
+
+        $this->info($singleTable ? "Table {$singleTable} truncated successfully." : 'All tables truncated successfully.');
     }
 }

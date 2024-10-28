@@ -92,6 +92,28 @@ class Allocation extends Model
             ->orWhereNull('section_id');
     }
 
+    public function scopeWhereSection($query, $section_id)
+    {
+        return $query->where('section_id', $section_id);
+    }
+
+    public function scopeWhereTimeTable($query, $time_table_id)
+    {
+        return $query->where('time_table_id', $time_table_id);
+    }
+
+    public function scopeConflictForDayAndTime($query, $dayId, $timeTableId, $startTime, $endTime)
+    {
+        return $query->where('day_id', $dayId)
+                     ->whereTimeTable($timeTableId)
+                     ->whereHas('slot', fn ($q) => $q->timeOverlaps($startTime, $endTime));
+    }
+
+    public function scopeExcludeById($query, $excludeId = null)
+    {
+        return $excludeId ? $query->where('id', '!=', $excludeId) : $query;
+    }
+
     // Relationships
     public function course(): BelongsTo
     {

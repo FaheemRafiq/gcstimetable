@@ -211,8 +211,12 @@ export default function CreateAllocation({
     // Submit Form
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+        
+        if (selectedAllocation.id !== 0) {
+            // Update Existing Allocation
+            put(route("allocations.update", selectedAllocation.id));
+        } else {
 
-        if (selectedAllocation.id === 0) {
             // Create New Allocation
             post(route("allocations.store"), {
                 onSuccess: () => {
@@ -220,9 +224,6 @@ export default function CreateAllocation({
                     setSelectedAllocation(EmptyAllocation);
                 },
             });
-        } else {
-            // Update Existing Allocation
-            put(route("allocations.update", selectedAllocation.id));
         }
     };
 
@@ -428,6 +429,7 @@ export default function CreateAllocation({
                                                     }
                                                 ) ?? []
                                             }
+                                            isError={Boolean(errors.section_id)}
                                         />
                                         <InputError
                                             message={errors.section_id}

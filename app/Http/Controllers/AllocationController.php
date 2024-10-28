@@ -17,8 +17,7 @@ use App\Exceptions\AllocationException;
 use Illuminate\Database\QueryException;
 use App\Http\Repositories\SectionRepository;
 use App\Http\Resources\AllocationCollection;
-use App\Http\Requests\UpdateAllocationRequest;
-use App\Http\Requests\Allocation\StoreAllocationRequest;
+use App\Http\Requests\Allocation\AllocationRequest;
 
 class AllocationController extends Controller
 {
@@ -115,11 +114,11 @@ class AllocationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreAllocationRequest $request)
+    public function store(AllocationRequest $request)
     {
 
         $attributes = $request->validated();
-        $response   = Gate::inspect('update', Allocation::class);
+        $response   = Gate::inspect('create', Allocation::class);
         $message    = '';
         try {
 
@@ -163,7 +162,7 @@ class AllocationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateAllocationRequest $request, Allocation $allocation)
+    public function update(AllocationRequest $request, Allocation $allocation)
     {
         $attributes = $request->validated();
 

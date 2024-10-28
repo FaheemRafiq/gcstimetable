@@ -10,7 +10,20 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Slot extends Model
 {
     use HasFactory;
-    //guarded
+
+    // Scopes 
+    
+    public function scopeTimeOverlaps($query, $startTime, $endTime)
+    {
+        return $query->where(function ($q) use ($startTime, $endTime) {
+                $q->whereBetween('start_time', [$startTime, $endTime])
+                  ->orWhereBetween('end_time', [$startTime, $endTime])
+                  ->orWhere(function ($q2) use ($startTime, $endTime) {
+                      $q2->where('start_time', '<=', $startTime)
+                         ->where('end_time', '>=', $endTime);
+                  });
+            });
+    }
 
     // Slot belongs to a Shift
     public function shift(): BelongsTo

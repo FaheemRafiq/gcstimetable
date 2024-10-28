@@ -23,6 +23,7 @@ interface AutoCompleteProps {
     setValue: (value: string) => void;
     values: { value: string; label: string }[];
     disabled?: boolean;
+    isError?: boolean;
 }
 
 export function AutoCompleteSelect({
@@ -31,12 +32,18 @@ export function AutoCompleteSelect({
     setValue,
     values,
     disabled,
+    isError = false,
 }: AutoCompleteProps) {
     const [open, setOpen] = React.useState(false);
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
+            <PopoverTrigger
+                asChild
+                className={cn({
+                    "border-destructive": isError,
+                })}
+            >
                 <Button
                     variant="outline"
                     role="combobox"

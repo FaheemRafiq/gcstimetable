@@ -100,7 +100,8 @@ class TimeTableController extends Controller
                     ->whereHas('semester', fn ($q) => $q->active())
                     ->with(['semester' => function ($query) {
                         $query->select('id', 'name', 'number');
-                    }])->get();
+                    }])
+                    ->get();
 
             }
         }
