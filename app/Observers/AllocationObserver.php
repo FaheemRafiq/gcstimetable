@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Allocation;
+use Illuminate\Support\Facades\DB;
 use App\Exceptions\AllocationException;
 use Illuminate\Validation\ValidationException;
 
@@ -38,12 +39,16 @@ class AllocationObserver
         $allocation->load('slot');
         $currentSlot = $allocation->slot;
 
+        if(!$allocation->hasDay()){
+            throw new AllocationException('Allocation must have a day.');
+        }
+
         if ($allocation->hasRoom() && (!$allocation->hasTeacher() || !$allocation->hasCourse())) {
             throw new AllocationException('Room allocation must have a 🧑‍🏫 teacher and a 📘 course.');
         }
 
         if ($allocation->hasTeacher() && !$allocation->hasCourse()) {
-            throw new AllocationException('Teacher allocation must have a 📘 course.');
+            throw ValidationException::withMessages(['course_id' => 'Teacher allocation must have a course.']);
         }
 
         if ($allocation->hasCourse() && !$allocation->hasSection()) {

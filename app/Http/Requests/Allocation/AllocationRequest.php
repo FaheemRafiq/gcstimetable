@@ -25,7 +25,7 @@ class AllocationRequest extends FormRequest
             'time_table_id' => 'required|integer',
             'slot_id'       => 'required|integer',
             'section_id'    => 'required|integer',
-            'day_id'        => 'required|integer',
+            'day_id'        => 'nullable|integer',
             'room_id'       => 'nullable|integer',
             'teacher_id'    => 'nullable|integer',
             'course_id'     => 'nullable|integer',

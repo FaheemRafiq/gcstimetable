@@ -77,17 +77,23 @@ class AllocationController extends Controller
                 'shift.institution.teachers'  => function ($query) {
                     $query->select('teachers.id', 'teachers.name', 'teachers.email', 'teachers.department_id');
                 },
-                'shift.semesters.courses'
+                'shift.semesters.courses',
+                'allocations' => fn($query) => $query->select('section_id', 'time_table_id')
             ]);
+            $removeSections = $timetable->allocations?->groupBy('section_id')->keys()->toArray();
 
             $slot      = Slot::find($request->slot_id);
             $sections  = $this->sectionRepository->getAllByShiftId($timetable?->shift_id, $request->input('section_id'));
-            // dd($sections, $timetable->id, $request->section_id);
             $courses     = $timetable?->shift?->semesters?->pluck('courses')->flatten();
 
             $allocations = [];
             if ($request->has('section_id')) {
+
                 $allocations = Allocation::where(['time_table_id' => $timetable->id, 'slot_id' => $request->slot_id, 'section_id' => $request->section_id])->withAll()->latest()->get();
+            } else if(count($removeSections) > 0){
+
+                // Remove Sections of that timetable when creating new allocation with no section
+                $sections = $sections->whereNotIn('id', $removeSections)->values();
             }
 
             // Remove the semesters relationship from the timetable object
@@ -140,7 +146,7 @@ class AllocationController extends Controller
             $message = 'Database error 👉 '.$exception->getMessage();
         }
 
-        return back()->withErrors('error', $message);
+        return back()->with('error', $message);
     }
 
     /**

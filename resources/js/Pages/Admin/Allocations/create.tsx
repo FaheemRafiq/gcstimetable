@@ -113,10 +113,10 @@ export default function CreateAllocation({
     // State
     const { setBreadcrumb } = useBreadcrumb();
     const [selectedAllocation, setSelectedAllocation] = useState<Allocation>(
-        props.allocations[0] ?? getDefaultAllocation()
+        getDefaultAllocation()
     );
 
-    const { data, setData, post, put, errors, processing, reset } =
+    const { data, setData, post, put, errors, processing, reset, clearErrors } =
         useForm<FormProps>({
             time_table_id: props?.timetable?.id,
             slot_id: props?.slot?.id,
@@ -162,6 +162,10 @@ export default function CreateAllocation({
     }
 
     function getDefaultAllocation() {
+        if(props.allocations[0]){
+            return props.allocations[0];
+        }
+
         const monday = props?.timetable?.shift?.institution?.days?.find(
             (day) => day.name === "Monday"
         );
@@ -170,7 +174,9 @@ export default function CreateAllocation({
     }
 
     function getSectionLabel(section: ModifiedSection) {
-        return `${section?.SemesterNo ? getNumberWithOrdinal(section.SemesterNo) : ''} - ${section?.name ?? ''} - ${section?.SemesterName ?? ''}`;
+        return `${
+            section?.SemesterNo ? getNumberWithOrdinal(section.SemesterNo) : ""
+        } - ${section?.name ?? ""} - ${section?.SemesterName ?? ""}`;
     }
 
     const filteredCourse: Course[] | [] = useMemo(() => {
@@ -211,17 +217,24 @@ export default function CreateAllocation({
     // Submit Form
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        
+
         if (selectedAllocation.id !== 0) {
             // Update Existing Allocation
             put(route("allocations.update", selectedAllocation.id));
         } else {
-
             // Create New Allocation
             post(route("allocations.store"), {
                 preserveState: true,
                 onSuccess: () => {
+                    reset("course_id", "teacher_id", "room_id");
                     setSelectedAllocation(getDefaultAllocation());
+                },
+                onError: (error) => {
+                    if (error?.error) {
+                        toast({
+                            description: error?.error,
+                        });
+                    }
                 },
             });
         }
@@ -242,7 +255,6 @@ export default function CreateAllocation({
             <Head title="Create Allocation" />
             <div className="bg-card text-card-foreground border border-border sm:rounded-lg">
                 <div className="p-2 md:p-6 space-y-4 flex flex-col">
-
                     {/* Show Allocations */}
                     <div className="order-2 md:order-1 w-full shadow-md rounded-lg bg-background px-6 py-4 border border-border">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
@@ -270,11 +282,12 @@ export default function CreateAllocation({
                                                     selectedAllocation.id ===
                                                         allocation.id
                                                 }
-                                                onClick={() =>
+                                                onClick={() => {
                                                     setSelectedAllocation(
                                                         allocation
-                                                    )
-                                                }
+                                                    );
+                                                    clearErrors();
+                                                }}
                                             >
                                                 <div
                                                     className={cn(
@@ -326,15 +339,16 @@ export default function CreateAllocation({
                                                 selectedAllocation.day_id ===
                                                 day.id
                                             }
-                                            onClick={() =>
+                                            onClick={() => {
                                                 setSelectedAllocation({
                                                     ...EmptyAllocation,
                                                     day_id: day.id,
                                                     slot_id: props.slot.id,
                                                     time_table_id:
                                                         props.timetable.id,
-                                                })
-                                            }
+                                                });
+                                                clearErrors();
+                                            }}
                                         >
                                             Empty
                                         </DayCard>
@@ -366,7 +380,9 @@ export default function CreateAllocation({
                                     <Information
                                         icon={Group}
                                         title="Section"
-                                        value={getSectionLabel(props.sections[0])}
+                                        value={getSectionLabel(
+                                            props.sections[0]
+                                        )}
                                     />
                                 ) : null}
 
@@ -439,7 +455,11 @@ export default function CreateAllocation({
 
                                 {/* Rooms */}
                                 <div className="col-span-12 md:col-span-6">
-                                    <InputLabel htmlFor="room" value="Room" className="mb-1" />
+                                    <InputLabel
+                                        htmlFor="room"
+                                        value="Room"
+                                        className="mb-1"
+                                    />
                                     <AutoCompleteSelect
                                         label="Select Room"
                                         disabled={filteredRooms.length === 0}
