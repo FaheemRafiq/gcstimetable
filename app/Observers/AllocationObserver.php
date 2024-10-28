@@ -32,7 +32,6 @@ class AllocationObserver
          * 1. Time Table
          * 2. Slot
          * 3. Section
-         * 4. Day
          */
 
         $excludeId = $action === 'update' ? $allocation->id : null;
