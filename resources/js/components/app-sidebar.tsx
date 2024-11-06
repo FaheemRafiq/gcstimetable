@@ -18,7 +18,8 @@ import {
   Building,
   CalendarDays,
   LayoutDashboardIcon,
-  GraduationCap
+  GraduationCap,
+  Hourglass
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -36,6 +37,7 @@ import {
 } from "@/components/ui/sidebar"
 import { User } from "@/types"
 import ApplicationLogo from "@/Components/ApplicationLogo"
+import { useAbilities } from "./abilities-provider"
 
 export type Icon = LucideIcon;
 
@@ -48,8 +50,9 @@ export type NavItem = {
   items?: NavItem[];
 };
 
-type NavDataType = {
+export type NavDataType = {
   navMain: NavItem[];
+  navCurriculum: NavItem[];
   navSecondary: any;
   projects: any;
 }
@@ -93,7 +96,33 @@ export const NavData : NavDataType = {
       url: route('rooms.index'),
       isActive: route().current('rooms.index'),
       icon: Building
+    },
+    {
+      title: 'Shifts',
+      url: route('shifts.index'),
+      isActive: route().current('shifts.index'),
+      icon: Hourglass
     }
+  ],
+  navCurriculum: [
+    {
+      title: "Programs",
+      url: route('programs.index'),
+      icon: BookOpen,
+      isActive: route().current('programs.index'),
+    },
+    {
+      title: "Semesters",
+      url: route('semesters.index'),
+      icon: Command,
+      isActive: route().current('semesters.index'),
+    },
+    {
+      title: "Sections",
+      url: route('sections.index'),
+      icon: SquareTerminal,
+      isActive: route().current('sections.index'),
+    },
   ],
   navSecondary: [
     {
@@ -149,7 +178,8 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={NavData.navMain} />
+        <NavMain label="Administration" items={NavData.navMain} />
+        <NavMain label="Academic Structure" items={NavData.navCurriculum} />
         {/* <NavProjects projects={NavData.projects} /> */}
         <NavSecondary items={NavData.navSecondary} className="mt-auto" />
       </SidebarContent>

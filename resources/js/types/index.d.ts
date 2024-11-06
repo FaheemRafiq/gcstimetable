@@ -49,7 +49,8 @@ export type TimeStamp = {
 export type Shift = {
     id: number;
     name: string;
-    comments: string;
+    is_active: "active" | "inactive";
+    program_type: string;
     slots?: Slot[];
 }
 

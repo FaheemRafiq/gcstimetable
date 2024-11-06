@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Models\Shift;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreShiftRequest;
 use App\Http\Requests\UpdateShiftRequest;
-use App\Models\Shift;
 
 class ShiftController extends Controller
 {
@@ -13,7 +15,20 @@ class ShiftController extends Controller
      */
     public function index()
     {
-        //
+        $admin  = Auth::user();
+        $shifts = [];
+
+        if($admin->isSuperAdmin()){
+            $shifts = Shift::all();
+
+        } if($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()){
+
+            $shifts = Shift::whereInstitution($admin->institution_id)->get();
+        }
+        
+        return inertia()->render('Admin/Shifts/index', [
+            'shifts' => $shifts,
+        ]);
     }
 
     /**

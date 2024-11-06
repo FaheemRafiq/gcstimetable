@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Models\Day;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\DayCollection;
 use App\Http\Requests\StoreDayRequest;
 use App\Http\Requests\UpdateDayRequest;
-use App\Http\Resources\DayCollection;
-use App\Models\Day;
 use Illuminate\Database\QueryException;
 
 class DayController extends Controller

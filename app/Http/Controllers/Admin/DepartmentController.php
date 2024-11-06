@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Models\Department;
+use App\Http\Controllers\Controller;
+use Illuminate\Database\QueryException;
+use App\Http\Resources\DepartmentCollection;
 use App\Http\Requests\StoreDepartmentRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
-use App\Http\Resources\DepartmentCollection;
-use App\Models\Department;
-use Illuminate\Database\QueryException;
 
 class DepartmentController extends Controller
 {

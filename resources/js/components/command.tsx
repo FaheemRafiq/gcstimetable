@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/command";
 import { router } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
+import { NavData, NavDataType, NavItem } from "./app-sidebar";
 
 export function CommandDialogDemo() {
     const [open, setOpen] = React.useState(false);
@@ -50,20 +51,66 @@ export function CommandDialogDemo() {
             e.preventDefault();
         }
 
-        handlePageSelect("profile.edit");
+        handlePageSelect(route("profile.edit"));
     };
 
-    const handlePageSelect = (routeName: string) => {
-        router.get(route(routeName));
+    const handlePageSelect = (routePath: string) => {
+        router.get(routePath);
 
         if (open === true) {
             setOpen(false);
         }
     };
 
+    const resolveSideBarNavs = (item: NavItem, index: number) => {
+        let NavItems: React.ReactNode[] = [];
+        if (item.items?.length) {
+            item.items.forEach((subItem, index) => {
+                NavItems.push(
+                    <CommandItem
+                        key={index + subItem.url}
+                        onSelect={() => handlePageSelect(subItem.url)}
+                    >
+                        <subItem.icon className="mr-2 h-4 w-4" />
+                        <span>{subItem.title}</span>
+                    </CommandItem>
+                );
+            });
+        }
+
+        if (NavItems.length === 0) {
+            return (
+                <CommandItem
+                    key={index}
+                    onSelect={() => handlePageSelect(item.url)}
+                >
+                    <item.icon className="mr-2 h-4 w-4" />
+                    <span>{item.title}</span>
+                </CommandItem>
+            );
+        }
+
+        NavItems.push(
+            <CommandItem
+                key={index}
+                onSelect={() => handlePageSelect(item.url)}
+            >
+                <item.icon className="mr-2 h-4 w-4" />
+                <span>{item.title}</span>
+            </CommandItem>
+        );
+
+        return NavItems;
+    };
+
     return (
         <>
-            <Button onClick={() => setOpen(!open)} variant="ghost" size="sm" className="h-7 px-2 flex items-center">
+            <Button
+                onClick={() => setOpen(!open)}
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 flex items-center"
+            >
                 <p className="text-sm text-muted-foreground">
                     Press{" "}
                     <kbd className="pointer-events-none inline-flex h-5 bg-muted border rounded-sm select-none items-center px-1.5 font-mono text-[10px] font-medium opacity-100">
@@ -79,42 +126,9 @@ export function CommandDialogDemo() {
                 <CommandList>
                     <CommandEmpty>No results found.</CommandEmpty>
                     <CommandGroup heading="Pages">
-                        <CommandItem
-                            onSelect={() => handlePageSelect("dashboard")}
-                        >
-                            <LayoutDashboardIcon className="mr-2 h-4 w-4" />
-                            <span>Dashboar</span>
-                        </CommandItem>
-                        <CommandItem
-                            onSelect={() => handlePageSelect("users.index")}
-                        >
-                            <Users className="mr-2 h-4 w-4" />
-                            <span>Users</span>
-                        </CommandItem>
-                        <CommandItem
-                            onSelect={() => handlePageSelect("students.index")}
-                        >
-                            <GraduationCap className="mr-2 h-4 w-4" />
-                            <span>Students</span>
-                        </CommandItem>
-                        <CommandItem
-                            onSelect={() => handlePageSelect("teachers.index")}
-                        >
-                            <User className="mr-2 h-4 w-4" />
-                            <span>Teachers</span>
-                        </CommandItem>
-                        <CommandItem
-                            onSelect={() => handlePageSelect("timetables.index")}
-                        >
-                            <CalendarDays className="mr-2 h-4 w-4" />
-                            <span>Time Tables</span>
-                        </CommandItem>
-                        <CommandItem
-                            onSelect={() => handlePageSelect("rooms.index")}
-                        >
-                            <Building className="mr-2 h-4 w-4" />
-                            <span>Rooms</span>
-                        </CommandItem>
+                        {NavData.navMain.map((item, index) =>
+                            resolveSideBarNavs(item, index)
+                        )}
                     </CommandGroup>
                     <CommandSeparator />
                     <CommandGroup heading="General">

@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use App\Models\Room;
 use Inertia\Inertia;
 use App\Models\Shift;
+use App\Http\Controllers\Controller;
 use App\Http\Resources\RoomResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;

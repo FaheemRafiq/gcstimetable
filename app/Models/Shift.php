@@ -33,6 +33,11 @@ class Shift extends Model
                      ->orWhereRaw('UPPER(name) LIKE ?', ['%INTER%']);
     }
 
+    public function scopeWhereInstitution($query, $value)
+    {
+        return $query->where('institution_id', $value);
+    }
+
     
 
     // has many slots

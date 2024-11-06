@@ -21,8 +21,9 @@ export default function Students({
 
     const columns: ColumnDef<Student>[] = [
         {
-            accessorKey: "id",
+            accessorKey: "index",
             header: "#",
+            cell: ({ row }) => row.index + 1,
         },
         {
             accessorKey: "name",

@@ -7,8 +7,9 @@ import { Actions } from "./actions";
 
 const columns: ColumnDef<Room>[] = [
     {
-        accessorKey: "id",
+        accessorKey: "index",
         header: "#",
+        cell: ({ row }) => row.index + 1,
     },
     {
         accessorKey: "name",

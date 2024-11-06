@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Models\Semester;
+use App\Http\Controllers\Controller;
+use Illuminate\Database\QueryException;
+use App\Http\Resources\SemesterCollection;
 use App\Http\Requests\StoreSemesterRequest;
 use App\Http\Requests\UpdateSemesterRequest;
-use App\Http\Resources\SemesterCollection;
-use App\Models\Semester;
-use Illuminate\Database\QueryException;
 
 class SemesterController extends Controller
 {

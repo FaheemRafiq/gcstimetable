@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use Inertia\Inertia;
 use App\Models\Shift;
@@ -16,7 +16,7 @@ class TimeTableController extends Controller
 {
     public function index()
     {
-        $admin  = Auth::user()->load('roles.permissions');
+        $admin  = Auth::user();
         $tables = [];
 
         if ($admin->isInstitutionAdmin()) {

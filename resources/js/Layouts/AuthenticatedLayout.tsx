@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { cn } from "@/lib/utils";
+import { AbilitiesProvider } from "@/components/abilities-provider";
 
 export default function Authenticated({
     user,
@@ -28,14 +29,16 @@ export default function Authenticated({
     }, [flash]);
 
     return (
-        <SidebarProvider className="h-screen">
-            <AppSidebar user={user} />
-            <SidebarInset className="overflow-hidden">
-                <Header SidebarTrigger={SidebarTrigger} />
-                <ScrollArea className={cn("flex flex-1 flex-col p-4 pt-0")}>
-                    {children}
-                </ScrollArea>
-            </SidebarInset>
-        </SidebarProvider>
+        <AbilitiesProvider user={user}>
+            <SidebarProvider className="h-screen">
+                <AppSidebar user={user} />
+                <SidebarInset className="overflow-hidden">
+                    <Header SidebarTrigger={SidebarTrigger} />
+                    <ScrollArea className={cn("flex flex-1 flex-col p-4 pt-0")}>
+                        {children}
+                    </ScrollArea>
+                </SidebarInset>
+            </SidebarProvider>
+        </AbilitiesProvider>
     );
 }

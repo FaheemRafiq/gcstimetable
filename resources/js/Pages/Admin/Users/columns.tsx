@@ -6,8 +6,9 @@ import { UserActions } from "./actions";
 
 const columns: ColumnDef<UserType>[] = [
     {
-        accessorKey: "id",
+        accessorKey: "index",
         header: "#",
+        cell: ({ row }) => row.index + 1,
     },
     {
         accessorKey: "name",

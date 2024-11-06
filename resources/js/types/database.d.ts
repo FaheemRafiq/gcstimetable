@@ -1,3 +1,5 @@
+import { Shift } from ".";
+
 export type Teacher = {
     id: number;
     name: string;
@@ -125,4 +127,20 @@ export type Semester = {
     is_active: string;
     created_at: string;
     updated_at: string;
+}
+
+export type Program = {
+    id: number;
+    name: string;
+    code: string;
+    duration: number;
+    type: "ADP" | "INTER" | "BS";
+    shift_id: number;
+    department_id: number;
+    created_at: string;
+    updated_at: string;
+
+    // Relations
+    shift?: Shift;
+    department?: Department;
 }

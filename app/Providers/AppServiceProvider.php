@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Allocation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 
@@ -23,5 +24,9 @@ class AppServiceProvider extends ServiceProvider
         Model::unguard();
 
         JsonResource::withoutWrapping();
+
+        Auth::macro('user', function() {
+            return Auth::user();
+        });
     }
 }

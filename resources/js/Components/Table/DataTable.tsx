@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
-    ColumnDef,
     ColumnFiltersState,
     flexRender,
     getCoreRowModel,
@@ -22,10 +21,8 @@ import {
 
 import { DataTableProps, InputProps } from "@/types/data-table";
 
-import InputField from "@/Components/TextInput";
 import { TablePagination } from "./Pagination";
 import { Button } from "@/components/ui/button";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 
 const DefaultInputProps: InputProps = {

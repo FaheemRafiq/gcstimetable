@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Models\Institution;
+use App\Http\Controllers\Controller;
+use Illuminate\Database\QueryException;
 use App\Http\Requests\StoreInstitutionRequest;
 use App\Http\Requests\UpdateInstitutionRequest;
-use App\Models\Institution;
-use Illuminate\Database\QueryException;
 
 class InstitutionController extends Controller
 {

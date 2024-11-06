@@ -35,9 +35,9 @@ export interface Teacher {
 // Extended columns array
 const columns: ColumnDef<Teacher>[] = [
     {
-        accessorKey: "id",
+        accessorKey: "index",
         header: "#",
-        size: 50,
+        cell: ({ row }) => row.index + 1,
     },
     {
         accessorKey: "name",

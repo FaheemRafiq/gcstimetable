@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Models\Program;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\QueryException;
+use App\Http\Resources\ProgramCollection;
 use App\Http\Requests\StoreProgramRequest;
 use App\Http\Requests\UpdateProgramRequest;
-use App\Http\Resources\ProgramCollection;
-use App\Models\Program;
-use Illuminate\Database\QueryException;
 
 class ProgramController extends Controller
 {
@@ -15,15 +17,32 @@ class ProgramController extends Controller
      */
     public function index()
     {
-        // get the department id from the request
+        $admin      = Auth::user();
+        $programs   = [];
 
-        $departmentId = request()->input('department_id');
-
-        // return all programs with proper exception handling just like DepartmentController
         try {
-            return response()->json(new ProgramCollection(Program::all()->where('department_id', $departmentId)->sortByDesc('updated_at')), 200); // 200 OK
+            if ($admin->isSuperAdmin()) {
+                $programs = Program::latest()->get();
+
+            } elseif ($admin->isInstitutionAdmin()) {
+
+                $programs = Program::whereHas("institution", function ($q) use ($admin) {
+                    $q->where('institutions.id', $admin->institution_id);
+                })
+                ->latest()
+                ->get();
+            } elseif ($admin->isDepartmentAdmin()) {
+                $programs = Program::where('department_id', $admin->department_id)
+                ->latest()
+                ->get();
+            }
+
+            return inertia()->render('Admin/Programs/index', [
+                'programs' => new ProgramCollection($programs),
+            ]);
         } catch (QueryException $exception) {
-            return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
+            dd($exception->getMessage());
+            logger($exception->getMessage());
         }
     }
 

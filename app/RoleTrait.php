@@ -14,7 +14,7 @@ trait RoleTrait
         return $this->hasRole(RoleEnum::DEPARTMENT_ADMIN->value);
     }
 
-    public function isSuperadmin(): bool
+    public function isSuperAdmin(): bool
     {
         return $this->hasRole(RoleEnum::SUPER_ADMIN->value);
     }

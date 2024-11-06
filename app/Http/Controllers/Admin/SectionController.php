@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\StoreCourseRequest;
-use App\Http\Requests\UpdateCourseRequest;
-use App\Http\Resources\SemesterCollection;
-use App\Models\Course;
+use App\Models\Section;
+use App\Http\Controllers\Controller;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Log;
+use App\Http\Resources\SectionCollection;
+use App\Http\Requests\StoreSectionRequest;
+use App\Http\Requests\UpdateSectionRequest;
 
-class CourseController extends Controller
+class SectionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,15 +17,14 @@ class CourseController extends Controller
     public function index()
     {
 
-        // get the query parameter from the URL
         $semesterid = request()->input('semester_id');
-        Log::debug('semesterid: '.$semesterid);
 
         try {
-            return response()->json(new SemesterCollection(Course::all()->where('semester_id', $semesterid)->sortByDesc('updated_at')), 200); // 200 OK
+            return response()->json(new SectionCollection(Section::all()->where('semester_id', $semesterid)->sortByDesc('updated_at')), 200); // 200 OK
         } catch (QueryException $exception) {
             return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
         }
+
     }
 
     /**
@@ -39,12 +38,13 @@ class CourseController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCourseRequest $request)
+    public function store(StoreSectionRequest $request)
     {
-        try {
-            $semester = Course::create($request->all());
 
-            return response()->json($semester, 201); // 201 Created
+        try {
+            $section = Section::create($request->all());
+
+            return response()->json($section, 201); // 201 Created
         } catch (QueryException $exception) {
             return response()->json(['error' => 'Constraint violation or other database error'.$exception->getMessage()], 422);
         }
@@ -53,20 +53,20 @@ class CourseController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Course $course)
+    public function show(Section $section)
     {
-
-        if (! $course) {
-            return response()->json(['message' => 'Semester not found'], 404);
+        // write show method like Day show method
+        if (! $section) {
+            return response()->json(['message' => 'Section not found'], 404);
         }
 
-        return response()->json($course);
+        return response()->json($section);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Course $course)
+    public function edit(Section $section)
     {
         //
     }
@@ -74,12 +74,13 @@ class CourseController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCourseRequest $request, Course $course)
+    public function update(UpdateSectionRequest $request, Section $section)
     {
-        try {
-            $course->update($request->all());
 
-            return response()->json($course, 200); // 200 OK
+        try {
+            $section->update($request->all());
+
+            return response()->json($section, 200); // 200 OK
         } catch (QueryException $exception) {
             return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
         }
@@ -88,12 +89,12 @@ class CourseController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Course $course)
+    public function destroy(Section $section)
     {
         try {
-            $course->delete();
+            $section->delete();
 
-            return response()->json(['course' => $course,  'message' => 'Resource successfully deleted'], 200);
+            return response()->json(['section' => $section,  'message' => 'Resource successfully deleted'], 200);
         } catch (QueryException $exception) {
             return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
         }
