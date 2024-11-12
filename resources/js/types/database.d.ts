@@ -72,19 +72,19 @@ export type Allocation = {
     name: string | null;
     day_id: number;
     slot_id: number;
-    teacher_id: number;
-    course_id: number;
-    room_id: number;
+    teacher_id: number | null;
+    course_id: number | null;
+    room_id: number | null;
     section_id: number;
     time_table_id: number;
 
     // Relations
-    day?: Day;
-    slot?: Slot;
+    day: Day;
+    slot: Slot;
     teacher?: Teacher;
     course?: Course;
     room?: Room;
-    section?: Section;
+    section: Section;
 }
 
 export type Course = {

@@ -151,7 +151,7 @@ export function DataTable<TData, TValue>({
                 </div>
             </div>
 
-            <div className="rounded-md border border-border text-foreground">
+            <div className="rounded-md border border-border shadow-md bg-background text-foreground">
                 <Table
                     style={{
                         ...(tableLayout === "fixed" && columnSizeVars),

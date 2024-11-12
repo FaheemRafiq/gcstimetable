@@ -48,9 +48,11 @@ class AllocationPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Allocation $allocation): bool
+    public function delete(User $user, Allocation $allocation): Response
     {
-        //
+        return $user->can(PermissionEnum::DELETE_ALLOCATION->value)
+            ? Response::allow() :
+            Response::deny(config('providers.permission_error_msg'));
     }
 
     /**

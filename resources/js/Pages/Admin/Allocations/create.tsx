@@ -15,12 +15,19 @@ import InputLabel from "@/Components/InputLabel";
 import InputError from "@/Components/InputError";
 import { toast } from "@/hooks/use-toast";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuPortal,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
     Day,
     Instituion,
@@ -41,9 +48,16 @@ import { useBreadcrumb } from "@/components/providers/breadcrum-provider";
 import {
     ArrowBigDown,
     CalendarDays,
+    EllipsisIcon,
+    EllipsisVertical,
     Group,
     Table,
+    Trash,
     TimerIcon,
+    ArrowLeftRight,
+    Mail,
+    MessageSquare,
+    PlusCircle,
 } from "lucide-react";
 import { Book, User, MapPin, Calendar, MoveDown } from "lucide-react";
 import DayCard from "./_components/DayCard";
@@ -51,6 +65,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { getBackgroundColor } from "@/utils/dayHelper";
 import Information from "./_components/Information";
+import DeleteAllocationDialog from "./_components/DeleteAllocationDialog";
 
 interface FormProps {
     time_table_id: number;
@@ -60,6 +75,7 @@ interface FormProps {
     room_id: number | null;
     teacher_id: number | null;
     course_id: number | null;
+    allocation_id: number | null;
 }
 
 type ModifiedSection = {
@@ -91,18 +107,6 @@ interface CreateAllocationProps {
     };
 }
 
-const EmptyAllocation: Allocation = {
-    id: 0,
-    day_id: 0,
-    room_id: 0,
-    teacher_id: 0,
-    course_id: 0,
-    section_id: 0,
-    slot_id: 0,
-    time_table_id: 0,
-    name: "",
-};
-
 export default function CreateAllocation({
     auth,
     props,
@@ -112,8 +116,8 @@ export default function CreateAllocation({
 
     // State
     const { setBreadcrumb } = useBreadcrumb();
-    const [selectedAllocation, setSelectedAllocation] = useState<Allocation>(
-        getDefaultAllocation()
+    const [deleteAllocation, setDeleteAllocation] = useState<number | null>(
+        null
     );
 
     const { data, setData, post, put, errors, processing, reset, clearErrors } =
@@ -126,10 +130,12 @@ export default function CreateAllocation({
             room_id: null,
             teacher_id: null,
             course_id: null,
+            allocation_id: null,
         });
 
     // Life Cycle Hooks
     useEffect(() => {
+        setDefaultValues();
         setBreadcrumb({
             title: "Allocation",
             backItems: [
@@ -145,32 +151,24 @@ export default function CreateAllocation({
         });
     }, [setBreadcrumb]);
 
-    useEffect(() => {
-        if (selectedAllocation) {
+    function setDefaultValues() {
+        if (props.allocations[0]) {
+            const allocation = props.allocations[0];
             setData((data) => ({
                 ...data,
-                day_id: mapZeroToNull(selectedAllocation.day_id),
-                room_id: mapZeroToNull(selectedAllocation.room_id),
-                teacher_id: mapZeroToNull(selectedAllocation.teacher_id),
-                course_id: mapZeroToNull(selectedAllocation.course_id),
+                day_id: allocation.day_id,
+                room_id: allocation.room_id,
+                teacher_id: allocation.teacher_id,
+                course_id: allocation.course_id,
+                allocation_id: allocation.id,
             }));
+        } else {
+            const monday = props?.timetable?.shift?.institution?.days?.find(
+                (day) => day.name === "Monday"
+            );
+
+            setData("day_id", monday?.id ?? null);
         }
-    }, [selectedAllocation]);
-
-    function mapZeroToNull(value: number) {
-        return value === 0 ? null : value;
-    }
-
-    function getDefaultAllocation() {
-        if(props.allocations[0]){
-            return props.allocations[0];
-        }
-
-        const monday = props?.timetable?.shift?.institution?.days?.find(
-            (day) => day.name === "Monday"
-        );
-
-        return { ...EmptyAllocation, day_id: monday?.id ?? 0 };
     }
 
     function getSectionLabel(section: ModifiedSection) {
@@ -210,29 +208,33 @@ export default function CreateAllocation({
 
     const selectedDay = useMemo(() => {
         return props?.timetable?.shift?.institution?.days?.find(
-            (day) => day.id === selectedAllocation.day_id
+            (day) => day.id === data.day_id
         );
-    }, [selectedAllocation]);
+    }, [data.day_id]);
+
+    const allocatedDays = useMemo(() => {
+        return props.allocations.map((allocation) => allocation.day_id);
+    }, [props.allocations]);
 
     // Submit Form
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        if (selectedAllocation.id !== 0) {
+        if (data.allocation_id) {
             // Update Existing Allocation
-            put(route("allocations.update", selectedAllocation.id));
+            put(route("allocations.update", data.allocation_id));
         } else {
             // Create New Allocation
             post(route("allocations.store"), {
                 preserveState: true,
                 onSuccess: () => {
-                    reset("course_id", "teacher_id", "room_id");
-                    setSelectedAllocation(getDefaultAllocation());
+                    setDefaultValues();
                 },
                 onError: (error) => {
-                    if (error?.error) {
+                    if (error.message) {
                         toast({
-                            description: error?.error,
+                            variant: "destructiveOutline",
+                            description: error.message,
                         });
                     }
                 },
@@ -252,7 +254,7 @@ export default function CreateAllocation({
 
     return (
         <AuthenticatedLayout user={auth.user}>
-            <Head title="Create Allocation" />
+            <Head title="Manage Allocation" />
             <div className="bg-card text-card-foreground border border-border sm:rounded-lg">
                 <div className="p-2 md:p-6 space-y-4 flex flex-col">
                     {/* Show Allocations */}
@@ -277,15 +279,23 @@ export default function CreateAllocation({
                                                 key={day.id}
                                                 day={day}
                                                 selected={
-                                                    selectedAllocation.day_id ===
-                                                        day.id &&
-                                                    selectedAllocation.id ===
+                                                    data.day_id === day.id &&
+                                                    data.allocation_id ===
                                                         allocation.id
                                                 }
                                                 onClick={() => {
-                                                    setSelectedAllocation(
-                                                        allocation
-                                                    );
+                                                    setData((prevData) => ({
+                                                        ...prevData,
+                                                        day_id: day.id,
+                                                        allocation_id:
+                                                            allocation.id,
+                                                        room_id:
+                                                            allocation.room_id,
+                                                        teacher_id:
+                                                            allocation.teacher_id,
+                                                        course_id:
+                                                            allocation.course_id,
+                                                    }));
                                                     clearErrors();
                                                 }}
                                             >
@@ -335,22 +345,84 @@ export default function CreateAllocation({
                                         <DayCard
                                             key={day.id}
                                             day={day}
-                                            selected={
-                                                selectedAllocation.day_id ===
-                                                day.id
-                                            }
+                                            selected={data.day_id === day.id}
                                             onClick={() => {
-                                                setSelectedAllocation({
-                                                    ...EmptyAllocation,
+                                                setData((prevData) => ({
+                                                    ...prevData,
                                                     day_id: day.id,
-                                                    slot_id: props.slot.id,
-                                                    time_table_id:
-                                                        props.timetable.id,
-                                                });
+                                                    course_id: null,
+                                                    teacher_id: null,
+                                                    room_id: null,
+                                                    allocation_id: null,
+                                                }));
                                                 clearErrors();
                                             }}
                                         >
-                                            Empty
+                                            {(data.course_id ||
+                                                data.teacher_id ||
+                                                data.room_id) &&
+                                            data.allocation_id === null &&
+                                            data.day_id === day.id ? (
+                                                <div
+                                                    className={cn(
+                                                        "flex items-start justify-center h-full cursor-pointer"
+                                                    )}
+                                                >
+                                                    <div className="flex flex-col mt-2">
+                                                        {data.course_id && (
+                                                            <div className="text-sm flex items-center space-x-2">
+                                                                <Book className="w-4 h-4" />
+                                                                <span>
+                                                                    {
+                                                                        props?.courses.find(
+                                                                            (
+                                                                                course
+                                                                            ) =>
+                                                                                course.id ===
+                                                                                data.course_id
+                                                                        )
+                                                                            ?.display_code
+                                                                    }
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                        {data.teacher_id && (
+                                                            <div className="text-sm flex items-center space-x-2">
+                                                                <User className="w-4 h-4" />
+                                                                <span>
+                                                                    {
+                                                                        props?.timetable?.shift?.institution?.teachers?.find(
+                                                                            (
+                                                                                teacher
+                                                                            ) =>
+                                                                                teacher.id ===
+                                                                                data.teacher_id
+                                                                        )?.name
+                                                                    }
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                        {data.room_id && (
+                                                            <div className="text-sm flex items-center space-x-2">
+                                                                <MapPin className="w-4 h-4" />
+                                                                <span>
+                                                                    {
+                                                                        props?.timetable?.shift?.institution?.rooms?.find(
+                                                                            (
+                                                                                room
+                                                                            ) =>
+                                                                                room.id ===
+                                                                                data.room_id
+                                                                        )?.name
+                                                                    }
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                "Empty"
+                                            )}
                                         </DayCard>
                                     );
                                 }
@@ -358,10 +430,100 @@ export default function CreateAllocation({
                         </div>
                     </div>
 
-                    {/* Create Allocation */}
+                    {/* Manage Allocation */}
                     <Card className="order-1 md:order-2 w-full bg-white shadow-md rounded-lg dark:bg-background border border-border">
-                        <CardHeader className="flex items-center space-x-4">
-                            <CardTitle>Create Allocation</CardTitle>
+                        <CardHeader className="relative flex flex-row items-center justify-center border-b space-x-4">
+                            <CardTitle>Manage Allocation</CardTitle>
+                            <div className="absolute top-0 right-0 p-6">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger
+                                        asChild
+                                        className="cursor-pointer"
+                                    >
+                                        <EllipsisVertical />
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent
+                                        side="left"
+                                        className="w-44"
+                                    >
+                                        <DropdownMenuLabel>
+                                            Operations
+                                        </DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuGroup>
+                                            <DropdownMenuSub>
+                                                <DropdownMenuSubTrigger
+                                                    disabled={
+                                                        allocatedDays.length ===
+                                                        0
+                                                    }
+                                                    className="cursor-pointer"
+                                                >
+                                                    <ArrowLeftRight className="mr-2 h-4 w-4" />
+                                                    <span>Same As</span>
+                                                </DropdownMenuSubTrigger>
+                                                <DropdownMenuPortal>
+                                                    <DropdownMenuSubContent>
+                                                        {allocatedDays.map(
+                                                            (dayId) => {
+                                                                const allocation =
+                                                                    getDayAllocation(
+                                                                        dayId
+                                                                    );
+                                                                return (
+                                                                    <DropdownMenuItem
+                                                                        key={
+                                                                            dayId
+                                                                        }
+                                                                        onClick={() => {
+                                                                            setData(
+                                                                                (
+                                                                                    prevData
+                                                                                ) => ({
+                                                                                    ...prevData,
+                                                                                    room_id:
+                                                                                        allocation?.room_id ??
+                                                                                        null,
+                                                                                    teacher_id:
+                                                                                        allocation?.teacher_id ??
+                                                                                        null,
+                                                                                    course_id:
+                                                                                        allocation?.course_id ??
+                                                                                        null,
+                                                                                })
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        {
+                                                                            allocation
+                                                                                ?.day
+                                                                                ?.name
+                                                                        }
+                                                                    </DropdownMenuItem>
+                                                                );
+                                                            }
+                                                        )}
+                                                    </DropdownMenuSubContent>
+                                                </DropdownMenuPortal>
+                                            </DropdownMenuSub>
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                disabled={
+                                                    data.allocation_id === null
+                                                }
+                                                onClick={() => {
+                                                    setDeleteAllocation(
+                                                        data.allocation_id
+                                                    );
+                                                }}
+                                            >
+                                                <Trash className="mr-2 h-4 w-4" />
+                                                <span>Delete</span>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuGroup>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </CardHeader>
 
                         <CardContent className="mt-4">
@@ -566,6 +728,12 @@ export default function CreateAllocation({
                     </Card>
                 </div>
             </div>
+
+            <DeleteAllocationDialog
+                open={deleteAllocation !== null}
+                onClose={() => setDeleteAllocation(null)}
+                allocation_id={deleteAllocation ?? 0}
+            />
         </AuthenticatedLayout>
     );
 }

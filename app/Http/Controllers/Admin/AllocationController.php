@@ -79,7 +79,7 @@ class AllocationController extends Controller
                     $query->select('teachers.id', 'teachers.name', 'teachers.email', 'teachers.department_id');
                 },
                 'shift.semesters.courses',
-                'allocations' => fn($query) => $query->select('section_id', 'time_table_id')
+                'allocations' => fn ($query) => $query->select('section_id', 'time_table_id')
             ]);
             $removeSections = $timetable->allocations?->groupBy('section_id')->keys()->toArray();
 
@@ -91,7 +91,7 @@ class AllocationController extends Controller
             if ($request->has('section_id')) {
 
                 $allocations = Allocation::where(['time_table_id' => $timetable->id, 'slot_id' => $request->slot_id, 'section_id' => $request->section_id])->withAll()->latest()->get();
-            } else if(count($removeSections) > 0){
+            } elseif (count($removeSections) > 0) {
 
                 // Remove Sections of that timetable when creating new allocation with no section
                 $sections = $sections->whereNotIn('id', $removeSections)->values();
@@ -147,7 +147,7 @@ class AllocationController extends Controller
             $message = 'Database error 👉 '.$exception->getMessage();
         }
 
-        return back()->with('error', $message);
+        return back()->withErrors(['message' => $message]);
     }
 
     /**
@@ -204,12 +204,14 @@ class AllocationController extends Controller
      */
     public function destroy(Allocation $allocation)
     {
-        try {
+        $response = Gate::inspect('delete', $allocation);
+
+        if ($response->allowed()) {
             $allocation->delete();
 
-            return response()->json(['allocation' => $allocation,  'message' => 'Resource successfully deleted'], 200);
-        } catch (QueryException $exception) {
-            return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
+            return back()->with('success', 'Resource successfully deleted');
         }
+
+        return back()->withErrors(['message' => $response->message()]);
     }
 }

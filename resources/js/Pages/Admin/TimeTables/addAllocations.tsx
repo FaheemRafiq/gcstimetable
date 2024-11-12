@@ -78,8 +78,8 @@ export default function AddAllocationsTimeTable({
         <AuthenticatedLayout user={auth.user}>
             <Head title="Add Allocations" />
 
-            <div className="bg-card text-card-foreground border border-border sm:rounded-lg shadow-lg">
-                <div className="p-6 flex flex-col">
+            <div className="bg-card text-card-foreground border border-border sm:rounded-lg">
+                <div className="p-6 pb-10 flex flex-col">
                     {/* Timetable Information */}
                     <div className="w-full text-center relative">
                         <div className="flex gap-4 justify-center items-center">
