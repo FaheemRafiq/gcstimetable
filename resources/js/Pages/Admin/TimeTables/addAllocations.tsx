@@ -27,7 +27,7 @@ export default function AddAllocationsTimeTable({
         }
 
         setBreadcrumb({
-            title: "Add Allocations",
+            title: timetable?.title ?? "Add Allocations",
             backItems: [
                 {
                     title: "Time Tables",

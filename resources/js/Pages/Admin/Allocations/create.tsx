@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import InputLabel from "@/Components/InputLabel";
 import InputError from "@/Components/InputError";
-import { toast } from "@/hooks/use-toast";
+import toast from "react-hot-toast";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -137,14 +137,14 @@ export default function CreateAllocation({
     useEffect(() => {
         setDefaultValues();
         setBreadcrumb({
-            title: "Allocation",
+            title: (props.sections.length > 1 ? null : getSectionLabel(props.sections[0])) ?? "Allocation",
             backItems: [
                 {
                     title: "Time Tables",
                     url: route("timetables.index"),
                 },
                 {
-                    title: "Add Allocations",
+                    title: props.timetable.title ?? "Add Allocations",
                     url: BACK_ROUTE,
                 },
             ],
@@ -232,10 +232,7 @@ export default function CreateAllocation({
                 },
                 onError: (error) => {
                     if (error.message) {
-                        toast({
-                            variant: "destructiveOutline",
-                            description: error.message,
-                        });
+                        toast.error(error.message);
                     }
                 },
             });
@@ -710,7 +707,9 @@ export default function CreateAllocation({
 
             <DeleteAllocationDialog
                 open={deleteAllocation !== null}
-                onClose={() => setDeleteAllocation(null)}
+                onClose={() => {
+                    setDeleteAllocation(null), setDefaultValues();
+                }}
                 allocation_id={deleteAllocation ?? 0}
             />
         </AuthenticatedLayout>

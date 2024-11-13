@@ -6,7 +6,6 @@ import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import AppTheme from "./app-theme";
 import { BreadcrumbProvider } from "@/components/providers/breadcrum-provider";
-import { Toaster } from "@/components/ui/toaster";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -23,7 +22,6 @@ createInertiaApp({
             <AppTheme>
                 <BreadcrumbProvider>
                     <App {...props} />
-                    <Toaster />
                 </BreadcrumbProvider>
             </AppTheme>
         );

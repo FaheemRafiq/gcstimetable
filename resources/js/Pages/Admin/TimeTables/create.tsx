@@ -14,7 +14,7 @@ import {
 import TextInput from "@/Components/TextInput";
 import InputLabel from "@/Components/InputLabel";
 import InputError from "@/Components/InputError";
-import { toast } from "@/hooks/use-toast";
+import toast from "react-hot-toast";
 import {
     Select,
     SelectContent,

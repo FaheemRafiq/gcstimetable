@@ -2,7 +2,7 @@ import React from "react";
 import Modal from "@/Components/Modal";
 import { Button } from "@/components/ui/button";
 import { router } from "@inertiajs/react";
-import { toast } from "@/hooks/use-toast";
+import toast from "react-hot-toast";
 
 interface DeleteAllocationDialogProps {
     open: boolean;
@@ -24,18 +24,16 @@ function DeleteAllocationDialog({
         router.delete(route("allocations.destroy", allocation_id), {
             preserveScroll: true,
             onSuccess: () => {
-                setProcessing(false);
                 onClose();
             },
             onError: (error) => {
                 if (error.message) {
-                    toast({
-                        variant: "destructive",
-                        description: error.message,
-                    });
+                    toast.error(error.message);
                 }
-                setProcessing(false);
             },
+            onFinish: () => {
+                setProcessing(false);
+            }
         });
     }
 

@@ -1,9 +1,8 @@
-import { PropsWithChildren, ReactNode, useEffect } from "react";
+import { PropsWithChildren, useEffect } from "react";
 import { PageProps, User } from "@/types";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import Header from "@/Components/layout/Header";
 import { usePage } from "@inertiajs/react";
-import { toast } from "@/hooks/use-toast";
 import {
     SidebarInset,
     SidebarProvider,
@@ -12,6 +11,7 @@ import {
 import { AppSidebar } from "@/components/app-sidebar";
 import { cn } from "@/lib/utils";
 import { AbilitiesProvider } from "@/components/abilities-provider";
+import toast from "react-hot-toast";
 
 export default function Authenticated({
     user,
@@ -20,11 +20,10 @@ export default function Authenticated({
     const { flash } = usePage<PageProps>().props;
 
     useEffect(() => {
-        if (flash?.error || flash?.success) {
-            toast({
-                variant: flash.error ? "destructiveOutline" : "successOutline",
-                description: flash.error || flash.success,
-            });
+        if (flash?.error) {
+            toast.error(flash?.error);
+        } else if (flash?.success) {
+            toast.success(flash?.success);
         }
     }, [flash]);
 

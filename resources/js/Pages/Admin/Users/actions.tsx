@@ -29,7 +29,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link, router, useForm } from "@inertiajs/react";
 import { UserType, Role } from "@/types";
-import { toast } from "@/hooks/use-toast";
+import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
