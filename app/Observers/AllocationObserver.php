@@ -58,7 +58,7 @@ class AllocationObserver
         if ($allocation->hasRoom()) {
 
             $roomConflict = Allocation::where('room_id', $allocation->room_id)
-                ->conflictForDayAndTime($allocation->day_id, $allocation->time_table_id, $currentSlot->start_time, $currentSlot->end_time)
+                ->conflictForDayAndTime($allocation->day_id, $currentSlot->start_time, $currentSlot->end_time)
                 ->excludeById($excludeId)
                 ->exists();
 
@@ -71,7 +71,7 @@ class AllocationObserver
         if ($allocation->hasTeacher()) {
 
             $teacherConflict = Allocation::where('teacher_id', $allocation->teacher_id)
-                ->conflictForDayAndTime($allocation->day_id, $allocation->time_table_id, $currentSlot->start_time, $currentSlot->end_time)
+                ->conflictForDayAndTime($allocation->day_id, $currentSlot->start_time, $currentSlot->end_time)
                 ->excludeById($excludeId)
                 ->exists();
 
@@ -84,7 +84,7 @@ class AllocationObserver
         if ($allocation->hasCourse() && $allocation->hasSection()) {
 
             $sectionConflict = Allocation::whereSection($allocation->section_id)
-                ->conflictForDayAndTime($allocation->day_id, $allocation->time_table_id, $currentSlot->start_time, $currentSlot->end_time)
+                ->conflictForDayAndTime($allocation->day_id, $currentSlot->start_time, $currentSlot->end_time)
                 ->excludeById($excludeId)
                 ->exists();
 

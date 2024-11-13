@@ -102,10 +102,9 @@ class Allocation extends Model
         return $query->where('time_table_id', $time_table_id);
     }
 
-    public function scopeConflictForDayAndTime($query, $dayId, $timeTableId, $startTime, $endTime)
+    public function scopeConflictForDayAndTime($query, $dayId, $startTime, $endTime)
     {
         return $query->where('day_id', $dayId)
-                     ->whereTimeTable($timeTableId)
                      ->whereHas('slot', fn ($q) => $q->timeOverlaps($startTime, $endTime));
     }
 

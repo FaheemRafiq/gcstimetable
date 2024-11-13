@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,18 +12,20 @@ class Slot extends Model
 {
     use HasFactory;
 
-    // Scopes 
-    
-    public function scopeTimeOverlaps($query, $startTime, $endTime)
+    // Scopes
+
+    public function scopeTimeOverlaps(Builder $query, string $startTime, string $endTime)
     {
+        timeaddminutes($startTime);
+        timeaddminutes($endTime, -1);
         return $query->where(function ($q) use ($startTime, $endTime) {
-                $q->whereBetween('start_time', [$startTime, $endTime])
-                  ->orWhereBetween('end_time', [$startTime, $endTime])
-                  ->orWhere(function ($q2) use ($startTime, $endTime) {
-                      $q2->where('start_time', '<=', $startTime)
-                         ->where('end_time', '>=', $endTime);
-                  });
-            });
+            $q->whereBetween('start_time', [$startTime, $endTime])
+              ->orWhereBetween('end_time', [$startTime, $endTime])
+              ->orWhere(function ($q2) use ($startTime, $endTime) {
+                  $q2->where('start_time', '<=', $startTime)
+                     ->where('end_time', '>=', $endTime);
+              });
+        });
     }
 
     // Slot belongs to a Shift

@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use App\Types\TimeSlot;
 
 function DaystoText($days)
@@ -74,5 +75,11 @@ if (!function_exists('generateAvatar')) {
                      '&color=' . $color;
 
         return $avatarUrl;
+    }
+}
+
+if(!function_exists('timeaddminute')){
+    function timeaddminutes(string &$time, int $mintues = 1){
+        $time = Carbon::parse($time)->addMinutes($mintues)->toTimeString();
     }
 }
