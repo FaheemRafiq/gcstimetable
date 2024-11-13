@@ -271,158 +271,137 @@ export default function CreateAllocation({
                             </div>
                             {props?.timetable?.shift?.institution?.days?.map(
                                 (day) => {
-                                    let allocation = getDayAllocation(day.id);
+                                    const allocation = getDayAllocation(day.id);
+                                    const isSelected =
+                                        data.day_id === day.id &&
+                                        data.allocation_id ===
+                                            (allocation ? allocation.id : null);
 
-                                    if (allocation) {
-                                        return (
-                                            <DayCard
-                                                key={day.id}
-                                                day={day}
-                                                selected={
-                                                    data.day_id === day.id &&
-                                                    data.allocation_id ===
-                                                        allocation.id
-                                                }
-                                                onClick={() => {
-                                                    setData((prevData) => ({
-                                                        ...prevData,
-                                                        day_id: day.id,
-                                                        allocation_id:
-                                                            allocation.id,
-                                                        room_id:
-                                                            allocation.room_id,
-                                                        teacher_id:
-                                                            allocation.teacher_id,
-                                                        course_id:
-                                                            allocation.course_id,
-                                                    }));
-                                                    clearErrors();
-                                                }}
-                                            >
-                                                <div
-                                                    className={cn(
-                                                        "flex items-start justify-center h-full cursor-pointer"
-                                                    )}
-                                                >
-                                                    <div className="flex flex-col mt-2">
-                                                        <div className="text-sm flex items-center space-x-2">
-                                                            <Book className="w-4 h-4" />
-                                                            <span>
-                                                                {
-                                                                    allocation
-                                                                        ?.course
-                                                                        ?.display_code
-                                                                }
-                                                            </span>
-                                                        </div>
-                                                        <div className="text-sm flex items-center space-x-2">
-                                                            <User className="w-4 h-4" />
-                                                            <span>
-                                                                {
-                                                                    allocation
-                                                                        ?.teacher
-                                                                        ?.name
-                                                                }
-                                                            </span>
-                                                        </div>
-                                                        <div className="text-sm flex items-center space-x-2">
-                                                            <MapPin className="w-4 h-4" />
-                                                            <span>
-                                                                {
-                                                                    allocation
-                                                                        ?.room
-                                                                        ?.name
-                                                                }
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </DayCard>
-                                        );
-                                    }
+                                    const handleClick = () => {
+                                        setData((prevData) => ({
+                                            ...prevData,
+                                            day_id: day.id,
+                                            allocation_id: allocation
+                                                ? allocation.id
+                                                : null,
+                                            room_id:
+                                                allocation?.room_id || null,
+                                            teacher_id:
+                                                allocation?.teacher_id || null,
+                                            course_id:
+                                                allocation?.course_id || null,
+                                        }));
+                                        clearErrors();
+                                    };
 
                                     return (
                                         <DayCard
                                             key={day.id}
                                             day={day}
-                                            selected={data.day_id === day.id}
-                                            onClick={() => {
-                                                setData((prevData) => ({
-                                                    ...prevData,
-                                                    day_id: day.id,
-                                                    course_id: null,
-                                                    teacher_id: null,
-                                                    room_id: null,
-                                                    allocation_id: null,
-                                                }));
-                                                clearErrors();
-                                            }}
+                                            selected={isSelected}
+                                            onClick={handleClick}
                                         >
-                                            {(data.course_id ||
-                                                data.teacher_id ||
-                                                data.room_id) &&
-                                            data.allocation_id === null &&
-                                            data.day_id === day.id ? (
-                                                <div
-                                                    className={cn(
-                                                        "flex items-start justify-center h-full cursor-pointer"
-                                                    )}
-                                                >
-                                                    <div className="flex flex-col mt-2">
-                                                        {data.course_id && (
+                                            <div
+                                                className={cn(
+                                                    "flex items-start justify-center h-full cursor-pointer"
+                                                )}
+                                            >
+                                                <div className="flex flex-col mt-2">
+                                                    {allocation ? (
+                                                        <>
                                                             <div className="text-sm flex items-center space-x-2">
                                                                 <Book className="w-4 h-4" />
                                                                 <span>
                                                                     {
-                                                                        props?.courses.find(
-                                                                            (
-                                                                                course
-                                                                            ) =>
-                                                                                course.id ===
-                                                                                data.course_id
-                                                                        )
+                                                                        allocation
+                                                                            .course
                                                                             ?.display_code
                                                                     }
                                                                 </span>
                                                             </div>
-                                                        )}
-                                                        {data.teacher_id && (
                                                             <div className="text-sm flex items-center space-x-2">
                                                                 <User className="w-4 h-4" />
                                                                 <span>
                                                                     {
-                                                                        props?.timetable?.shift?.institution?.teachers?.find(
-                                                                            (
-                                                                                teacher
-                                                                            ) =>
-                                                                                teacher.id ===
-                                                                                data.teacher_id
-                                                                        )?.name
+                                                                        allocation
+                                                                            .teacher
+                                                                            ?.name
                                                                     }
                                                                 </span>
                                                             </div>
-                                                        )}
-                                                        {data.room_id && (
                                                             <div className="text-sm flex items-center space-x-2">
                                                                 <MapPin className="w-4 h-4" />
                                                                 <span>
                                                                     {
-                                                                        props?.timetable?.shift?.institution?.rooms?.find(
-                                                                            (
-                                                                                room
-                                                                            ) =>
-                                                                                room.id ===
-                                                                                data.room_id
-                                                                        )?.name
+                                                                        allocation
+                                                                            .room
+                                                                            ?.name
                                                                     }
                                                                 </span>
                                                             </div>
-                                                        )}
-                                                    </div>
+                                                        </>
+                                                    ) : (data.course_id ||
+                                                          data.teacher_id ||
+                                                          data.room_id) &&
+                                                      data.day_id === day.id ? (
+                                                        <>
+                                                            {data.course_id && (
+                                                                <div className="text-sm flex items-center space-x-2">
+                                                                    <Book className="w-4 h-4" />
+                                                                    <span>
+                                                                        {
+                                                                            props?.courses.find(
+                                                                                (
+                                                                                    course
+                                                                                ) =>
+                                                                                    course.id ===
+                                                                                    data.course_id
+                                                                            )
+                                                                                ?.display_code
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                            {data.teacher_id && (
+                                                                <div className="text-sm flex items-center space-x-2">
+                                                                    <User className="w-4 h-4" />
+                                                                    <span>
+                                                                        {
+                                                                            props?.timetable?.shift?.institution?.teachers?.find(
+                                                                                (
+                                                                                    teacher
+                                                                                ) =>
+                                                                                    teacher.id ===
+                                                                                    data.teacher_id
+                                                                            )
+                                                                                ?.name
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                            {data.room_id && (
+                                                                <div className="text-sm flex items-center space-x-2">
+                                                                    <MapPin className="w-4 h-4" />
+                                                                    <span>
+                                                                        {
+                                                                            props?.timetable?.shift?.institution?.rooms?.find(
+                                                                                (
+                                                                                    room
+                                                                                ) =>
+                                                                                    room.id ===
+                                                                                    data.room_id
+                                                                            )
+                                                                                ?.name
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                        </>
+                                                    ) : (
+                                                        "Empty"
+                                                    )}
                                                 </div>
-                                            ) : (
-                                                "Empty"
-                                            )}
+                                            </div>
                                         </DayCard>
                                     );
                                 }
