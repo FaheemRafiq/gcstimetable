@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use App\Observers\AllocationObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
 /*
 *   Allocation Observer
@@ -113,6 +114,15 @@ class Allocation extends Model
         return $excludeId ? $query->where('id', '!=', $excludeId) : $query;
     }
 
+    public function scopeWhereInstitutionId(Builder $query, $institutionId)
+    {
+        $query->whereHas('timetable', function (Builder $query) use ($institutionId){
+            $query->whereHas('shift', function (Builder $query) use ($institutionId){
+                $query->where('institution_id', $institutionId);
+            });
+        });
+    }
+
     // Relationships
     public function course(): BelongsTo
     {
@@ -146,6 +156,6 @@ class Allocation extends Model
 
     public function timetable(): BelongsTo
     {
-        return $this->belongsTo(TimeTable::class);
+        return $this->belongsTo(TimeTable::class, 'time_table_id');
     }
 }

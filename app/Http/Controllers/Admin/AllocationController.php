@@ -143,9 +143,12 @@ class AllocationController extends Controller
             }
 
         } catch (AllocationException $exception) {
-            $message = 'Constraint violation 👉 '.$exception->getMessage();
+            $message = 'Constraint violation 👉 '. $exception->getMessage();
         } catch (QueryException $exception) {
-            $message = 'Database error 👉 '.$exception->getMessage();
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('allocations')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
         }
 
         return back()->withErrors(['message' => $message]);
