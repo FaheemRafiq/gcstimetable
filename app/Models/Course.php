@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Scopes\SemesterScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -11,11 +10,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Course extends Model
 {
     use HasFactory;
-
-    protected static function booted(): void
-    {
-        parent::addGlobalScope(new SemesterScope);
-    }
 
     // Course my Taught by many Teachers on Different Days
     public function teachers(): BelongsToMany

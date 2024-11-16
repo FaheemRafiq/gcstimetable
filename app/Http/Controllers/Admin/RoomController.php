@@ -10,6 +10,7 @@ use App\Http\Resources\RoomResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\RoomCollection;
+use App\Http\Services\DateTimeService;
 use App\Http\Requests\StoreRoomRequest;
 use Illuminate\Database\QueryException;
 use App\Http\Requests\UpdateRoomRequest;
@@ -25,7 +26,7 @@ class RoomController extends Controller
         $rooms    = [];
         $admin    = Auth::user();
 
-        if($admin->isInstitutionAdmin()){
+        if ($admin->isInstitutionAdmin()) {
             $rooms = new RoomCollection(Room::where('institution_id', $admin->institution_id)->get());
         }
 
@@ -52,7 +53,7 @@ class RoomController extends Controller
     public function store(StoreRoomRequest $request)
     {
         $request->validated();
-        
+
         try {
             $room = Room::create($request->all());
 
@@ -65,20 +66,45 @@ class RoomController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Room $room)
+    public function show($room, DateTimeService $dateTimeService)
     {
-        $room->load('allocations');
-        $shifts = Shift::query()
-                ->when($room->isBsRoom(), fn ($query) => $query->bsRoom())
-                ->when($room->isInterRoom(), fn ($query) => $query->interRoom())
-                ->when($room->isBothInterAndBsRoom(), fn ($query) => $query->bothInterAndBsRoom())
-                ->where('institution_id', $room->institution_id)
-                ->with('slots')
-                ->get();
+        $room = Room::whereKey($room)
+            ->with([
+                'allocations' => function ($query) {
+                    $query->select('id', 'room_id', 'day_id', 'slot_id', 'course_id')
+                        ->with([
+                            'day:id,name',
+                            'slot:id,start_time,end_time',
+                            'course:id,name,type',
+                        ]);
+                }
+            ])
+            ->first();
+
+
+        $events = new \stdClass();
+
+        foreach ($room->allocations as $allocation) {
+            if (isset($allocation->day->name)) {
+                $key = strtolower($allocation->day->name);
+
+                if (!isset($events->$key)) {
+                    $events->$key = [];
+                }
+
+                $events->$key[] = [
+                    'id'        => $allocation->id,
+                    'name'      => $allocation->course->name ?? 'Course',
+                    'type'      => $allocation->course->type ?? 'Lecture',
+                    'startTime' => $dateTimeService->convertToISO8601($allocation->slot->start_time),
+                    'endTime'   => $dateTimeService->convertToISO8601($allocation->slot->end_time),
+                ];
+            }
+        }
 
         return Inertia::render('Admin/Rooms/show', [
-            'room' => $room,
-            'shifts' => $shifts,
+            'room'   => $room,
+            'events' => $events,
         ]);
     }
 
