@@ -19,7 +19,6 @@ export default function ShowRoom({
     room,
     events,
 }: PageProps<ShowRoomProps>) {
-    console.log("ShorRoom -> events", events);
     
     const { setBreadcrumb } = useBreadcrumb();
 

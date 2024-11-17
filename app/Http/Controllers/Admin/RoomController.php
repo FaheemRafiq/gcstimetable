@@ -96,8 +96,8 @@ class RoomController extends Controller
                     'id'        => $allocation->id,
                     'name'      => $allocation->course->name ?? 'Course',
                     'type'      => $allocation->course->type ?? 'Lecture',
-                    'startTime' => $dateTimeService->convertToISO8601($allocation->slot->start_time),
-                    'endTime'   => $dateTimeService->convertToISO8601($allocation->slot->end_time),
+                    'startTime' => "2024-11-17T" . $allocation->slot->start_time,
+                    'endTime'   => "2024-11-17T" . $allocation->slot->end_time,
                 ];
             }
         }
