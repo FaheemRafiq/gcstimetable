@@ -6,6 +6,7 @@ import columns, { Teacher } from "./columns";
 import { ResourcePaginator } from "@/types/data-table";
 import { useBreadcrumb } from "@/components/providers/breadcrum-provider";
 import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function Teachers({
     auth,

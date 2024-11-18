@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Shift;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Database\QueryException;
 use App\Http\Requests\StoreShiftRequest;
 use App\Http\Requests\UpdateShiftRequest;
 
@@ -36,7 +39,27 @@ class ShiftController extends Controller
      */
     public function store(StoreShiftRequest $request)
     {
-        //
+        $attributes = $request->validated();
+        $response   = Gate::inspect('create', Shift::class);
+        $message    = '';
+        try {
+
+            if ($response->allowed() || true) {
+                Shift::create($attributes);
+
+                return back()->with('success', 'Resource successfully created');
+            } else {
+                $message = $response->message();
+            }
+
+        }catch (QueryException $exception) {
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('shifts')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
+        }
+
+        return back()->withErrors(['message' => $message]);
     }
 
     /**

@@ -6,12 +6,11 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreShiftRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
+    public function prepareForValidation(): void
     {
-        return false;
+        $this->merge([
+            'institution_id' => $this->user()->institution_id,
+        ]);
     }
 
     /**
@@ -22,7 +21,10 @@ class StoreShiftRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name'      => ['required', 'string', 'max:255'],
+            'type'      => ['required', 'string', 'in:Morning,Afternoon,Evening'],
+            'program_type'   => ['required', 'string', 'in:INTER,BS,ADP'],
+            'institution_id' => ['required', 'integer'],
         ];
     }
 }

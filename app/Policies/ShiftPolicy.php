@@ -4,6 +4,8 @@ namespace App\Policies;
 
 use App\Models\Shift;
 use App\Models\User;
+use App\PermissionEnum;
+use Illuminate\Auth\Access\Response;
 
 class ShiftPolicy
 {
@@ -26,9 +28,11 @@ class ShiftPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user): Response
     {
-        return true;
+        return $user->can(PermissionEnum::CREATE_SHIFT->value)
+            ? Response::allow()
+            : Response::deny(config('providers.permission_error_msg'));
     }
 
     /**

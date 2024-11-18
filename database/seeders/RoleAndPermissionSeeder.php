@@ -68,6 +68,19 @@ class RoleAndPermissionSeeder extends Seeder
         Permission::create(['name' => PermissionEnum::DELETE_ALLOCATION->value]);
         Permission::create(['name' => PermissionEnum::VIEW_ALLOCATION->value]);
 
+        // Room Module
+        Permission::create(['name' => PermissionEnum::CREATE_ROOM->value]);
+        Permission::create(['name' => PermissionEnum::EDIT_ROOM->value]);
+        Permission::create(['name' => PermissionEnum::DELETE_ROOM->value]);
+        Permission::create(['name' => PermissionEnum::VIEW_ROOM->value]);
+
+        // Shift Module
+        Permission::create(['name' => PermissionEnum::CREATE_SHIFT->value]);
+        Permission::create(['name' => PermissionEnum::EDIT_SHIFT->value]);
+        Permission::create(['name' => PermissionEnum::DELETE_SHIFT->value]);
+        Permission::create(['name' => PermissionEnum::VIEW_SHIFT->value]);
+        
+
 
         // Assign Permissions to Roles
 

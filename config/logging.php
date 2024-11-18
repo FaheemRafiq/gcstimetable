@@ -134,6 +134,13 @@ return [
             'level' => 'debug',
             'days' => 30,
         ],
+
+        'shifts' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/'.now()->toDateString().'/allocations.log'),
+            'level' => 'debug',
+            'days' => 30,
+        ],
     ],
 
 ];

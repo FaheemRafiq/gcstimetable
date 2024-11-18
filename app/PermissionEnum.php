@@ -41,10 +41,15 @@ enum PermissionEnum : string
     case DELETE_ALLOCATION  = 'delete allocation';
     case VIEW_ALLOCATION    = 'view allocation';
 
-    case CREATE_ROOM = 'create room';
-    case EDIT_ROOM = 'edit room';
-    case DELETE_ROOM = 'delete room';
-    case VIEW_ROOM = 'view room';
+    case CREATE_ROOM        = 'create room';
+    case EDIT_ROOM          = 'edit room';
+    case DELETE_ROOM        = 'delete room';
+    case VIEW_ROOM          = 'view room';
+
+    case CREATE_SHIFT       = 'create shift';
+    case EDIT_SHIFT         = 'edit shift';
+    case DELETE_SHIFT       = 'delete shift';
+    case VIEW_SHIFT         = 'view shift';
 
     public static function toArray(): array
     {
