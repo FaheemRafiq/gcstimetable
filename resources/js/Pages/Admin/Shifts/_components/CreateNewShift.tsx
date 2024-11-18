@@ -179,7 +179,7 @@ export function CreateNewShift() {
                                 Close
                             </Button>
                         </SheetClose>
-                        <Button size={"sm"} type="submit">
+                        <Button disabled={processing} size={"sm"} type="submit">
                             Save
                         </Button>
                     </SheetFooter>
