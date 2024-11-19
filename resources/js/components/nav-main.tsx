@@ -19,7 +19,13 @@ import {
 import { NavItem } from "./app-sidebar";
 import { Link } from "@inertiajs/react";
 
-export function NavMain({ label, items }: { label?: string; items: NavItem[] }) {
+export function NavMain({
+    label,
+    items,
+}: {
+    label?: string;
+    items: NavItem[];
+}) {
     return (
         <SidebarGroup>
             <SidebarGroupLabel>{label ? label : "Platform"}</SidebarGroupLabel>
@@ -28,10 +34,14 @@ export function NavMain({ label, items }: { label?: string; items: NavItem[] }) 
                     <Collapsible
                         key={item.title}
                         asChild
-                        defaultOpen={item.isActive}
+                        defaultOpen={item.collaped}
                     >
                         <SidebarMenuItem>
-                            <SidebarMenuButton asChild tooltip={item.title}>
+                            <SidebarMenuButton
+                                asChild
+                                tooltip={item.title}
+                                isActive={item.isActive}
+                            >
                                 <Link href={item.url}>
                                     <item.icon />
                                     <span>{item.title}</span>
@@ -55,6 +65,9 @@ export function NavMain({ label, items }: { label?: string; items: NavItem[] }) 
                                                 >
                                                     <SidebarMenuSubButton
                                                         asChild
+                                                        isActive={
+                                                            subItem.isActive
+                                                        }
                                                     >
                                                         <Link
                                                             href={subItem.url}

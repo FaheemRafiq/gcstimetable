@@ -146,7 +146,7 @@ class RoomController extends Controller
                 return back()->with('message', 'Database error '.$exception->getMessage());
             }
 
-            return back()->with('success', 'User deleted successfully.');
+            return back()->with('success', 'Room deleted successfully.');
         }
 
         return back()->with('error', $response->message());
