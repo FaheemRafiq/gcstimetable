@@ -83,7 +83,7 @@ export function CreateNewShift() {
         });
     };
     return (
-        <Sheet open={open}>
+        <Sheet open={open} onOpenChange={() => setOpen(!open)}>
             <SheetTrigger asChild>
                 <Button onClick={() => setOpen(true)} size={"sm"}>
                     <Plus /> New

@@ -32,7 +32,7 @@ class AllocationPolicy
     {
         return $user->can(PermissionEnum::CREATE_ALLOCATION->value)
                 ? Response::allow() :
-                Response::deny(config('providers.permission_error_msg'));
+                Response::deny(config('providers.permission.action.error'));
     }
 
     /**
@@ -42,7 +42,7 @@ class AllocationPolicy
     {
         return $user->can(PermissionEnum::EDIT_ALLOCATION->value)
             ? Response::allow() :
-            Response::deny(config('providers.permission_error_msg'));
+            Response::deny(config('providers.permission.action.error'));
     }
 
     /**
@@ -52,7 +52,7 @@ class AllocationPolicy
     {
         return $user->can(PermissionEnum::DELETE_ALLOCATION->value)
             ? Response::allow() :
-            Response::deny(config('providers.permission_error_msg'));
+            Response::deny(config('providers.permission.action.error'));
     }
 
     /**

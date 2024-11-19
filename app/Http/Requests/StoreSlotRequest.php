@@ -2,16 +2,16 @@
 
 namespace App\Http\Requests;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreSlotRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
+    public function prepareForValidation(): void
     {
-        return true;
+        $this->merge([
+            'name' => $this->getTimeField('start_time').'-'.$this->getTimeField('end_time'),
+        ]);
     }
 
     /**
@@ -22,7 +22,17 @@ class StoreSlotRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'code'          => ['required', 'string', 'max:255'],
+            'name'          => ['required', 'string', 'max:255'],
+            'shift_id'      => ['required', 'integer'],
+            'start_time'    => ['required', 'date_format:H:i:s'],
+            'end_time'      => ['required', 'date_format:H:i:s'],
+            'is_practical'  => ['required', 'boolean'],
         ];
+    }
+
+    public function getTimeField(string $key)
+    {
+        return $this->input($key) ? Carbon::createFromFormat('H:i:s', $this->$key)->format('h:i') : '';
     }
 }

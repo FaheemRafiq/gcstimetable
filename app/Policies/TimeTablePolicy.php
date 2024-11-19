@@ -32,7 +32,7 @@ class TimeTablePolicy
     {
         return $user->can(PermissionEnum::CREATE_TIMETABLE->value)
             ? Response::allow()
-            : Response::deny(config('providers.permission_error_msg'));
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**
@@ -42,7 +42,7 @@ class TimeTablePolicy
     {
         return $user->can(PermissionEnum::EDIT_TIMETABLE->value)
             ? Response::allow()
-            : Response::deny(config('providers.permission_error_msg'));
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**

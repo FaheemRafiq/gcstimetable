@@ -49,10 +49,11 @@ export type TimeStamp = {
 export type Shift = {
     id: number;
     name: string;
+    type: "Morning" | "Afternoon" | "Evening";
     is_active: "active" | "inactive";
     program_type: string;
     slots?: Slot[];
-}
+};
 
 export type TimeTable = {
     id: number;
@@ -60,8 +61,8 @@ export type TimeTable = {
     description: string;
     shift_id: number;
     shift?: Shift;
-    allocations?: Allocation[]
-}
+    allocations?: Allocation[];
+};
 
 export type PageProps<
     T extends Record<string, unknown> = Record<string, unknown>
@@ -73,5 +74,5 @@ export type PageProps<
     flash: {
         success: string;
         error: string;
-    }
+    };
 };

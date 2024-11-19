@@ -5,8 +5,6 @@ import { DataTable } from "@/Components/Table/DataTable";
 import columns from "./_components/columns";
 import { useBreadcrumb } from "@/components/providers/breadcrum-provider";
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import { CreateNewShift } from "./_components/CreateNewShift";
 
 export default function Rooms({

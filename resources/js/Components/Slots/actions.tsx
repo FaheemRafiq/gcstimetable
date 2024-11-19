@@ -1,39 +1,36 @@
-import { useState } from "react";
-import { EllipsisVertical, Eye, Trash, User as UserIcon } from "lucide-react";
+import React from "react";
+import { EllipsisVertical, Eye, Trash, Pencil } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuPortal,
     DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Fragment } from "react/jsx-runtime";
-import { Link, router, useForm } from "@inertiajs/react";
-import toast from "react-hot-toast";
-import { Shift } from "@/types";
+import { router } from "@inertiajs/react";
+import { Slot } from "@/types/database";
+import { EditSlot } from "@/Components/Slots";
 
-export function Actions({ row }: { row: Shift }) {
-    const handleDelete = (row: Shift) => {
-        router.delete(route("shifts.destroy", row.id), {
+export function Actions({ row }: { row: Slot }) {
+    const [open, setOpen] = React.useState(false);
+
+    const handleDelete = (row: Slot) => {
+        router.delete(route("slots.destroy", row.id), {
             preserveScroll: true,
             preserveState: true,
         });
     };
 
-    function handleView(row: Shift) {
-        router.get(route("shifts.show", row.id));
+    function handleChange() {
+        setOpen(!open);
     }
 
     return (
         <Fragment>
-            <DropdownMenu>
+            <DropdownMenu open={open} onOpenChange={handleChange}>
                 <DropdownMenuTrigger asChild className="cursor-pointer">
                     <EllipsisVertical />
                 </DropdownMenuTrigger>
@@ -41,12 +38,8 @@ export function Actions({ row }: { row: Shift }) {
                     <DropdownMenuLabel>Operations</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                        <DropdownMenuItem
-                            className="cursor-pointer"
-                            onClick={() => handleView(row)}
-                        >
-                            <Eye className="mr-2 h-4 w-4" />
-                            <span>View</span>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                            <EditSlot slot={row} onSuccess={handleChange} />
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             className="cursor-pointer"

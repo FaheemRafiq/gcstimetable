@@ -13,6 +13,8 @@ use App\Http\Requests\UpdateShiftRequest;
 
 class ShiftController extends Controller
 {
+    const ONLY = ['index', 'show', 'store', 'update', 'destroy'];
+
     /**
      * Display a listing of the resource.
      */
@@ -21,14 +23,14 @@ class ShiftController extends Controller
         $admin  = Auth::user();
         $shifts = [];
 
-        if($admin->isSuperAdmin()){
+        if ($admin->isSuperAdmin()) {
             $shifts = Shift::all();
 
-        } if($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()){
+        } if ($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()) {
 
             $shifts = Shift::whereInstitution($admin->institution_id)->get();
         }
-        
+
         return inertia()->render('Admin/Shifts/index', [
             'shifts' => $shifts,
         ]);
@@ -44,7 +46,7 @@ class ShiftController extends Controller
         $message    = '';
         try {
 
-            if ($response->allowed() || true) {
+            if ($response->allowed()) {
                 Shift::create($attributes);
 
                 return back()->with('success', 'Resource successfully created');
@@ -52,7 +54,7 @@ class ShiftController extends Controller
                 $message = $response->message();
             }
 
-        }catch (QueryException $exception) {
+        } catch (QueryException $exception) {
             $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
             Log::channel('shifts')->error('QueryException', $logData);
 
@@ -67,7 +69,18 @@ class ShiftController extends Controller
      */
     public function show(Shift $shift)
     {
-        //
+        $response = Gate::inspect('view', $shift);
+        $message  = '';
+
+        if ($response->allowed()) {
+            return inertia()->render('Admin/Shifts/show', [
+                'shift' => $shift->load('slots'),
+            ]);
+        } else {
+            $message = $response->message();
+        }
+
+        return back()->with('error', $message);
     }
 
     /**
@@ -75,7 +88,27 @@ class ShiftController extends Controller
      */
     public function update(UpdateShiftRequest $request, Shift $shift)
     {
-        //
+        $attributes = $request->validated();
+        $response   = Gate::inspect('update', $shift);
+        $message    = '';
+
+        try {
+            if ($response->allowed()) {
+                $shift->update($attributes);
+
+                return back()->with('success', 'Resource successfully updated');
+            } else {
+                $message = $response->message();
+            }
+
+        } catch (QueryException $exception) {
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('shifts')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
+        }
+
+        return back()->withErrors(['message' => $message]);
     }
 
     /**
@@ -83,6 +116,25 @@ class ShiftController extends Controller
      */
     public function destroy(Shift $shift)
     {
-        //
+        $response = Gate::inspect('delete', $shift);
+        $message  = '';
+
+        try {
+            if ($response->allowed()) {
+                $shift->delete();
+
+                return back()->with('success', 'Resource successfully deleted');
+            } else {
+                $message = $response->message();
+            }
+
+        } catch (QueryException $exception) {
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('shifts')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
+        }
+
+        return back()->with('error', $message);
     }
 }

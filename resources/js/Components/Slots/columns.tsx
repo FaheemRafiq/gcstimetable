@@ -3,9 +3,9 @@ import Tooltip from "@/components/ui/tooltip";
 import { Check, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Actions } from "./actions";
-import { Shift } from "@/types";
+import { Slot } from "@/types/database";
 
-const columns: ColumnDef<Shift>[] = [
+const columns: ColumnDef<Slot>[] = [
     {
         accessorKey: "index",
         header: "#",
@@ -16,29 +16,27 @@ const columns: ColumnDef<Shift>[] = [
         header: "Name",
     },
     {
-        accessorKey: "type",
-        header: "Type",
+        accessorKey: "code",
+        header: "Code",
     },
     {
-        accessorKey: "is_active",
-        header: "Active",
+        accessorKey: "start_time",
+        header: "Start Time",
         cell: ({ row }) => {
-            const isActive = row.original.is_active === "active";
-
             return (
-                <Tooltip title={isActive ? "Active" : "Not Active"}>
-                    {isActive ? <Check color="green" /> : <X color="red" />}
-                </Tooltip>
+                <Badge variant={"secondary"} className="capitalize">
+                    {row.original.start_time}
+                </Badge>
             );
         },
     },
     {
-        accessorKey: "program_type",
-        header: "Program Type",
+        accessorKey: "end_time",
+        header: "End Time",
         cell: ({ row }) => {
             return (
                 <Badge variant={"secondary"} className="capitalize">
-                    {row.original.program_type}
+                    {row.original.end_time}
                 </Badge>
             );
         },
@@ -48,6 +46,19 @@ const columns: ColumnDef<Shift>[] = [
         header: "Actions",
         cell: ({ row }) => {
             return <Actions row={row.original} />;
+        },
+    },
+    {
+        accessorKey: "is_practical",
+        header: "Practical",
+        cell: ({ row }) => {
+            const isPractical = row.original.is_practical === 1;
+
+            return (
+                <Tooltip title={isPractical ? "Practical" : "Not Practical"}>
+                    {isPractical ? <Check color="green" /> : <X color="red" />}
+                </Tooltip>
+            );
         },
     },
 ];

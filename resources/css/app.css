@@ -34,7 +34,7 @@
         --accent-foreground: 240 12% 32%;
         --destructive: 0 100% 50%;
         --destructive-foreground: 0 0% 100%;
-        --success: 120 100% 50%;
+        --success: 120 80% 25%;
         --success-foreground: 120 100% 100%;
         --ring: 240 100% 40%;
         --radius: 0.5rem;
@@ -70,7 +70,7 @@
 
         --card-friday: 280 100% 22%;
         --card-friday-foreground: 0 0% 100%;
-        
+
         --card-saturday: 0 80% 50%;
         --card-saturday-foreground: 0 0% 100%;
     }
@@ -95,7 +95,7 @@
         --accent-foreground: 253 13% 74%;
         --destructive: 0 100% 50%;
         --destructive-foreground: 0 0% 100%;
-        --success: 120 100% 50%;
+        --success: 120 80% 25%;
         --success-foreground: 120 100% 100%;
         --ring: 240 100% 40%;
         --chart-1: 220 70% 50%;
@@ -130,7 +130,7 @@
 
         --card-friday: 280 100% 22%;
         --card-friday-foreground: 0 0% 100%;
-        
+
         --card-saturday: 0 80% 50%;
         --card-saturday-foreground: 0 0% 100%;
     }

@@ -51,48 +51,8 @@ enum PermissionEnum : string
     case DELETE_SHIFT       = 'delete shift';
     case VIEW_SHIFT         = 'view shift';
 
-    public static function toArray(): array
-    {
-        return [
-            'CREATE_USER'       => self::CREATE_USER,
-            'EDIT_USER'         => self::EDIT_USER,
-            'DELETE_USER'       => self::DELETE_USER,
-            'VIEW_USER'         => self::VIEW_USER,
-
-            'CREATE_TEACHER'    => self::CREATE_TEACHER,
-            'EDIT_TEACHER'      => self::EDIT_TEACHER,
-            'DELETE_TEACHER'    => self::DELETE_TEACHER,
-            'VIEW_TEACHER'      => self::VIEW_TEACHER,
-
-            'CREATE_STUDENT'    => self::CREATE_STUDENT,
-            'EDIT_STUDENT'      => self::EDIT_STUDENT,
-            'DELETE_STUDENT'    => self::DELETE_STUDENT,
-            'VIEW_STUDENT'      => self::VIEW_STUDENT,
-
-            'CREATE_INSTITUTE'  => self::CREATE_INSTITUTE,
-            'EDIT_INSTITUTE'    => self::EDIT_INSTITUTE,
-            'DELETE_INSTITUTE'  => self::DELETE_INSTITUTE,
-            'VIEW_INSTITUTE'    => self::VIEW_INSTITUTE,
-
-            'CREATE_DEPARTMENT' => self::CREATE_DEPARTMENT,
-            'EDIT_DEPARTMENT'   => self::EDIT_DEPARTMENT,
-            'DELETE_DEPARTMENT' => self::DELETE_DEPARTMENT,
-            'VIEW_DEPARTMENT'   => self::VIEW_DEPARTMENT,
-
-            'CREATE_TIMETABLE'  => self::CREATE_TIMETABLE,
-            'EDIT_TIMETABLE'    => self::EDIT_TIMETABLE,
-            'DELETE_TIMETABLE'  => self::DELETE_TIMETABLE,
-            'VIEW_TIMETABLE'    => self::VIEW_TIMETABLE,
-
-            'CREATE_ALLOCATION' => self::CREATE_ALLOCATION,
-            'EDIT_ALLOCATION'   => self::EDIT_ALLOCATION,
-            'DELETE_ALLOCATION' => self::DELETE_ALLOCATION,
-            'VIEW_ALLOCATION'   => self::VIEW_ALLOCATION,
-
-            'CREATE_ROOM'       => self::CREATE_ROOM,
-            'EDIT_ROOM'         => self::EDIT_ROOM,
-            'DELETE_ROOM'       => self::DELETE_ROOM,
-            'VIEW_ROOM'         => self::VIEW_ROOM,
-        ];
-    }
+    case CREATE_SLOT        = 'create slot';
+    case EDIT_SLOT          = 'edit slot';
+    case DELETE_SLOT        = 'delete slot';
+    case VIEW_SLOT          = 'view slot';
 }

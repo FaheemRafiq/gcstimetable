@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exceptions\SlotException;
 use App\Models\Slot;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\SlotCollection;
 use App\Http\Requests\StoreSlotRequest;
 use Illuminate\Database\QueryException;
@@ -11,6 +14,8 @@ use App\Http\Requests\UpdateSlotRequest;
 
 class SlotController extends Controller
 {
+    const ONLY = ['index', 'store', 'update', 'destroy'];
+
     /**
      * Display a listing of the resource.
      */
@@ -27,45 +32,36 @@ class SlotController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreSlotRequest $request)
     {
+        $attributes = $request->validated();
+        $response   = Gate::inspect('create', Slot::class);
+        $message    = '';
         try {
-            $semester = Slot::create($request->all());
 
-            return response()->json($semester, 201); // 201 Created
+            if ($response->allowed()) {
+                Slot::create($attributes);
+
+                return back()->with('success', 'Resource successfully created');
+            } else {
+                $message = $response->message();
+            }
+
+        } catch (SlotException $exception) {
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('shifts')->error('QueryException', $logData);
+
+            $message = 'Validation error 👉 ' . $exception->getMessage();
         } catch (QueryException $exception) {
-            return response()->json(['error' => 'Constraint violation or other database error'.$exception->getMessage()], 422);
-        }
-    }
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('shifts')->error('QueryException', $logData);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Slot $slot)
-    {
-        if (! $slot) {
-            return response()->json(['message' => 'Semester not found'], 404);
+            $message = 'Database error 👉 Something went wrong!';
         }
 
-        return response()->json($slot);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Slot $slot)
-    {
-        //
+        return back()->withErrors(['message' => $message]);
     }
 
     /**
@@ -73,13 +69,32 @@ class SlotController extends Controller
      */
     public function update(UpdateSlotRequest $request, Slot $slot)
     {
-        try {
-            $slot->update($request->all());
+        $attributes = $request->validated();
+        $response   = Gate::inspect('update', $slot);
+        $message    = '';
 
-            return response()->json($slot, 200); // 200 OK
+        try {
+            if ($response->allowed()) {
+                $slot->update($attributes);
+
+                return back()->with('success', 'Resource successfully updated');
+            } else {
+                $message = $response->message();
+            }
+
+        } catch (SlotException $exception) {
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('shifts')->error('QueryException', $logData);
+
+            $message = 'Validation error 👉 ' . $exception->getMessage();
         } catch (QueryException $exception) {
-            return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('shifts')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
         }
+
+        return back()->withErrors(['message' => $message]);
     }
 
     /**
@@ -87,12 +102,25 @@ class SlotController extends Controller
      */
     public function destroy(Slot $slot)
     {
-        try {
-            $slot->delete();
+        $response = Gate::inspect('delete', $slot);
+        $message  = '';
 
-            return response()->json(['slot' => $slot,  'message' => 'Resource successfully deleted'], 200);
+        try {
+            if ($response->allowed()) {
+                $slot->delete();
+
+                return back()->with('success', 'Resource successfully deleted');
+            } else {
+                $message = $response->message();
+            }
+
         } catch (QueryException $exception) {
-            return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('shifts')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
         }
+
+        return back()->with('error', $message);
     }
 }

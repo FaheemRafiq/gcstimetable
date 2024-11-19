@@ -38,8 +38,6 @@ class Shift extends Model
         return $query->where('institution_id', $value);
     }
 
-    
-
     // has many slots
     public function slots(): HasMany
     {

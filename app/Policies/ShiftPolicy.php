@@ -20,9 +20,11 @@ class ShiftPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Shift $shift): bool
+    public function view(User $user, Shift $shift): Response
     {
-        //
+        return $user->can(PermissionEnum::VIEW_SHIFT->value)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.view.error'));
     }
 
     /**
@@ -32,23 +34,27 @@ class ShiftPolicy
     {
         return $user->can(PermissionEnum::CREATE_SHIFT->value)
             ? Response::allow()
-            : Response::deny(config('providers.permission_error_msg'));
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Shift $shift): bool
+    public function update(User $user, Shift $shift): Response
     {
-        return true;
+        return $user->can(PermissionEnum::EDIT_SHIFT->value)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Shift $shift): bool
+    public function delete(User $user, Shift $shift): Response
     {
-        return true;
+        return $user->can(PermissionEnum::DELETE_SHIFT->value)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**

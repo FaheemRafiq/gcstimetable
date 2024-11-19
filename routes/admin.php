@@ -46,7 +46,7 @@ Route::prefix('admin')
         Route::resource('rooms', Admin\RoomController::class);
 
         // Shifts ⏲️
-        Route::resource('shifts', Admin\ShiftController::class);
+        Route::resource('shifts', Admin\ShiftController::class)->only(Admin\ShiftController::ONLY);
 
         // Programs 📚
         Route::resource('programs', Admin\ProgramController::class);
@@ -56,4 +56,7 @@ Route::prefix('admin')
 
         // Sections 📂
         Route::resource('sections', Admin\SectionController::class);
+
+        // slots 🎰
+        Route::resource('slots', Admin\SlotController::class)->only(Admin\SlotController::ONLY);
     });
