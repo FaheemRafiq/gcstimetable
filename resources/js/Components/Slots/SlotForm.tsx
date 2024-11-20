@@ -40,12 +40,22 @@ interface FormProps {
 interface SlotFormProps {
     slot?: Slot | null;
     shiftId?: number;
-    onSuccess?: () => void;
+    open?: boolean;
+    onClose?: () => void;
 }
 
-export function SlotForm({ slot, shiftId, onSuccess }: SlotFormProps) {
+export function SlotForm({
+    slot,
+    shiftId,
+    open: openProp = false,
+    onClose,
+}: SlotFormProps) {
     const isEditMode = !!slot;
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = React.useState(openProp);
+
+    React.useEffect(() => {
+        setOpen(openProp);
+    }, [openProp]);
 
     const { data, errors, processing, setData, post, reset, put } =
         useForm<FormProps>({
@@ -53,21 +63,20 @@ export function SlotForm({ slot, shiftId, onSuccess }: SlotFormProps) {
             start_time: slot?.start_time || "07:00:00",
             end_time: slot?.end_time || "08:00:00",
             is_practical: slot?.is_practical.toString() || "0",
-            shift_id: slot?.shift_id || shiftId || 0,
+            shift_id: slot?.shift_id ?? shiftId ?? 0,
         });
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const method = isEditMode ? put : post;
         const routeName = isEditMode ? `slots.update` : `slots.store`;
-        const routeParams = isEditMode ? [slot!.id] : [];
+        const routeParams = isEditMode && slot ? [slot.id] : [];
 
         method(route(routeName, routeParams), {
             preserveState: true,
             onSuccess: () => {
                 reset();
                 setOpen(false);
-                if (onSuccess) onSuccess();
             },
             onError: (error) => {
                 if (error.message) {
@@ -78,13 +87,18 @@ export function SlotForm({ slot, shiftId, onSuccess }: SlotFormProps) {
     };
 
     function handleClose() {
-        setOpen(!open);
-        if (!open) reset();
+        setOpen(false);
+        reset();
+        onClose?.();
     }
 
     function createDateWithTime(timeString = "07:00:00") {
-        const today = new Date().toISOString().split("T")[0];
-        return new Date(`${today}T${timeString || "07:00:00"}`);
+        try {
+            const today = new Date().toISOString().split("T")[0];
+            return new Date(`${today}T${timeString}`);
+        } catch {
+            return new Date();
+        }
     }
 
     function setTimeData(key: keyof FormProps, date: Date | undefined) {
@@ -93,21 +107,13 @@ export function SlotForm({ slot, shiftId, onSuccess }: SlotFormProps) {
 
     return (
         <Sheet open={open} onOpenChange={handleClose}>
-            <SheetTrigger asChild>
-                {isEditMode ? (
-                    <button
-                        onClick={() => setOpen(true)}
-                        className="flex appearance-none w-full"
-                    >
-                        <Pencil className="mr-2 h-4 w-4" />
-                        <span>Edit</span>
-                    </button>
-                ) : (
+            {!isEditMode && (
+                <SheetTrigger asChild>
                     <Button onClick={() => setOpen(true)} size={"sm"}>
                         <Plus /> New
                     </Button>
-                )}
-            </SheetTrigger>
+                </SheetTrigger>
+            )}
             <SheetContent>
                 <form onSubmit={handleSubmit}>
                     <SheetHeader>

@@ -1,6 +1,4 @@
 import { ColumnDef } from "@tanstack/react-table";
-import Tooltip from "@/components/ui/tooltip";
-import { Check, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Actions } from "./actions";
 import { Slot } from "@/types/database";
@@ -55,9 +53,13 @@ const columns: ColumnDef<Slot>[] = [
             const isPractical = row.original.is_practical === 1;
 
             return (
-                <Tooltip title={isPractical ? "Practical" : "Not Practical"}>
-                    {isPractical ? <Check color="green" /> : <X color="red" />}
-                </Tooltip>
+                <>
+                    {isPractical ? (
+                        <Badge variant={"successOutline"}>Yes</Badge>
+                    ) : (
+                        <Badge variant={"destructiveOutline"}>No</Badge>
+                    )}
+                </>
             );
         },
     },

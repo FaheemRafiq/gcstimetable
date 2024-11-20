@@ -36,7 +36,13 @@ class TimeTableController extends Controller
 
     public function create()
     {
-        $shifts = Shift::all();
+        $admin = Auth::user();
+        $shifts = [];
+
+        if ($admin->isInstitutionAdmin()) {
+            $shifts = Shift::where('institution_id', $admin->institution_id)->get();
+        }
+        
         return Inertia::render('Admin/TimeTables/create', [
             'shifts' => $shifts
         ]);
@@ -88,7 +94,7 @@ class TimeTableController extends Controller
 
     public function addAllocations($timetable)
     {
-        $timetable   = TimeTable::where('id', $timetable)->with(['shift.slots', 'allocations' => fn($q) => $q->withAll()])->firstOrFail();
+        $timetable   = TimeTable::where('id', $timetable)->with(['shift.slots', 'allocations' => fn ($q) => $q->withAll()])->firstOrFail();
         $sections    = [];
 
         if ($timetable->allocations) {

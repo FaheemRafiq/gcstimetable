@@ -1,5 +1,5 @@
 import React from "react";
-import { EllipsisVertical, Eye, Trash, Pencil } from "lucide-react";
+import { EllipsisVertical, Pencil, Trash } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -9,28 +9,33 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Fragment } from "react/jsx-runtime";
 import { router } from "@inertiajs/react";
 import { Slot } from "@/types/database";
 import { EditSlot } from "@/Components/Slots";
+import DeleteConfirmationDialog from "../Dialog/DeleteConfirmationDialog";
 
 export function Actions({ row }: { row: Slot }) {
-    const [open, setOpen] = React.useState(false);
+    // Edit State
+    const [openEdit, setOpenEdit] = React.useState(false);
+
+    // Delete Action State
+    const [openConfirm, setOpenConfirm] = React.useState(false);
+    const [deleting, setDeleting] = React.useState(false);
 
     const handleDelete = (row: Slot) => {
+        setDeleting(true);
         router.delete(route("slots.destroy", row.id), {
             preserveScroll: true,
             preserveState: true,
+            onFinish: () => {
+                setDeleting(false);
+            },
         });
     };
 
-    function handleChange() {
-        setOpen(!open);
-    }
-
     return (
-        <Fragment>
-            <DropdownMenu open={open} onOpenChange={handleChange}>
+        <>
+            <DropdownMenu>
                 <DropdownMenuTrigger asChild className="cursor-pointer">
                     <EllipsisVertical />
                 </DropdownMenuTrigger>
@@ -38,12 +43,13 @@ export function Actions({ row }: { row: Slot }) {
                     <DropdownMenuLabel>Operations</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <EditSlot slot={row} onSuccess={handleChange} />
+                        <DropdownMenuItem onSelect={(e) => setOpenEdit(true)}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            <span>Edit</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             className="cursor-pointer"
-                            onClick={() => handleDelete(row)}
+                            onSelect={(e) => setOpenConfirm(true)}
                         >
                             <Trash className="mr-2 h-4 w-4" />
                             <span>Delete</span>
@@ -51,6 +57,25 @@ export function Actions({ row }: { row: Slot }) {
                     </DropdownMenuGroup>
                 </DropdownMenuContent>
             </DropdownMenu>
-        </Fragment>
+
+            {/* Edit Slot Sheet */}
+            <EditSlot
+                open={openEdit}
+                onClose={() => setOpenEdit(false)}
+                slot={row}
+            />
+
+            {/* Slot Delete Confirmation */}
+            <DeleteConfirmationDialog
+                open={openConfirm}
+                onClose={() => setOpenConfirm(false)}
+                onDelete={() => handleDelete(row)}
+                processing={deleting}
+                title="Delete Time Slot?"
+                message="Once a slot is deleted, it cannot be recovered. Are you sure you want to delete this slot?"
+                confirmButtonLabel="Delete Slot"
+                cancelButtonLabel="Cancel"
+            />
+        </>
     );
 }

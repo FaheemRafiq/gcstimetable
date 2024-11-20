@@ -181,7 +181,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
             isActive: route().current(item.route),
         };
 
-        if (NewItem?.collaped) {
+        if (NewItem?.collaped !== undefined) {
             NewItem.collaped = NewItem.items?.some((subItem) =>
                 route().current(subItem.route)
             );
