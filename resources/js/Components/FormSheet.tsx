@@ -10,6 +10,7 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FormSheetProps {
     open: boolean;
@@ -28,9 +29,10 @@ export function FormSheet({
     children,
     footerActions,
 }: FormSheetProps) {
+    const isMobile = useIsMobile();
     return (
         <Sheet open={open} onOpenChange={setOpen}>
-            <SheetContent>
+            <SheetContent side={isMobile ? "bottom" : "right"}>
                 <SheetHeader>
                     <SheetTitle>{title}</SheetTitle>
                     {description && (
