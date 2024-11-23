@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Room;
 use Inertia\Inertia;
 use App\Models\Shift;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RoomResource;
 use Illuminate\Support\Facades\Auth;
@@ -17,17 +18,18 @@ use App\Http\Requests\UpdateRoomRequest;
 
 class RoomController extends Controller
 {
+    public const ONLY = ['index', 'show', 'store', 'update', 'destroy'];
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-
         $rooms    = [];
         $admin    = Auth::user();
 
-        if ($admin->isInstitutionAdmin()) {
-            $rooms = new RoomCollection(Room::where('institution_id', $admin->institution_id)->get());
+        if ($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()) {
+            $rooms = new RoomCollection(Room::where('institution_id', $admin->institution_id)->orderByDesc('created_at')->get());
         }
 
         try {
@@ -40,27 +42,38 @@ class RoomController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreRoomRequest $request)
     {
-        $request->validated();
-
+        $admin      = Auth::user();
+        $attributes = $request->validated();
+        $response   = Gate::inspect('create', Room::class);
+        $message    = '';
         try {
-            $room = Room::create($request->all());
 
-            return response()->json($room, 201); // 201 Created
+            if ($response->allowed()) {
+                $exists = Room::where(['type' => $attributes['type'], 'code' => $attributes['code']])->whereInstitution($admin->institution_id)->exists();
+
+                if ($exists) {
+                    return back()->withErrors(['message' => $attributes['type'] . ' room already exists for ' . $attributes['code']]);
+                }
+
+                Room::create($attributes);
+
+                return back()->with('success', 'Resource successfully created');
+            } else {
+                $message = $response->message();
+            }
+
         } catch (QueryException $exception) {
-            return response()->json(['error' => 'Constraint violation or other database error'.$exception->getMessage()], 422);
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('rooms')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
         }
+
+        return back()->withErrors(['message' => $message]);
     }
 
     /**
@@ -109,26 +122,38 @@ class RoomController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Room $room)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(UpdateRoomRequest $request, Room $room)
     {
-        //write update method like Day update method
+        $admin      = Auth::user();
+        $attributes = $request->validated();
+        $response   = Gate::inspect('update', $room);
+        $message    = '';
         try {
-            $room->update($request->all());
 
-            return response()->json($room, 200); // 200 OK
+            if ($response->allowed()) {
+                $exists = Room::where(['type' => $attributes['type'], 'code' => $attributes['code']])->whereInstitution($admin->institution_id)->where('id', '!=', $room->id)->exists();
+
+                if ($exists) {
+                    return back()->withErrors(['message' => $attributes['code'] . ' room already exists for ' . $attributes['type']]);
+                }
+
+                $room->update($attributes);
+
+                return back()->with('success', 'Resource successfully updated');
+            } else {
+                $message = $response->message();
+            }
+
         } catch (QueryException $exception) {
-            return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('rooms')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
         }
+
+        return back()->withErrors(['message' => $message]);
     }
 
     /**
@@ -143,12 +168,12 @@ class RoomController extends Controller
             try {
                 $room->delete();
             } catch (QueryException $exception) {
-                return back()->with('message', 'Database error '.$exception->getMessage());
+                return back()->with('error', 'Database error '.$exception->getMessage());
             }
 
             return back()->with('success', 'Room deleted successfully.');
         }
 
-        return back()->with('error', $response->message());
+        return back()->withErrors(['message' => $response->message()]);
     }
 }

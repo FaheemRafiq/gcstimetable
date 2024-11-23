@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { EllipsisVertical, Eye, Trash, User as UserIcon } from "lucide-react";
+import {
+    EllipsisVertical,
+    Eye,
+    Pencil,
+    Trash,
+    User as UserIcon,
+} from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -19,8 +25,13 @@ import { Link, router, useForm } from "@inertiajs/react";
 import toast from "react-hot-toast";
 import { Shift } from "@/types";
 import DeleteConfirmationDialog from "@/Components/Dialog/DeleteConfirmationDialog";
+import { ShiftForm } from "./ShiftForm";
 
 export function Actions({ row }: { row: Shift }) {
+    // Edit State
+    const [openEdit, setOpenEdit] = useState(false);
+
+    // Delete Action State
     const [openConfirm, setOpenConfirm] = useState(false);
     const [deleting, setDeleting] = useState(false);
 
@@ -58,6 +69,13 @@ export function Actions({ row }: { row: Shift }) {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             className="cursor-pointer"
+                            onClick={() => setOpenEdit(true)}
+                        >
+                            <Pencil className="mr-2 h-4 w-4" />
+                            <span>Edit</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            className="cursor-pointer"
                             onClick={() => setOpenConfirm(true)}
                         >
                             <Trash className="mr-2 h-4 w-4" />
@@ -66,6 +84,13 @@ export function Actions({ row }: { row: Shift }) {
                     </DropdownMenuGroup>
                 </DropdownMenuContent>
             </DropdownMenu>
+
+            {/* Edit Shift */}
+            <ShiftForm
+                shift={row}
+                open={openEdit}
+                onClose={() => setOpenEdit(false)}
+            />
 
             {/* Shift Delete Confirmation */}
             <DeleteConfirmationDialog

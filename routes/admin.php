@@ -27,23 +27,23 @@ Route::prefix('admin')
         Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('dashboard');
 
         // Users 🧑‍🤝‍🧑
-        Route::resource('users', UserController::class);
+        Route::resource('users', UserController::class)->only(UserController::ONLY);
 
         // Students 🧑‍🎓
-        Route::resource('students', Admin\StudentController::class);
+        Route::resource('students', Admin\StudentController::class)->only(Admin\StudentController::ONLY);
 
         // Teachers 🧑‍🏫
-        Route::resource('teachers', Admin\TeacherController::class);
+        Route::resource('teachers', Admin\TeacherController::class)->only(Admin\TeacherController::ONLY);
 
         // Time Table Resource 📆
-        Route::resource('timetables', Admin\TimeTableController::class);
+        Route::resource('timetables', Admin\TimeTableController::class)->only(Admin\TimeTableController::ONLY);
         Route::get('/timetables/{timetable}/add/allocations', [Admin\TimeTableController::class, 'addAllocations'])->name('timetables.add.allocations');
 
         // Allocations 🔹
-        Route::resource('allocations', Admin\AllocationController::class);
+        Route::resource('allocations', Admin\AllocationController::class)->only(Admin\AllocationController::ONLY);
 
         // Rooms 🏫
-        Route::resource('rooms', Admin\RoomController::class);
+        Route::resource('rooms', Admin\RoomController::class)->only(Admin\RoomController::ONLY);
 
         // Shifts ⏲️
         Route::resource('shifts', Admin\ShiftController::class)->only(Admin\ShiftController::ONLY);

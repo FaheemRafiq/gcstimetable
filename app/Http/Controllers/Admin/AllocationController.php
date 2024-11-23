@@ -23,32 +23,11 @@ use App\Http\Requests\Allocation\AllocationRequest;
 
 class AllocationController extends Controller
 {
+    public const ONLY = ['create', 'store', 'update', 'destroy'];
+
     public function __construct(
         protected SectionRepository $sectionRepository
     ) {
-    }
-
-
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
-    {
-        try {
-
-            $allocations = Allocation::all();
-
-            if ($request->wantsJson()) {
-                return response()->json(new AllocationCollection($allocations));
-            } else {
-                return Inertia::render('AllocationForm', [
-                    'allocations' => new AllocationCollection($allocations),
-                ]);
-            }
-
-        } catch (QueryException $exception) {
-            return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
-        }
     }
 
     /**
@@ -152,26 +131,6 @@ class AllocationController extends Controller
         }
 
         return back()->withErrors(['message' => $message]);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Allocation $allocation)
-    {
-        if (! $allocation) {
-            return response()->json(['message' => 'Resource not found'], 404);
-        }
-
-        return response()->json($allocation);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Allocation $allocation)
-    {
-        //
     }
 
     /**

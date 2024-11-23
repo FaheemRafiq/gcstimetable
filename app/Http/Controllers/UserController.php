@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
+    public const ONLY = ['index', 'destroy'];
+    
     public function index(Request $request)
     {
         $admin  = Auth::user();

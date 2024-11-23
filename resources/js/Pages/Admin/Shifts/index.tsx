@@ -5,7 +5,7 @@ import { DataTable } from "@/Components/Table/DataTable";
 import columns from "./_components/columns";
 import { useBreadcrumb } from "@/components/providers/breadcrum-provider";
 import { useEffect } from "react";
-import { CreateNewShift } from "./_components/CreateNewShift";
+import { ShiftForm } from "./_components/ShiftForm";
 
 export default function Rooms({
     auth,
@@ -25,7 +25,7 @@ export default function Rooms({
             <div className="bg-card text-card-foreground border border-border sm:rounded-lg">
                 <div className="p-6">
                     <div className="flex justify-end">
-                        <CreateNewShift />
+                        <ShiftForm />
                     </div>
                     <DataTable
                         data={shifts}

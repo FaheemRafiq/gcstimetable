@@ -14,6 +14,8 @@ use App\Http\Requests\TimeTable\UpdateTimeTableRequest;
 
 class TimeTableController extends Controller
 {
+    public const ONLY = ['index', 'create', 'store', 'edit', 'update'];
+
     public function index()
     {
         $admin  = Auth::user();
@@ -42,7 +44,7 @@ class TimeTableController extends Controller
         if ($admin->isInstitutionAdmin()) {
             $shifts = Shift::where('institution_id', $admin->institution_id)->get();
         }
-        
+
         return Inertia::render('Admin/TimeTables/create', [
             'shifts' => $shifts
         ]);

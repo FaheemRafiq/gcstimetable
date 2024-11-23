@@ -124,7 +124,8 @@ export default function CreateTimeTable({
                                                     key={shift.id}
                                                     value={shift.id.toString()}
                                                 >
-                                                    {shift.name}
+                                                    {shift.name} -{" "}
+                                                    {shift.program_type}
                                                 </SelectItem>
                                             ))}
                                     </SelectContent>

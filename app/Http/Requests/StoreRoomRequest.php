@@ -6,12 +6,11 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreRoomRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
+    public function prepareForValidation(): void
     {
-        return true;
+        $this->merge([
+            'institution_id' => $this->user()->institution_id ?? null,
+        ]);
     }
 
     /**
@@ -22,7 +21,12 @@ class StoreRoomRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name'           => ['required', 'string', 'max:255'],
+            'code'           => ['required', 'string', 'max:255'],
+            'capacity'       => ['required', 'integer', 'min:1'],
+            'isavailable'    => ['required', 'boolean'],
+            'type'           => ['required', 'string', 'in:INTER,BS,BOTH'],
+            'institution_id' => ['required', 'integer'],
         ];
     }
 }

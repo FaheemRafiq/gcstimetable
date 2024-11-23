@@ -36,6 +36,11 @@ class Room extends Model
         return $query->where('isavailable', 1);
     }
 
+    public function scopeWhereInstitution($query, int $institutionId)
+    {
+        return $query->where('institution_id', $institutionId);
+    }
+
     // Room has many Allocations
     public function allocations(): HasMany
     {

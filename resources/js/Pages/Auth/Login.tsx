@@ -6,6 +6,7 @@ import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 export default function Login({
     status,
@@ -73,7 +74,25 @@ export default function Login({
                 </div>
 
                 <div className="block mt-4">
-                    <label className="flex items-center">
+                    <div className="items-top flex items-center space-x-2">
+                        <Checkbox
+                            id="remember"
+                            name="remember"
+                            checked={data.remember}
+                            onCheckedChange={(checked) =>
+                                setData("remember", Boolean(checked))
+                            }
+                        />
+                        <div className="grid gap-1.5 leading-none">
+                            <Label
+                                htmlFor="remember"
+                                className="text-sm font-medium leading-none"
+                            >
+                                Remember me
+                            </Label>
+                        </div>
+                    </div>
+                    {/* <label className="flex items-center">
                         <Checkbox
                             name="remember"
                             checked={data.remember}
@@ -81,10 +100,10 @@ export default function Login({
                                 setData("remember", Boolean(checked))
                             }
                         />
-                        <span className="ms-2 text-sm text-gray-600 dark:text-gray-400">
+                        <Label className="ms-2 text-sm text-gray-600 dark:text-gray-400">
                             Remember me
-                        </span>
-                    </label>
+                        </Label>
+                    </label> */}
                 </div>
 
                 <div className="flex items-center justify-end mt-4">

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { EllipsisVertical, Pencil, Trash } from "lucide-react";
 import {
     DropdownMenu,
@@ -33,6 +33,14 @@ export function Actions({ row }: { row: Slot }) {
         });
     };
 
+    function handleCloseEdit() {
+        setOpenEdit(false);
+
+        setTimeout(() => {
+            document.body.style.removeProperty("pointer-events");
+        }, 1000);
+    }
+
     return (
         <>
             <DropdownMenu>
@@ -43,13 +51,13 @@ export function Actions({ row }: { row: Slot }) {
                     <DropdownMenuLabel>Operations</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                        <DropdownMenuItem onSelect={(e) => setOpenEdit(true)}>
+                        <DropdownMenuItem onClick={() => setOpenEdit(true)}>
                             <Pencil className="mr-2 h-4 w-4" />
                             <span>Edit</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             className="cursor-pointer"
-                            onSelect={(e) => setOpenConfirm(true)}
+                            onClick={() => setOpenConfirm(true)}
                         >
                             <Trash className="mr-2 h-4 w-4" />
                             <span>Delete</span>
@@ -59,11 +67,7 @@ export function Actions({ row }: { row: Slot }) {
             </DropdownMenu>
 
             {/* Edit Slot Sheet */}
-            <EditSlot
-                open={openEdit}
-                onClose={() => setOpenEdit(false)}
-                slot={row}
-            />
+            <EditSlot open={openEdit} onClose={handleCloseEdit} slot={row} />
 
             {/* Slot Delete Confirmation */}
             <DeleteConfirmationDialog
@@ -72,9 +76,7 @@ export function Actions({ row }: { row: Slot }) {
                 onDelete={() => handleDelete(row)}
                 processing={deleting}
                 title="Delete Time Slot?"
-                message="Once a slot is deleted, it cannot be recovered. Are you sure you want to delete this slot?"
-                confirmButtonLabel="Delete Slot"
-                cancelButtonLabel="Cancel"
+                message={`Once this time slot ${row.name} is deleted, it cannot be recovered. Are you sure you want to delete this slot?`}
             />
         </>
     );

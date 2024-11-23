@@ -2,7 +2,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import { PageProps } from "@/types";
 import { Link } from "@inertiajs/react";
-import { Allocation, Room } from "@/types/database";
+import { Room } from "@/types/database";
 import { Button } from "@/components/ui/button";
 import { useBreadcrumb } from "@/components/providers/breadcrum-provider";
 import { useEffect } from "react";
@@ -19,7 +19,6 @@ export default function ShowRoom({
     room,
     events,
 }: PageProps<ShowRoomProps>) {
-    
     const { setBreadcrumb } = useBreadcrumb();
 
     useEffect(() => {

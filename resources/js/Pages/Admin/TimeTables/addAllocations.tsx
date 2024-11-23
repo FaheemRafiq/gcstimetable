@@ -44,8 +44,11 @@ export default function AddAllocationsTimeTable({
                 allocation.section_id === sectionId
         );
 
-        if(arrayOfAllocations.length > 0) {
-            arrayOfAllocations.sort((acc, curr) => Number(acc.day?.number) - Number(curr.day?.number));
+        if (arrayOfAllocations.length > 0) {
+            arrayOfAllocations.sort(
+                (acc, curr) =>
+                    Number(acc.day?.number) - Number(curr.day?.number)
+            );
         }
 
         return arrayOfAllocations;

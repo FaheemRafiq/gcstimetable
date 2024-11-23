@@ -106,7 +106,7 @@ export type Room = {
     name: string;
     type: string;
     capacity: number;
-    isavailable: number;
+    isavailable: boolean;
     institution_id: number;
     created_at: string;
     updated_at: string;

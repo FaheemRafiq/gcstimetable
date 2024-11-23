@@ -13,7 +13,7 @@ use App\Http\Requests\UpdateShiftRequest;
 
 class ShiftController extends Controller
 {
-    const ONLY = ['index', 'show', 'store', 'update', 'destroy'];
+    public const ONLY = ['index', 'show', 'store', 'update', 'destroy'];
 
     /**
      * Display a listing of the resource.
@@ -41,12 +41,19 @@ class ShiftController extends Controller
      */
     public function store(StoreShiftRequest $request)
     {
+        $admin      = Auth::user();
         $attributes = $request->validated();
         $response   = Gate::inspect('create', Shift::class);
         $message    = '';
         try {
 
             if ($response->allowed()) {
+                $exists = Shift::where(['type' => $attributes['type'], 'program_type' => $attributes['program_type']])->whereInstitution($admin->institution_id)->exists();
+
+                if ($exists) {
+                    return back()->withErrors(['message' => $attributes['type'] . ' shift already exists for ' . $attributes['program_type']]);
+                }
+
                 Shift::create($attributes);
 
                 return back()->with('success', 'Resource successfully created');
