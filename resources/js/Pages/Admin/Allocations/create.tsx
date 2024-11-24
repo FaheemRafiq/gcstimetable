@@ -41,7 +41,6 @@ import {
 } from "@/types/database";
 import { AutoCompleteSelect } from "@/components/combobox";
 import { formatTime, getNumberWithOrdinal } from "@/utils/helper";
-import { AllocationCell } from "../TimeTables/Partials/AllocationCell";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useBreadcrumb } from "@/components/providers/breadcrum-provider";
@@ -55,9 +54,6 @@ import {
     Trash,
     TimerIcon,
     ArrowLeftRight,
-    Mail,
-    MessageSquare,
-    PlusCircle,
 } from "lucide-react";
 import { Book, User, MapPin, Calendar, MoveDown } from "lucide-react";
 import DayCard from "./_components/DayCard";
@@ -137,7 +133,10 @@ export default function CreateAllocation({
     useEffect(() => {
         setDefaultValues();
         setBreadcrumb({
-            title: (props.sections.length > 1 ? null : getSectionLabel(props.sections[0])) ?? "Allocation",
+            title:
+                (props.sections.length > 1
+                    ? null
+                    : getSectionLabel(props.sections[0])) ?? "Allocation",
             backItems: [
                 {
                     title: "Time Tables",
@@ -600,7 +599,6 @@ export default function CreateAllocation({
                                     />
                                     <AutoCompleteSelect
                                         label="Select Room"
-                                        disabled={filteredRooms.length === 0}
                                         value={data.room_id?.toString() ?? null}
                                         setValue={(value: string) => {
                                             setData(
@@ -664,7 +662,6 @@ export default function CreateAllocation({
 
                                     <AutoCompleteSelect
                                         label="Select Course"
-                                        disabled={filteredCourse.length === 0}
                                         value={
                                             data.course_id?.toString() ?? null
                                         }

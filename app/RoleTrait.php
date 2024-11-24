@@ -6,7 +6,7 @@ trait RoleTrait
 {
     public function isInstitutionAdmin(): bool
     {
-        return $this->hasRole(RoleEnum::INSTITUTE_ADMIN->value);
+        return $this->hasRole(RoleEnum::INSTITUTION_ADMIN->value);
     }
 
     public function isDepartmentAdmin(): bool

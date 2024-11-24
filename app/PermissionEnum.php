@@ -60,4 +60,19 @@ enum PermissionEnum : string
     case EDIT_PROGRAM       = 'edit program';
     case DELETE_PROGRAM     = 'delete program';
     case VIEW_PROGRAM       = 'view program';
+
+    case CREATE_COURSE      = 'create course';
+    case EDIT_COURSE        = 'edit course';
+    case DELETE_COURSE      = 'delete course';
+    case VIEW_COURSE        = 'view course';
+
+    case CREATE_SEMESTER    = 'create semester';
+    case EDIT_SEMESTER      = 'edit semester';
+    case DELETE_SEMESTER    = 'delete semester';
+    case VIEW_SEMESTER      = 'view semester';
+
+    case CREATE_DAY         = 'create day';
+    case EDIT_DAY           = 'edit day';
+    case DELETE_DAY         = 'delete day';
+    case VIEW_DAY           = 'view day';
 }

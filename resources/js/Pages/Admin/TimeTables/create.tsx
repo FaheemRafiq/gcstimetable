@@ -1,3 +1,4 @@
+import React, { useEffect } from "react";
 import { FormEventHandler } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
@@ -23,6 +24,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { useBreadcrumb } from "@/components/providers/breadcrum-provider";
 
 interface FormProps {
     title: string;
@@ -40,6 +42,20 @@ export default function CreateTimeTable({
             description: "",
             shift_id: null,
         });
+
+    const { setBreadcrumb } = useBreadcrumb();
+
+    useEffect(() => {
+        setBreadcrumb({
+            title: "Create",
+            backItems: [
+                {
+                    title: "Time Tables",
+                    url: route("timetables.index"),
+                },
+            ],
+        });
+    }, [setBreadcrumb]);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();

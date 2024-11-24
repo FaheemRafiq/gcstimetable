@@ -20,11 +20,12 @@ class UserResource extends JsonResource
             'email'         => $this->email,
             'createdAt'     => $this->created_at?->format(config('providers.date.readable')),
             'verifiedAt'    => $this->email_verified_at?->format(config('providers.date.readable')),
-            
+
             'profilePhotoUrl'   => $this->profile_photo_url,
             'label'             => $this->label,
             'roles'             => RoleResource::collection($this->roles),
             'permissions'       => PermissionResource::collection($this->getAllPermissions()),
+            'institution'       => $this->institution
         ];
     }
 

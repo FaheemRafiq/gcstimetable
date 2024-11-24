@@ -124,20 +124,6 @@ export const NavData: NavDataType = {
             icon: BookOpen,
             isActive: route().current("programs.index"),
         },
-        {
-            title: "Semesters",
-            route: "semesters.index",
-            url: route("semesters.index"),
-            icon: Command,
-            isActive: route().current("semesters.index"),
-        },
-        {
-            title: "Sections",
-            route: "sections.index",
-            url: route("sections.index"),
-            icon: SquareTerminal,
-            isActive: route().current("sections.index"),
-        },
     ],
     navSecondary: [
         {
@@ -212,10 +198,10 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
                                 <ApplicationLogo />
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-semibold">
-                                        Time Table
+                                        {user.label ?? "Time Table"}
                                     </span>
                                     <span className="truncate text-xs">
-                                        Enterprise
+                                        {user.institution?.name ?? "Enterprise"}
                                     </span>
                                 </div>
                             </a>

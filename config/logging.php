@@ -162,6 +162,13 @@ return [
             'level' => 'debug',
             'days' => 30,
         ],
+
+        'semesters' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/'.now()->toDateString().'/semesters.log'),
+            'level' => 'debug',
+            'days' => 30,
+        ],
     ],
 
 ];

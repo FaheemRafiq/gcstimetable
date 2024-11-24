@@ -54,6 +54,8 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
         if ($user) {
+            $user->load('institution:id,name');
+            
             return new UserResource($user);
         }
 

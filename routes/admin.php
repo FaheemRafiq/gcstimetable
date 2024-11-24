@@ -49,10 +49,10 @@ Route::prefix('admin')
         Route::resource('shifts', Admin\ShiftController::class)->only(Admin\ShiftController::ONLY);
 
         // Programs 📚
-        Route::resource('programs', Admin\ProgramController::class);
+        Route::resource('programs', Admin\ProgramController::class)->only(Admin\ProgramController::ONLY);
 
         // Semesters 📅
-        Route::resource('semesters', Admin\SemesterController::class);
+        Route::resource('semesters', Admin\SemesterController::class)->only(Admin\SemesterController::ONLY);
 
         // Sections 📂
         Route::resource('sections', Admin\SectionController::class);

@@ -18,7 +18,6 @@ export default function TimeTables({
     auth,
     timeTables,
 }: PageProps & { timeTables: TimeTable[] }) {
-
     const { setBreadcrumb } = useBreadcrumb();
 
     useEffect(() => {
@@ -35,9 +34,7 @@ export default function TimeTables({
                 <div className="p-6 flex justify-end cursor-pointer">
                     <Tooltip title="Add New Table">
                         <Link href={route("timetables.create")}>
-                            <Button size={"icon"}>
-                                <Plus size={15} />
-                            </Button>
+                            <Button size={"sm"}>Create Table</Button>
                         </Link>
                     </Tooltip>
                 </div>
@@ -77,7 +74,9 @@ export default function TimeTables({
                                         className="p-2 ml-auto"
                                     >
                                         <Tooltip title="Add Allocations">
-                                            <Button size={"sm"}>Allocations</Button>
+                                            <Button size={"sm"}>
+                                                Allocations
+                                            </Button>
                                         </Tooltip>
                                     </Link>
                                 </div>

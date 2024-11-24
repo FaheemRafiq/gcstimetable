@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Shift;
+use App\Http\Requests\ShiftRequest;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\QueryException;
-use App\Http\Requests\StoreShiftRequest;
-use App\Http\Requests\UpdateShiftRequest;
 
 class ShiftController extends Controller
 {
@@ -39,21 +38,14 @@ class ShiftController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreShiftRequest $request)
+    public function store(ShiftRequest $request)
     {
-        $admin      = Auth::user();
         $attributes = $request->validated();
         $response   = Gate::inspect('create', Shift::class);
         $message    = '';
         try {
 
             if ($response->allowed()) {
-                $exists = Shift::where(['type' => $attributes['type'], 'program_type' => $attributes['program_type']])->whereInstitution($admin->institution_id)->exists();
-
-                if ($exists) {
-                    return back()->withErrors(['message' => $attributes['type'] . ' shift already exists for ' . $attributes['program_type']]);
-                }
-
                 Shift::create($attributes);
 
                 return back()->with('success', 'Shift successfully created');
@@ -93,7 +85,7 @@ class ShiftController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateShiftRequest $request, Shift $shift)
+    public function update(ShiftRequest $request, Shift $shift)
     {
         $attributes = $request->validated();
         $response   = Gate::inspect('update', $shift);

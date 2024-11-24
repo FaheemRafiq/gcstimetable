@@ -13,7 +13,11 @@ class Shift extends Model
     use HasFactory;
     use IsActiveTrait;
 
-    // guarded
+    public const TYPES = [
+        'Morning'   => 'Morning',
+        'Afternoon' => 'Afternoon',
+        'Evening'   => 'Evening',
+    ];
 
     // Scopes
 
@@ -55,7 +59,7 @@ class Shift extends Model
         return $this->belongsTo(Institution::class);
     }
 
-    public function semesters() 
+    public function semesters()
     {
         return $this->hasManyThrough(Semester::class, Program::class);
     }

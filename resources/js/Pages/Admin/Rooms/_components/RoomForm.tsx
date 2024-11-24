@@ -85,7 +85,9 @@ export const RoomForm: React.FC<RoomFormProps> = ({
                 onClose?.();
             },
             onError: (error) => {
-                toast.error(error.message || "An error occurred.");
+                if(error.message){
+                    toast.error(error.message);
+                }
             },
         });
     };
@@ -109,9 +111,7 @@ export const RoomForm: React.FC<RoomFormProps> = ({
             <FormSheet
                 open={open}
                 setOpen={handleOpen}
-                title={
-                    isEditForm ? `Edit Shift: ${room?.name}` : "Create Shift"
-                }
+                title={isEditForm ? `Edit Room: ${room?.name}` : "Create Room"}
                 description={`Fill the required fields to ${
                     isEditForm ? "update the room." : "create a new room."
                 }`}

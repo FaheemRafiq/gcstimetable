@@ -1,11 +1,10 @@
 import { ColumnDef } from "@tanstack/react-table";
-import Tooltip from "@/components/ui/tooltip";
-import { Check, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Actions } from "./actions";
-import { Shift } from "@/types";
+import { Semester } from "@/types/database";
+import { getNumberWithOrdinal } from "@/utils/helper";
 
-const columns: ColumnDef<Shift>[] = [
+const columns: ColumnDef<Semester>[] = [
     {
         accessorKey: "index",
         header: "#",
@@ -16,8 +15,9 @@ const columns: ColumnDef<Shift>[] = [
         header: "Name",
     },
     {
-        accessorKey: "type",
-        header: "Type",
+        accessorKey: "number",
+        header: "No.",
+        cell: ({ row }) => getNumberWithOrdinal(row.original.number),
     },
     {
         accessorKey: "is_active",
@@ -33,17 +33,6 @@ const columns: ColumnDef<Shift>[] = [
                         <Badge variant={"destructiveOutline"}>No</Badge>
                     )}
                 </>
-            );
-        },
-    },
-    {
-        accessorKey: "program_type",
-        header: "Program Type",
-        cell: ({ row }) => {
-            return (
-                <Badge variant={"secondary"} className="capitalize">
-                    {row.original.program_type}
-                </Badge>
             );
         },
     },

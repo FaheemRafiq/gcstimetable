@@ -4,6 +4,9 @@ namespace App;
 
 trait IsActiveTrait
 {
+    public const ACTIVE = 'active';
+    public const INACTIVE = 'inactive';
+
     // Scopes
     public function scopeWhereActive($query, $value)
     {

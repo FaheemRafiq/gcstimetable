@@ -55,8 +55,8 @@ export function NavUser({ user }: { user: User }) {
                                     src={user.profilePhotoUrl}
                                     alt={user.name}
                                 />
-                                <AvatarFallback className="rounded-lg">
-                                    CN
+                                <AvatarFallback className="rounded-lg uppercase text-muted-foreground dark:border dark:border-muted-foreground">
+                                    {user.label.slice(0, 2)}
                                 </AvatarFallback>
                             </Avatar>
                             <div className="grid flex-1 text-left text-sm leading-tight">
@@ -77,7 +77,10 @@ export function NavUser({ user }: { user: User }) {
                         sideOffset={4}
                     >
                         <DropdownMenuLabel className="p-0 font-normal">
-                            <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                            <Link
+                                className="flex items-center gap-2 px-1 py-1.5 text-left text-sm"
+                                href="/profile"
+                            >
                                 <Avatar className="h-8 w-8 rounded-lg">
                                     <AvatarImage
                                         src={user.profilePhotoUrl}
@@ -95,7 +98,7 @@ export function NavUser({ user }: { user: User }) {
                                         {user.email}
                                     </span>
                                 </div>
-                            </div>
+                            </Link>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator className="bg-sidebar dark:bg-muted" />
                         <DropdownMenuGroup>

@@ -1,4 +1,4 @@
-import { Shift } from ".";
+import { IsActive, Shift } from ".";
 
 export type Teacher = {
     id: number;
@@ -27,7 +27,7 @@ export type Teacher = {
     isActive: boolean;
     created_at: string;
     updated_at: string;
-}
+};
 
 export type Department = {
     id: number;
@@ -35,7 +35,7 @@ export type Department = {
     code: string;
     created_at: string;
     updated_at: string;
-}
+};
 
 export type Instituion = {
     id: number;
@@ -45,7 +45,7 @@ export type Instituion = {
     phone: string;
     created_at: string;
     updated_at: string;
-}
+};
 
 export type Slot = {
     id: number;
@@ -57,15 +57,15 @@ export type Slot = {
     end_time: string;
     created_at: string;
     updated_at: string;
-}
+};
 
 export type Day = {
-    id : number;
+    id: number;
     number: number;
     name: string;
     code: string;
-    institution?: Instituion
-}
+    institution?: Instituion;
+};
 
 export type Allocation = {
     id: number;
@@ -85,7 +85,7 @@ export type Allocation = {
     course?: Course;
     room?: Room;
     section: Section;
-}
+};
 
 export type Course = {
     id: number;
@@ -98,7 +98,7 @@ export type Course = {
     is_default: number;
     created_at: string;
     updated_at: string;
-}
+};
 
 export type Room = {
     id: number;
@@ -110,7 +110,7 @@ export type Room = {
     institution_id: number;
     created_at: string;
     updated_at: string;
-}
+};
 
 export type Section = {
     id: number;
@@ -119,15 +119,21 @@ export type Section = {
     semester?: Semester;
     created_at: string;
     updated_at: string;
-}
+};
 
 export type Semester = {
     id: number;
     name: string;
-    is_active: string;
+    number: number;
+    is_active: IsActive;
+    program_id: number;
     created_at: string;
     updated_at: string;
-}
+
+    // Relations
+    courses?: Course[];
+    sections?: Section[];
+};
 
 export type Program = {
     id: number;
@@ -143,4 +149,5 @@ export type Program = {
     // Relations
     shift?: Shift;
     department?: Department;
-}
+    semesters?: Semester[];
+};

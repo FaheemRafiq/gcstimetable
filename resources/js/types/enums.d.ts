@@ -1,6 +1,6 @@
 export interface Roles {
     SUPER_ADMIN: string;
-    INSTITUTE_ADMIN: string;
+    INSTITUTION_ADMIN: string;
     DEPARTMENT_ADMIN: string;
     STUDENT: string;
     TEACHER: string;

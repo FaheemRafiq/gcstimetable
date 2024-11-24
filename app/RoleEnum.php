@@ -5,7 +5,7 @@ namespace App;
 enum RoleEnum: string
 {
     case SUPER_ADMIN        = 'super admin';
-    case INSTITUTE_ADMIN    = 'institution admin';
+    case INSTITUTION_ADMIN  = 'institution admin';
     case DEPARTMENT_ADMIN   = 'department admin';
     case STUDENT            = 'student';
     case TEACHER            = 'teacher';
@@ -14,7 +14,7 @@ enum RoleEnum: string
     {
         return match ($role) {
             self::SUPER_ADMIN->value => 'Super Admin',
-            self::INSTITUTE_ADMIN->value => 'Institute Admin',
+            self::INSTITUTION_ADMIN->value => 'Institution Admin',
             self::DEPARTMENT_ADMIN->value => 'Department Admin',
             self::STUDENT->value => 'Student',
             self::TEACHER->value => 'Teacher',
@@ -24,12 +24,6 @@ enum RoleEnum: string
 
     public static function toArray(): array
     {
-        return [
-            'SUPER_ADMIN'       => self::SUPER_ADMIN,
-            'INSTITUTE_ADMIN'   => self::INSTITUTE_ADMIN,
-            'DEPARTMENT_ADMIN'  => self::DEPARTMENT_ADMIN,
-            'STUDENT'           => self::STUDENT,
-            'TEACHER'           => self::TEACHER,
-        ];
+        return (new \ReflectionClass(self::class))->getConstants();
     }
 }

@@ -27,7 +27,18 @@ const columns: ColumnDef<Program>[] = [
     },
     {
         accessorKey: "type",
-        header: "Type"
+        header: "Type",
+        cell: ({ row }) => {
+            return (
+                <Badge variant={"secondary"} className="capitalize">
+                    {row.original.type}
+                </Badge>
+            );
+        },
+    },
+    {
+        accessorKey: "shift.name",
+        header: "Shift",
     },
     {
         accessorKey: "id",

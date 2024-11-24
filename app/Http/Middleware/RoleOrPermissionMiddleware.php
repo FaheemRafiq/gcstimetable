@@ -21,8 +21,12 @@ class RoleOrPermissionMiddleware
         $user = Auth::user();
 
         // Check if the user is SUPER_ADMIN or has the required permission
-        if ($user->hasRole(RoleEnum::SUPER_ADMIN->value) || 
-            $user->can(PermissionEnum::CAN_ACCESS_DAHSBOARD->value)) {
+        if ($user->hasRole(RoleEnum::SUPER_ADMIN->value) ||
+            (
+                $user->can(PermissionEnum::CAN_ACCESS_DAHSBOARD->value) && 
+                $user->hasRole([RoleEnum::INSTITUTION_ADMIN->value, RoleEnum::DEPARTMENT_ADMIN->value])
+            )
+        ) {
             return $next($request);
         }
 

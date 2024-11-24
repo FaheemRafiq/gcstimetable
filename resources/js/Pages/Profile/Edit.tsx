@@ -17,12 +17,6 @@ export default function Edit({
     useEffect(() => {
         setBreadcrumb({
             title: "Profile",
-            backItems: [
-                {
-                    title: "Dashboard",
-                    url: route("dashboard"),
-                },
-            ],
         });
     }, [setBreadcrumb]);
 

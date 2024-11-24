@@ -24,7 +24,7 @@ class ProgramPolicy
     {
         return $user->can(PermissionEnum::VIEW_PROGRAM->value)
             ? Response::allow()
-            : Response::deny(config('providers.permissions.action.error'));
+            : Response::deny(config('providers.permission.view.error'));
     }
 
     /**
@@ -34,7 +34,7 @@ class ProgramPolicy
     {
         return $user->can(PermissionEnum::CREATE_PROGRAM->value)
             ? Response::allow()
-            : Response::deny(config('providers.permissions.action.error'));
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**
@@ -44,7 +44,7 @@ class ProgramPolicy
     {
         return $user->can(PermissionEnum::EDIT_PROGRAM->value)
             ? Response::allow()
-            : Response::deny(config('providers.permissions.action.error'));
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**
@@ -54,7 +54,7 @@ class ProgramPolicy
     {
         return $user->can(PermissionEnum::DELETE_PROGRAM->value)
             ? Response::allow()
-            : Response::deny(config('providers.permissions.action.error'));
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**

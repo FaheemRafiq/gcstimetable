@@ -1,5 +1,7 @@
 import { Config } from "ziggy-js";
-import { Allocation, Slot } from "./database";
+import { Allocation, Instituion, Slot } from "./database";
+
+export type IsActive = "active" | "inactive";
 
 interface Role {
     id: number;
@@ -21,6 +23,9 @@ export interface User {
     roles: Role[];
     permissions: Permission[];
     email_verified_at?: string;
+
+    // relations
+    institution?: Instituion;
 }
 
 export type UserType = User & {
@@ -50,7 +55,7 @@ export type Shift = {
     id: number;
     name: string;
     type: "Morning" | "Afternoon" | "Evening";
-    is_active: "active" | "inactive";
+    is_active: IsActive;
     program_type: string;
     slots?: Slot[];
 };

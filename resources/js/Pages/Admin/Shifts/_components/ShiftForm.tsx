@@ -13,7 +13,8 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import InputError from "@/Components/InputError";
-import { Shift } from "@/types";
+import { IsActive, Shift } from "@/types";
+import { Switch } from "@/components/ui/switch";
 
 export const types = ["Morning", "Afternoon", "Evening"];
 export const programs = ["INTER", "BS", "ADP"];
@@ -21,6 +22,7 @@ export const programs = ["INTER", "BS", "ADP"];
 interface FormProps {
     name: string;
     type: string;
+    is_active: IsActive;
     program_type: string;
 }
 
@@ -51,6 +53,7 @@ export const ShiftForm: React.FC<ShiftFormProps> = ({
         useForm<FormProps>({
             name: shift?.name || "",
             type: shift?.type || "",
+            is_active: shift?.is_active || "active",
             program_type: shift?.program_type || "",
         });
 
@@ -171,6 +174,27 @@ export const ShiftForm: React.FC<ShiftFormProps> = ({
                             </SelectContent>
                         </Select>
                         <InputError message={errors.program_type} />
+                    </div>
+
+                    {/* Is Active Field */}
+                    <div>
+                        <Label htmlFor="is_active">Is Active</Label>
+                        <div className="flex items-center gap-2 mt-2">
+                            <Switch
+                                id="is_active"
+                                checked={data.is_active === "active"}
+                                onCheckedChange={(checked) =>
+                                    setData(
+                                        "is_active",
+                                        checked ? "active" : "inactive"
+                                    )
+                                }
+                            />
+                            <span>
+                                {data.is_active === "active" ? "Yes" : "No"}
+                            </span>
+                        </div>
+                        <InputError message={errors.is_active} />
                     </div>
                 </form>
             </FormSheet>

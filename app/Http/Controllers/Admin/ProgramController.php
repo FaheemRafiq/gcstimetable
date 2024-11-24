@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Shift;
 use App\Models\Program;
+use App\Models\Department;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use App\Http\Requests\ProgramRequest;
 use Illuminate\Database\QueryException;
 use App\Http\Resources\ProgramCollection;
 use App\Http\Requests\StoreProgramRequest;
@@ -15,29 +17,28 @@ use App\Http\Requests\UpdateProgramRequest;
 
 class ProgramController extends Controller
 {
+    public const ONLY = ['index', 'create', 'store', 'show', 'update', 'destroy'];
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         $admin      = Auth::user();
-        $programs   = [];
+        $builder    = Program::query();
 
-        if ($admin->isSuperAdmin()) {
-            $programs = Program::latest()->get();
+        if ($admin->isInstitutionAdmin()) {
 
-        } elseif ($admin->isInstitutionAdmin()) {
-
-            $programs = Program::whereHas("institution", function ($q) use ($admin) {
+            $builder->whereHas("institution", function ($q) use ($admin) {
                 $q->where('institutions.id', $admin->institution_id);
-            })
-            ->latest()
-            ->get();
+            });
+
         } elseif ($admin->isDepartmentAdmin()) {
-            $programs = Program::where('department_id', $admin->department_id)
-            ->latest()
-            ->get();
+
+            $programs = $builder->where('department_id', $admin->department_id);
         }
+
+        $programs = $builder->with('shift:id,name')->latest()->get();
 
         return inertia()->render('Admin/Programs/index', [
             'programs' => new ProgramCollection($programs),
@@ -49,17 +50,17 @@ class ProgramController extends Controller
      */
     public function create()
     {
-        $admin = Auth::user();
+        $admin       = Auth::user();
+        $shifts      = Shift::select('id', 'name', 'program_type', 'institution_id')->whereInstitution($admin->institution_id)->active()->get();
+        $departments = Department::select('id', 'name', 'code', 'institution_id')->where('institution_id', $admin->institution_id)->get();
 
-        $shifts = Shift::whereInstitution($admin->institution_id)->get();
-
-        return inertia()->share('shifts', $shifts)->render('Admin/Programs/create');
+        return response()->json(['shifts' => $shifts, 'departments' => $departments, 'program_types' => Program::TYPES]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreProgramRequest $request)
+    public function store(ProgramRequest $request)
     {
         $attributes = $request->validated();
         $response   = Gate::inspect('create', Program::class);
@@ -69,7 +70,7 @@ class ProgramController extends Controller
             if ($response->allowed()) {
                 Program::create($attributes);
 
-                return back()->with('success', 'Resource successfully created');
+                return back()->with('success', 'Program successfully created');
             } else {
                 $message = $response->message();
             }
@@ -82,7 +83,6 @@ class ProgramController extends Controller
         }
 
         return back()->withErrors(['message' => $message]);
-
     }
 
     /**
@@ -90,35 +90,45 @@ class ProgramController extends Controller
      */
     public function show(Program $program)
     {
-        // write show method like Day show method
-        if (! $program) {
-            return response()->json(['message' => 'Program not found'], 404);
-        }
+        // $response = Gate::inspect('view', $program);
 
-        return response()->json($program);
-    }
+        // if ($response->denied()) {
+        //     return back()->with('error', $response->message());
+        // }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Program $program)
-    {
-        //
+        $program->load('semesters', 'shift');
+
+        return inertia()->render('Admin/Programs/show', [
+            'program' => $program,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProgramRequest $request, Program $program)
+    public function update(ProgramRequest $request, Program $program)
     {
-        // write update method like Day update method
+        $attributes = $request->validated();
+        $response   = Gate::inspect('update', $program);
+        $message    = '';
         try {
-            $program->update($request->all());
 
-            return response()->json($program, 200); // 200 OK
+            if ($response->allowed()) {
+                $program->update($attributes);
+
+                return back()->with('success', 'Program successfully updated');
+            } else {
+                $message = $response->message();
+            }
+
         } catch (QueryException $exception) {
-            return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('programs')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
         }
+
+        return back()->withErrors(['message' => $message]);
     }
 
     /**
@@ -126,13 +136,25 @@ class ProgramController extends Controller
      */
     public function destroy(Program $program)
     {
-        // write destroy method like Day destroy method
+        $response = Gate::inspect('delete', $program);
+        $message  = '';
         try {
-            $program->delete();
 
-            return response()->json($program, 204); // 204 Successfully Deleted or 200 OK
+            if ($response->allowed()) {
+                $program->delete();
+
+                return back()->with('success', 'Program successfully deleted');
+            } else {
+                $message = $response->message();
+            }
+
         } catch (QueryException $exception) {
-            return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('programs')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
         }
+
+        return back()->with('error', $message);
     }
 }

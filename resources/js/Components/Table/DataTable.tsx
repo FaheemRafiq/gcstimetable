@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
     ColumnFiltersState,
     flexRender,
@@ -24,6 +24,7 @@ import { DataTableProps, InputProps } from "@/types/data-table";
 import { TablePagination } from "./Pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CircleXIcon, X } from "lucide-react";
 
 const DefaultInputProps: InputProps = {
     pagination: true,
@@ -47,6 +48,7 @@ export function DataTable<TData, TValue>({
         pageIndex: 0, //initial page index
         pageSize: 10, //default page size
     });
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const TotalRecords: React.FC<{
         paramTotalCount: number | null;
@@ -106,27 +108,57 @@ export function DataTable<TData, TValue>({
         return colSizes;
     }, [table.getState().columnSizingInfo, table.getState().columnSizing]);
 
+    const handleClearInput = () => {
+        if (finalProps.searchFilter && finalProps.filterColumn) {
+            table.getColumn(finalProps.filterColumn)?.setFilterValue("");
+        }
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    };
+
     return (
         <div>
-            <div className="flex items-center py-4">
-                {finalProps.searchFilter && (
-                    <Input
-                        placeholder={`Filter ${finalProps.filterColumn} ...`}
-                        value={
-                            (table
-                                .getColumn(finalProps.filterColumn)
-                                ?.getFilterValue() as string) ?? ""
-                        }
-                        onChange={(event) =>
-                            table
-                                .getColumn(finalProps.filterColumn)
-                                ?.setFilterValue(event.target.value)
-                        }
-                        className="max-w-sm"
-                        autoFocus
-                    />
+            <div className="flex flex-col sm:flex-row items-center justify-between py-4">
+                {finalProps.searchFilter ? (
+                    <div className="relative max-w-md w-full">
+                        <Input
+                            ref={inputRef}
+                            placeholder={`Search by ${finalProps.filterColumn} ...`}
+                            value={
+                                (table
+                                    .getColumn(finalProps.filterColumn)
+                                    ?.getFilterValue() as string) ?? ""
+                            }
+                            onChange={(event) =>
+                                table
+                                    .getColumn(finalProps.filterColumn)
+                                    ?.setFilterValue(event.target.value)
+                            }
+                            className="md:shadow-md"
+                            autoFocus
+                        />
+                        {((table
+                            .getColumn(finalProps.filterColumn)
+                            ?.getFilterValue() as string) ??
+                            "") && (
+                            <button
+                                className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                                aria-label="Clear input"
+                                onClick={handleClearInput}
+                            >
+                                <X
+                                    size={18}
+                                    strokeWidth={2}
+                                    aria-hidden="true"
+                                />
+                            </button>
+                        )}
+                    </div>
+                ) : (
+                    <div />
                 )}
-                <div className="ml-auto self-end dark:text-foreground">
+                <div className="mt-3 sm:mt-0 self-end dark:text-foreground text-nowrap">
                     <TotalRecords
                         paramTotalCount={
                             finalProps.pagination
@@ -226,14 +258,14 @@ export function DataTable<TData, TValue>({
                     <Button
                         onClick={() => table.previousPage()}
                         disabled={!table.getCanPreviousPage()}
-                        size={'sm'}
+                        size={"sm"}
                     >
                         Previous
                     </Button>
                     <Button
                         onClick={() => table.nextPage()}
                         disabled={!table.getCanNextPage()}
-                        size={'sm'}
+                        size={"sm"}
                     >
                         Next
                     </Button>

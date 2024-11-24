@@ -17,7 +17,7 @@ class RoleAndPermissionSeeder extends Seeder
     public function run(): void
     {
         $superadmin_role        = Role::create(['name' => RoleEnum::SUPER_ADMIN->value]);
-        $institute_admin_role   = Role::create(['name' => RoleEnum::INSTITUTE_ADMIN->value]);
+        $institute_admin_role   = Role::create(['name' => RoleEnum::INSTITUTION_ADMIN->value]);
         $department_admin_role  = Role::create(['name' => RoleEnum::DEPARTMENT_ADMIN->value]);
         $student_role           = Role::create(['name' => RoleEnum::STUDENT->value]);
         $teacher_role           = Role::create(['name' => RoleEnum::TEACHER->value]);

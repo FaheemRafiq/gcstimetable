@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RoleAndPermissionSeeder::class);
 
         $superadmin_role        = Role::where('name', RoleEnum::SUPER_ADMIN)->first();
-        $institute_admin_role   = Role::where('name', RoleEnum::INSTITUTE_ADMIN)->first();
+        $institute_admin_role   = Role::where('name', RoleEnum::INSTITUTION_ADMIN)->first();
         $department_admin_role  = Role::where('name', RoleEnum::DEPARTMENT_ADMIN)->first();
 
         // Institutions

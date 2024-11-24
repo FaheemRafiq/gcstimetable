@@ -5,34 +5,33 @@ import { Label } from "@/components/ui/label";
 import { useForm } from "@inertiajs/react";
 import InputError from "@/Components/InputError";
 import toast from "react-hot-toast";
-import { TimePickerDemo } from "@/components/time-picker/time-picker-input";
 import { format } from "date-fns";
-import { Slot } from "@/types/database";
+import { Semester, Slot } from "@/types/database";
 import { Switch } from "@/components/ui/switch";
 import { FormSheet } from "@/Components/FormSheet";
+import { IsActive } from "@/types";
 
 interface FormProps {
-    code: string;
-    start_time: string;
-    end_time: string;
-    is_practical: string;
-    shift_id: number;
+    name: string;
+    number: number;
+    is_active: IsActive;
+    program_id: number | null;
 }
 
-interface SlotFormProps {
-    slot?: Slot | null;
-    shiftId?: number;
+interface PageProps {
+    semester?: Semester | null;
+    programId?: number;
     open?: boolean;
     onClose?: () => void;
 }
 
-export const SlotForm: React.FC<SlotFormProps> = ({
-    slot,
-    shiftId,
+export const SemesterForm: React.FC<PageProps> = ({
+    semester,
+    programId,
     open: openProp,
     onClose,
 }) => {
-    const isEditForm = !!slot;
+    const isEditForm = !!semester;
 
     const [open, setOpen] = React.useState(false);
 
@@ -44,19 +43,18 @@ export const SlotForm: React.FC<SlotFormProps> = ({
 
     const { data, errors, processing, setData, post, reset, put } =
         useForm<FormProps>({
-            code: slot?.code || "",
-            start_time: slot?.start_time || "07:00:00",
-            end_time: slot?.end_time || "08:00:00",
-            is_practical: slot?.is_practical?.toString() || "0",
-            shift_id: slot?.shift_id ?? shiftId ?? 0,
+            name: semester?.name ?? "",
+            number: semester?.number ?? 1,
+            is_active: semester?.is_active ?? "active",
+            program_id: semester?.program_id ?? programId ?? null,
         });
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const method = isEditForm ? put : post;
-        const routeName = isEditForm ? "slots.update" : "slots.store";
-        const routeParams = isEditForm && slot ? [slot.id] : [];
+        const routeName = isEditForm ? "semesters.update" : "semesters.store";
+        const routeParams = isEditForm && semester ? [semester.id] : [];
 
         method(route(routeName, routeParams), {
             preserveState: true,
@@ -98,7 +96,7 @@ export const SlotForm: React.FC<SlotFormProps> = ({
         <Fragment>
             {openProp === undefined && (
                 <Button onClick={() => setOpen(true)} size="sm">
-                    {isEditForm ? "Edit" : "Create"} Slot
+                    {isEditForm ? "Edit" : "Create"} Semester
                 </Button>
             )}
             <FormSheet
@@ -106,12 +104,12 @@ export const SlotForm: React.FC<SlotFormProps> = ({
                 setOpen={handleOpen}
                 title={
                     isEditForm
-                        ? "Edit Time Slot : " + slot.name
-                        : "Create Time Slot"
+                        ? "Edit Semester : " + semester.name
+                        : "Create Semester"
                 }
                 description={`Fill the required fields to ${
                     isEditForm ? "edit" : "create"
-                } a time slot. Click save when you're done.`}
+                } a Semester. Click save when you're done.`}
                 footerActions={
                     <Button
                         disabled={processing}
@@ -131,7 +129,7 @@ export const SlotForm: React.FC<SlotFormProps> = ({
                     {/* Code Field */}
                     <div>
                         <Label htmlFor="code">
-                            Code
+                            Name
                             <span className="ps-0.5 text-xs text-red-600">
                                 *
                             </span>
@@ -139,68 +137,56 @@ export const SlotForm: React.FC<SlotFormProps> = ({
                         <Input
                             id="code"
                             type="text"
-                            value={data.code}
-                            placeholder="Enter slot code"
-                            onChange={(e) => setData("code", e.target.value)}
+                            value={data.name}
+                            placeholder="Enter name"
+                            onChange={(e) => setData("name", e.target.value)}
                             required
                         />
-                        <InputError message={errors.code} />
+                        <InputError message={errors.name} />
                     </div>
 
-                    {/* Start Time Field */}
+                    {/* Semester No. Field */}
                     <div>
-                        <Label htmlFor="start_time">
-                            Start Time
+                        <Label htmlFor="code">
+                            Semester No.
                             <span className="ps-0.5 text-xs text-red-600">
                                 *
                             </span>
                         </Label>
-                        <div className="flex justify-center">
-                            <TimePickerDemo
-                                date={createDateWithTime(data.start_time)}
-                                setDate={(date) =>
-                                    setTimeData("start_time", date)
-                                }
-                            />
-                        </div>
-                        <InputError message={errors.start_time} />
+                        <Input
+                            id="code"
+                            type="number"
+                            min={1}
+                            max={10}
+                            value={data.number}
+                            placeholder="Enter semester number"
+                            onChange={(e) =>
+                                setData("number", parseInt(e.target.value))
+                            }
+                            required
+                        />
+                        <InputError message={errors.number} />
                     </div>
 
-                    {/* End Time Field */}
+                    {/* Is Active Field */}
                     <div>
-                        <Label htmlFor="end_time">
-                            End Time
-                            <span className="ps-0.5 text-xs text-red-600">
-                                *
-                            </span>
-                        </Label>
-                        <div className="flex justify-center">
-                            <TimePickerDemo
-                                date={createDateWithTime(data.end_time)}
-                                setDate={(date) =>
-                                    setTimeData("end_time", date)
-                                }
-                            />
-                        </div>
-                        <InputError message={errors.end_time} />
-                    </div>
-
-                    {/* Is Practical Field */}
-                    <div>
-                        <Label htmlFor="is_practical">Is Practical</Label>
-                        <div className="flex items-center gap-2">
+                        <Label htmlFor="is_active">Is Active</Label>
+                        <div className="flex items-center gap-2 mt-2">
                             <Switch
-                                id="is_practical"
-                                checked={data.is_practical === "1"}
+                                id="is_active"
+                                checked={data.is_active === "active"}
                                 onCheckedChange={(checked) =>
-                                    setData("is_practical", checked ? "1" : "0")
+                                    setData(
+                                        "is_active",
+                                        checked ? "active" : "inactive"
+                                    )
                                 }
                             />
                             <span>
-                                {data.is_practical === "1" ? "Yes" : "No"}
+                                {data.is_active === "active" ? "Yes" : "No"}
                             </span>
                         </div>
-                        <InputError message={errors.is_practical} />
+                        <InputError message={errors.is_active} />
                     </div>
                 </form>
             </FormSheet>

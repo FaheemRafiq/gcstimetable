@@ -125,8 +125,14 @@ export function CommandDialogDemo() {
                 />
                 <CommandList>
                     <CommandEmpty>No results found.</CommandEmpty>
-                    <CommandGroup heading="Pages">
+                    <CommandGroup heading="Administration">
                         {NavData.navMain.map((item, index) =>
+                            resolveSideBarNavs(item, index)
+                        )}
+                    </CommandGroup>
+                    <CommandSeparator />
+                    <CommandGroup heading="Academic Structure">
+                        {NavData.navCurriculum.map((item, index) =>
                             resolveSideBarNavs(item, index)
                         )}
                     </CommandGroup>

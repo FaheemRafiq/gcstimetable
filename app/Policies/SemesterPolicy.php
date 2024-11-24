@@ -4,6 +4,8 @@ namespace App\Policies;
 
 use App\Models\Semester;
 use App\Models\User;
+use App\PermissionEnum;
+use Illuminate\Auth\Access\Response;
 
 class SemesterPolicy
 {
@@ -18,33 +20,41 @@ class SemesterPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Semester $semester): bool
+    public function view(User $user, Semester $semester): Response
     {
-        //
+        return $user->can(PermissionEnum::VIEW_SEMESTER)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.view.error'));
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user): Response
     {
-        return true;
+        return $user->can(PermissionEnum::CREATE_SEMESTER)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Semester $semester): bool
+    public function update(User $user, Semester $semester): Response
     {
-        return true;
+        return $user->can(PermissionEnum::EDIT_SEMESTER)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Semester $semester): bool
+    public function delete(User $user, Semester $semester): Response
     {
-        return true;
+        return $user->can(PermissionEnum::DELETE_SEMESTER)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**

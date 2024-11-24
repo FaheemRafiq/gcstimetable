@@ -19,7 +19,7 @@ export const AbilitiesProvider: React.FC<{
 }> = ({ user, children }) => {
     // Roles
     const isSuperAdmin = () => isRole(user, RoleEnum.SUPER_ADMIN);
-    const isInstitutionAdmin = () => isRole(user, RoleEnum.INSTITUTE_ADMIN);
+    const isInstitutionAdmin = () => isRole(user, RoleEnum.INSTITUTION_ADMIN);
     const hasRole = (role: RoleEnum) => isRole(user, role);
 
     // Permissions

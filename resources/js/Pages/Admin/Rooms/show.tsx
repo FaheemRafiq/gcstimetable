@@ -23,7 +23,7 @@ export default function ShowRoom({
 
     useEffect(() => {
         setBreadcrumb({
-            title: "Show " + room.name,
+            title:  room.name,
             backItems: [
                 {
                     title: "Rooms",
