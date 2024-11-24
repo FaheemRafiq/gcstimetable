@@ -55,4 +55,9 @@ enum PermissionEnum : string
     case EDIT_SLOT          = 'edit slot';
     case DELETE_SLOT        = 'delete slot';
     case VIEW_SLOT          = 'view slot';
+
+    case CREATE_PROGRAM     = 'create program';
+    case EDIT_PROGRAM       = 'edit program';
+    case DELETE_PROGRAM     = 'delete program';
+    case VIEW_PROGRAM       = 'view program';
 }

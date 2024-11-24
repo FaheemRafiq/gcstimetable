@@ -28,7 +28,14 @@ const columns: ColumnDef<Program>[] = [
     {
         accessorKey: "type",
         header: "Type"
-    }
+    },
+    {
+        accessorKey: "id",
+        header: "",
+        cell: ({ row }) => {
+            return <Actions row={row.original} />;
+        },
+    },
 ];
 
 export default columns;

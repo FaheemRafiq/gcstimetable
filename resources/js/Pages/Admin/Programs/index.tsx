@@ -7,23 +7,25 @@ import { Program } from "@/types/database";
 
 // Components
 import { DataTable } from "@/Components/Table/DataTable";
-import columns from "./columns";
+import columns from "./_components/columns";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useBreadcrumb } from "@/components/providers/breadcrum-provider";
 
-export default function Rooms({ auth, programs }: PageProps<{ programs: Program[] }>) {
-
+export default function Rooms({
+    auth,
+    programs,
+}: PageProps<{ programs: Program[] }>) {
     const { setBreadcrumb } = useBreadcrumb();
 
     useEffect(() => {
         setBreadcrumb({
-            title: 'Shifts',
+            title: "Programs",
         });
     }, [setBreadcrumb]);
 
     return (
         <AuthenticatedLayout user={auth.user}>
-            <Head title="Shifts" />
+            <Head title="Programs" />
             <div className="bg-card text-card-foreground border border-border sm:rounded-lg">
                 <div className="p-6">
                     <DataTable

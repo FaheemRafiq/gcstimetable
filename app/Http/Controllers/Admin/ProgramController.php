@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Shift;
 use App\Models\Program;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\QueryException;
 use App\Http\Resources\ProgramCollection;
 use App\Http\Requests\StoreProgramRequest;
@@ -20,30 +23,25 @@ class ProgramController extends Controller
         $admin      = Auth::user();
         $programs   = [];
 
-        try {
-            if ($admin->isSuperAdmin()) {
-                $programs = Program::latest()->get();
+        if ($admin->isSuperAdmin()) {
+            $programs = Program::latest()->get();
 
-            } elseif ($admin->isInstitutionAdmin()) {
+        } elseif ($admin->isInstitutionAdmin()) {
 
-                $programs = Program::whereHas("institution", function ($q) use ($admin) {
-                    $q->where('institutions.id', $admin->institution_id);
-                })
-                ->latest()
-                ->get();
-            } elseif ($admin->isDepartmentAdmin()) {
-                $programs = Program::where('department_id', $admin->department_id)
-                ->latest()
-                ->get();
-            }
-
-            return inertia()->render('Admin/Programs/index', [
-                'programs' => new ProgramCollection($programs),
-            ]);
-        } catch (QueryException $exception) {
-            dd($exception->getMessage());
-            logger($exception->getMessage());
+            $programs = Program::whereHas("institution", function ($q) use ($admin) {
+                $q->where('institutions.id', $admin->institution_id);
+            })
+            ->latest()
+            ->get();
+        } elseif ($admin->isDepartmentAdmin()) {
+            $programs = Program::where('department_id', $admin->department_id)
+            ->latest()
+            ->get();
         }
+
+        return inertia()->render('Admin/Programs/index', [
+            'programs' => new ProgramCollection($programs),
+        ]);
     }
 
     /**
@@ -51,7 +49,11 @@ class ProgramController extends Controller
      */
     public function create()
     {
-        //
+        $admin = Auth::user();
+
+        $shifts = Shift::whereInstitution($admin->institution_id)->get();
+
+        return inertia()->share('shifts', $shifts)->render('Admin/Programs/create');
     }
 
     /**
@@ -59,14 +61,27 @@ class ProgramController extends Controller
      */
     public function store(StoreProgramRequest $request)
     {
-        // write store method like Department store method
+        $attributes = $request->validated();
+        $response   = Gate::inspect('create', Program::class);
+        $message    = '';
         try {
-            $program = Program::create($request->all());
 
-            return response()->json($program, 201); // 201 Created
+            if ($response->allowed()) {
+                Program::create($attributes);
+
+                return back()->with('success', 'Resource successfully created');
+            } else {
+                $message = $response->message();
+            }
+
         } catch (QueryException $exception) {
-            return response()->json(['error' => 'Constraint violation or other database error'.$exception->getMessage()], 422);
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('programs')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
         }
+
+        return back()->withErrors(['message' => $message]);
 
     }
 

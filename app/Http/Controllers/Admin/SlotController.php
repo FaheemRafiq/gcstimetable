@@ -14,22 +14,7 @@ use App\Http\Requests\UpdateSlotRequest;
 
 class SlotController extends Controller
 {
-    const ONLY = ['index', 'store', 'update', 'destroy'];
-
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        // get the institution id from the request
-        $institutionId = request()->input('institutionid');
-
-        try {
-            return response()->json(new SlotCollection(Slot::all()->where('institution_id', $institutionId)->sortByDesc('updated_at')), 200); // 200 OK
-        } catch (QueryException $exception) {
-            return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
-        }
-    }
+    const ONLY = ['store', 'update', 'destroy'];
 
     /**
      * Store a newly created resource in storage.
@@ -51,12 +36,12 @@ class SlotController extends Controller
 
         } catch (SlotException $exception) {
             $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
-            Log::channel('shifts')->error('QueryException', $logData);
+            Log::channel('slots')->error('QueryException', $logData);
 
             $message = 'Validation error 👉 ' . $exception->getMessage();
         } catch (QueryException $exception) {
             $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
-            Log::channel('shifts')->error('QueryException', $logData);
+            Log::channel('slots')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';
         }
@@ -84,12 +69,12 @@ class SlotController extends Controller
 
         } catch (SlotException $exception) {
             $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
-            Log::channel('shifts')->error('QueryException', $logData);
+            Log::channel('slots')->error('QueryException', $logData);
 
             $message = 'Validation error 👉 ' . $exception->getMessage();
         } catch (QueryException $exception) {
             $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
-            Log::channel('shifts')->error('QueryException', $logData);
+            Log::channel('slots')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';
         }
@@ -116,7 +101,7 @@ class SlotController extends Controller
 
         } catch (QueryException $exception) {
             $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
-            Log::channel('shifts')->error('QueryException', $logData);
+            Log::channel('slots')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';
         }

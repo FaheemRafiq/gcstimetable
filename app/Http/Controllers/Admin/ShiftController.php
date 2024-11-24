@@ -56,7 +56,7 @@ class ShiftController extends Controller
 
                 Shift::create($attributes);
 
-                return back()->with('success', 'Resource successfully created');
+                return back()->with('success', 'Shift successfully created');
             } else {
                 $message = $response->message();
             }

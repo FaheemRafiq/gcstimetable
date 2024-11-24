@@ -17,19 +17,19 @@ import {
 import { Fragment } from "react/jsx-runtime";
 import { Link, router, useForm } from "@inertiajs/react";
 import toast from "react-hot-toast";
-import { Room } from "@/types/database";
+import { Program, Room } from "@/types/database";
 
-export function Actions({ row }: { row: Room }) {
+export function Actions({ row }: { row: Program }) {
 
-    const handleDelete = (row: Room) => {
-        router.delete(route("rooms.destroy", row.id), {
+    const handleDelete = (row: Program) => {
+        router.delete(route("programs.destroy", row.id), {
             preserveScroll: true,
             preserveState: true
         });
     };
 
-    function handleView(row: Room) {
-        router.get(route("rooms.show", row.id));
+    function handleView(row: Program) {
+        router.get(route("programs.show", row.id));
     }
 
     return (

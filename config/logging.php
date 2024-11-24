@@ -137,14 +137,28 @@ return [
 
         'shifts' => [
             'driver' => 'single',
-            'path' => storage_path('logs/'.now()->toDateString().'/allocations.log'),
+            'path' => storage_path('logs/'.now()->toDateString().'/shifts.log'),
             'level' => 'debug',
             'days' => 30,
         ],
 
         'rooms' => [
             'driver' => 'single',
-            'path' => storage_path('logs/'.now()->toDateString().'/allocations.log'),
+            'path' => storage_path('logs/'.now()->toDateString().'/rooms.log'),
+            'level' => 'debug',
+            'days' => 30,
+        ],
+
+        'slots' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/'.now()->toDateString().'/slots.log'),
+            'level' => 'debug',
+            'days' => 30,
+        ],
+
+        'programs' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/'.now()->toDateString().'/programs.log'),
             'level' => 'debug',
             'days' => 30,
         ],
