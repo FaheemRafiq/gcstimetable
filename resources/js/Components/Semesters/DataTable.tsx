@@ -5,16 +5,25 @@ import { DataTable as Table } from "@/Components/Table/DataTable";
 
 interface DataTableProps {
     semesters: Semester[];
+    searchFilter?: boolean;
+    filterColumn?: string;
+    pagination?: boolean;
 }
 
-const DataTable: React.FC<DataTableProps> = ({ semesters }) => {
+const DataTable: React.FC<DataTableProps> = ({
+    semesters,
+    searchFilter = false,
+    filterColumn = "name",
+    pagination = false,
+}) => {
     return (
         <Table
             data={semesters}
             columns={columns}
             inputProps={{
-                searchFilter: false,
-                pagination: true,
+                searchFilter: searchFilter,
+                filterColumn: filterColumn,
+                pagination: pagination,
             }}
         />
     );

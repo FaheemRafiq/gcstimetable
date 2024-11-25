@@ -6,10 +6,12 @@ import { useForm } from "@inertiajs/react";
 import InputError from "@/Components/InputError";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
-import { Semester, Slot } from "@/types/database";
+import { Program, Semester, Slot } from "@/types/database";
 import { Switch } from "@/components/ui/switch";
 import { FormSheet } from "@/Components/FormSheet";
 import { IsActive } from "@/types";
+import { fetchWrapper } from "@/lib/fetchWrapper";
+import { AutoCompleteSelect } from "@/components/combobox";
 
 interface FormProps {
     name: string;
@@ -25,6 +27,11 @@ interface PageProps {
     onClose?: () => void;
 }
 
+interface PageStateProps {
+    programs: Program[];
+    isFetched: boolean;
+}
+
 export const SemesterForm: React.FC<PageProps> = ({
     semester,
     programId,
@@ -33,7 +40,36 @@ export const SemesterForm: React.FC<PageProps> = ({
 }) => {
     const isEditForm = !!semester;
 
+    // Page States
     const [open, setOpen] = React.useState(false);
+    const [pageStates, setPageStates] = React.useState<PageStateProps>({
+        programs: [],
+        isFetched: false,
+    });
+
+    useEffect(() => {
+        if (
+            open === true &&
+            pageStates.isFetched === false &&
+            programId === undefined
+        ) {
+            (() => {
+                fetchWrapper({
+                    url: route("semesters.create"),
+                    method: "GET",
+                })
+                    .then((data) => {
+                        setPageStates({
+                            ...data,
+                            isFetched: true,
+                        });
+                    })
+                    .catch((error) => {
+                        console.error("handleCreate -> error", error);
+                    });
+            })();
+        }
+    }, [open]);
 
     useEffect(() => {
         if (openProp !== undefined) {
@@ -167,6 +203,25 @@ export const SemesterForm: React.FC<PageProps> = ({
                         />
                         <InputError message={errors.number} />
                     </div>
+
+                    {/* Program Field */}
+                    {pageStates.programs.length > 0 && (
+                        <div>
+                            <Label htmlFor="program_id">Program</Label>
+                            <AutoCompleteSelect
+                                label="Select Program"
+                                value={data.program_id?.toString() ?? ""}
+                                setValue={(value) =>
+                                    setData("program_id", parseInt(value))
+                                }
+                                values={pageStates.programs.map((program) => ({
+                                    value: program.id.toString(),
+                                    label: program.name,
+                                }))}
+                            />
+                            <InputError message={errors.program_id} />
+                        </div>
+                    )}
 
                     {/* Is Active Field */}
                     <div>

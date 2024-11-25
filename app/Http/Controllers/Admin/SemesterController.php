@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Semester;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\SemesterRequest;
 use Illuminate\Database\QueryException;
@@ -13,7 +14,35 @@ use App\Http\Requests\UpdateSemesterRequest;
 
 class SemesterController extends Controller
 {
-    public const ONLY = ['store', 'update', 'destroy'];
+    public const ONLY = ['index', 'create', 'store', 'update', 'destroy'];
+
+    public function index()
+    {
+        $admin = Auth::user();
+        $builder = Semester::query();
+
+        if ($admin->isInstitutionAdmin()) {
+            $builder->whereHas('program', function ($query) use ($admin) {
+                $query->whereIn('department_id', $admin->institution?->departments?->pluck('id')->toArray() ?? []);
+            });
+        } elseif ($admin->isDepartmentAdmin()) {
+            $builder->whereHas('program', function ($query) use ($admin) {
+                $query->whereIn('department_id', [$admin->department_id]);
+            });
+        }
+
+        $semesters = $builder->with('program:id,name,code')->latest()->get();
+
+        return inertia()->render('Admin/Semesters/index', compact('semesters'));
+    }
+
+    public function create()
+    {
+        $admin      = Auth::user();
+        $programs   = $admin->institution->programs()->select('programs.id', 'programs.name', 'programs.code')->get();
+
+        return response()->json(compact('programs'));
+    }
 
     /**
      * Store a newly created resource in storage.

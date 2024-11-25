@@ -27,6 +27,9 @@ export function Actions({ row }: { row: Semester }) {
         router.delete(route("semesters.destroy", row.id), {
             preserveScroll: true,
             preserveState: true,
+            onSuccess: () => {
+                setOpenConfirm(false);
+            },
             onFinish: () => {
                 setDeleting(false);
             },

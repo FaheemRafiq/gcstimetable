@@ -124,6 +124,13 @@ export const NavData: NavDataType = {
             icon: BookOpen,
             isActive: route().current("programs.index"),
         },
+        {
+            title: "Semesters",
+            route: "semesters.index",
+            url: route("semesters.index"),
+            icon: Command,
+            isActive: route().current("semesters.index"),
+        },
     ],
     navSecondary: [
         {
