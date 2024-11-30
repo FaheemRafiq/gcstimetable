@@ -1,4 +1,4 @@
-import Modal from "@/Components/Modal";
+import Modal from "@/Components/AnimatedModal";
 import { Button } from "@/components/ui/button";
 
 interface DeleteConfirmationDialogProps {

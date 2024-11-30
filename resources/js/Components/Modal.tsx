@@ -63,7 +63,11 @@ export default function Modal({
                     leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                 >
                     <DialogPanel
-                        className={cn(`mb-6 border border-border bg-background rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:mx-auto `, maxWidthClass, className)}
+                        className={cn(
+                            `mb-6 border border-border bg-background rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:mx-auto `,
+                            maxWidthClass,
+                            className
+                        )}
                     >
                         {children}
                     </DialogPanel>
