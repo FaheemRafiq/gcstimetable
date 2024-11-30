@@ -90,13 +90,13 @@ class ProgramController extends Controller
      */
     public function show(Program $program)
     {
-        // $response = Gate::inspect('view', $program);
+        $response = Gate::inspect('view', $program);
 
-        // if ($response->denied()) {
-        //     return back()->with('error', $response->message());
-        // }
+        if ($response->denied()) {
+            return back()->with('error', $response->message());
+        }
 
-        $program->load('semesters', 'shift');
+        $program->load(['semesters' => fn ($q) => $q->withCount('sections'), 'shift']);
 
         return inertia()->render('Admin/Programs/show', [
             'program' => $program,

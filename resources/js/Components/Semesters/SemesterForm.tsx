@@ -5,7 +5,6 @@ import { Label } from "@/components/ui/label";
 import { useForm } from "@inertiajs/react";
 import InputError from "@/Components/InputError";
 import toast from "react-hot-toast";
-import { format } from "date-fns";
 import { Program, Semester, Slot } from "@/types/database";
 import { Switch } from "@/components/ui/switch";
 import { FormSheet } from "@/Components/FormSheet";
@@ -56,7 +55,6 @@ export const SemesterForm: React.FC<PageProps> = ({
             (() => {
                 fetchWrapper({
                     url: route("semesters.create"),
-                    method: "GET",
                 })
                     .then((data) => {
                         setPageStates({
@@ -64,9 +62,7 @@ export const SemesterForm: React.FC<PageProps> = ({
                             isFetched: true,
                         });
                     })
-                    .catch((error) => {
-                        console.error("handleCreate -> error", error);
-                    });
+                    .catch((error) => {});
             })();
         }
     }, [open]);
@@ -107,24 +103,12 @@ export const SemesterForm: React.FC<PageProps> = ({
         });
     };
 
-    const createDateWithTime = (timeString = "07:00:00") => {
-        try {
-            const today = new Date().toISOString().split("T")[0];
-            return new Date(`${today}T${timeString}`);
-        } catch {
-            return new Date();
-        }
-    };
-
-    const setTimeData = (key: keyof FormProps, date: Date | undefined) => {
-        setData(key, date ? format(date, "HH:mm:ss") : "");
-    };
-
     function handleOpen(value: boolean) {
         setOpen(value);
 
         if (value === false) {
             onClose?.();
+            reset();
         }
     }
 

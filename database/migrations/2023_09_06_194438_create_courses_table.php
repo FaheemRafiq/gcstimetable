@@ -33,7 +33,7 @@ return new class extends Migration
             // course type
             $table->enum('type', ['CLASS', 'LAB'])->default('CLASS');
 
-            $table->foreignId('semester_id')->constrained('semesters');
+            $table->foreignId('semester_id')->constrained('semesters')->nullOnDelete();
 
             $table->timestamps();
         });

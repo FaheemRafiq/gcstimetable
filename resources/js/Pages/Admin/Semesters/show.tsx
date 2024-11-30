@@ -6,23 +6,24 @@ import { Button } from "@/components/ui/button";
 import { useBreadcrumb } from "@/components/providers/breadcrum-provider";
 import { useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Program } from "@/types/database";
+import { Program, Semester } from "@/types/database";
 import { DataTable, SemesterForm } from "@/Components/Semesters";
+import { getNumberWithOrdinal } from "@/utils/helper";
 
 interface ShowRoomProps extends Record<string, unknown> {
-    program: Program;
+    semester: Semester;
 }
 
-function ShowPage({ auth, program }: PageProps<ShowRoomProps>) {
+function ShowPage({ auth, semester }: PageProps<ShowRoomProps>) {
     const { setBreadcrumb } = useBreadcrumb();
 
     useEffect(() => {
         setBreadcrumb({
-            title: program.name,
+            title: semester.name,
             backItems: [
                 {
-                    title: "Programs",
-                    url: route("programs.index"),
+                    title: "Semesters",
+                    url: route("semesters.index"),
                 },
             ],
         });
@@ -30,16 +31,16 @@ function ShowPage({ auth, program }: PageProps<ShowRoomProps>) {
 
     return (
         <AuthenticatedLayout user={auth.user}>
-            <Head title="Show Program" />
+            <Head title="Show Semester" />
 
             <div className="bg-card text-card-foreground border border-border sm:rounded-lg">
                 <div className="p-6 flex flex-col">
                     <div className="flex justify-between">
                         <h1 className="text-xl font-semibold mb-6 text-card-foreground dark:text-foreground">
-                            {program.name} Details
+                            {semester.name} Details
                         </h1>
                         <Link
-                            href={route("programs.index")}
+                            href={route("semesters.index")}
                             className="flex items-center space-x-2"
                         >
                             <Button variant={"outline"}>Back</Button>
@@ -52,38 +53,45 @@ function ShowPage({ auth, program }: PageProps<ShowRoomProps>) {
                                 <h3 className="text-lg font-semibold mb-2">
                                     Name
                                 </h3>
-                                <p>{program.name}</p>
+                                <p>{semester.name}</p>
                             </div>
                             <div>
                                 <h3 className="text-lg font-semibold mb-2">
-                                    Code
+                                    Number
                                 </h3>
-                                <p>{program.code}</p>
+                                <p>{getNumberWithOrdinal(semester.number)}</p>
                             </div>
                             <div>
                                 <h3 className="text-lg font-semibold mb-2">
-                                    Duration
-                                </h3>
-                                <p>{program.duration} Years</p>
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold mb-2">
-                                    Type
+                                    Is Active
                                 </h3>
                                 <span>
-                                    <Badge
-                                        variant={"secondary"}
-                                        className="capitalize"
-                                    >
-                                        {program.type}
-                                    </Badge>
+                                    {semester.is_active === "active" ? (
+                                        <Badge variant={"successOutline"}>
+                                            Yes
+                                        </Badge>
+                                    ) : (
+                                        <Badge variant={"destructiveOutline"}>
+                                            No
+                                        </Badge>
+                                    )}
                                 </span>
                             </div>
                             <div>
                                 <h3 className="text-lg font-semibold mb-2">
-                                    Shift
+                                    Program Name
                                 </h3>
-                                <p>{program?.shift?.name}</p>
+                                <p>{semester?.program?.name} Years</p>
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold mb-2">
+                                    Sections
+                                </h3>
+                                <span>
+                                    <Badge variant={"secondary"}>
+                                        {semester?.sections?.length}
+                                    </Badge>
+                                </span>
                             </div>
                         </div>
 
@@ -91,15 +99,15 @@ function ShowPage({ auth, program }: PageProps<ShowRoomProps>) {
                             <div className="mb-4">
                                 <div className="flex justify-between">
                                     <h3 className="text-lg font-semibold mb-2">
-                                        Semesters
+                                        Sections
                                     </h3>
                                     <span>
-                                        <SemesterForm programId={program.id} />
+                                        {/* <SemesterForm programId={program.id} /> */}
                                     </span>
                                 </div>
-                                <DataTable
+                                {/* <DataTable
                                     semesters={program.semesters ?? []}
-                                />
+                                /> */}
                             </div>
                         </div>
                     </div>

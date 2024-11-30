@@ -7,13 +7,12 @@ import { Program, Semester } from "@/types/database";
 
 // Components
 import { DataTable, SemesterForm } from "@/Components/Semesters";
-import columns from "./_components/columns";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useBreadcrumb } from "@/components/providers/breadcrum-provider";
 import { Button } from "@/components/ui/button";
-import { ProgramForm } from "./_components/ProgramForm";
+import columns from "./_components/columns";
 
-export default function Rooms({
+export default function IndexPage({
     auth,
     semesters,
 }: PageProps<{ semesters: Semester[] }>) {
@@ -39,7 +38,13 @@ export default function Rooms({
                             Create Semester
                         </Button>
                     </h2>
-                    <DataTable semesters={semesters} searchFilter pagination />
+                    <DataTable
+                        semesters={semesters}
+                        columns={columns}
+                        searchFilter
+                        pagination
+                        isMainListing
+                    />
                 </div>
             </div>
 

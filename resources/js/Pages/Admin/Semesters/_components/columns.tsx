@@ -1,12 +1,10 @@
 import { ColumnDef } from "@tanstack/react-table";
-import Tooltip from "@/components/ui/tooltip";
-import { Check, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Actions } from "./actions";
-import { Shift } from "@/types";
-import { Program } from "@/types/database";
+import { Semester } from "@/types/database";
+import { getNumberWithOrdinal } from "@/utils/helper";
 
-const columns: ColumnDef<Program>[] = [
+const columns: ColumnDef<Semester>[] = [
     {
         accessorKey: "index",
         header: "#",
@@ -17,32 +15,41 @@ const columns: ColumnDef<Program>[] = [
         header: "Name",
     },
     {
-        accessorKey: "code",
-        header: "Code",
+        accessorKey: "number",
+        header: "No.",
+        cell: ({ row }) => getNumberWithOrdinal(row.original.number),
     },
     {
-        accessorKey: "duration",
-        header: "Duration",
-        cell: ({ row }) => row.original.duration + " Years",
-    },
-    {
-        accessorKey: "type",
-        header: "Type",
+        accessorKey: "is_active",
+        header: "Is Active",
         cell: ({ row }) => {
+            const isActive = row.original.is_active === "active";
+
             return (
-                <Badge variant={"secondary"} className="capitalize">
-                    {row.original.type}
-                </Badge>
+                <>
+                    {isActive ? (
+                        <Badge variant={"successOutline"}>Yes</Badge>
+                    ) : (
+                        <Badge variant={"destructiveOutline"}>No</Badge>
+                    )}
+                </>
             );
         },
     },
     {
-        accessorKey: "shift.name",
-        header: "Shift",
+        accessorKey: "program.name",
+        header: "Program",
+    },
+    {
+        accessorKey: "sections_count",
+        header: "Sections",
+        cell: ({ row }) => (
+            <Badge variant={"secondary"}>{row.original.sections_count}</Badge>
+        ),
     },
     {
         accessorKey: "id",
-        header: "",
+        header: "Actions",
         cell: ({ row }) => {
             return <Actions row={row.original} />;
         },

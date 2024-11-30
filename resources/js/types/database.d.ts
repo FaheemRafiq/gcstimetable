@@ -133,6 +133,9 @@ export type Semester = {
     // Relations
     courses?: Course[];
     sections?: Section[];
+    program?: Program;
+
+    sections_count?: number;
 };
 
 export type Program = {

@@ -10,7 +10,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { router } from "@inertiajs/react";
-import { Program, Semester, Slot } from "@/types/database";
+import { Semester } from "@/types/database";
 import DeleteConfirmationDialog from "../Dialog/DeleteConfirmationDialog";
 import { SemesterForm } from "./SemesterForm";
 

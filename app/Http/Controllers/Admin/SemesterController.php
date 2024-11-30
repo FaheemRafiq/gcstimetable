@@ -9,12 +9,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\SemesterRequest;
 use Illuminate\Database\QueryException;
-use App\Http\Resources\SemesterCollection;
-use App\Http\Requests\UpdateSemesterRequest;
 
 class SemesterController extends Controller
 {
-    public const ONLY = ['index', 'create', 'store', 'update', 'destroy'];
+    public const ONLY = ['index', 'create', 'show', 'store', 'update', 'destroy'];
 
     public function index()
     {
@@ -31,7 +29,7 @@ class SemesterController extends Controller
             });
         }
 
-        $semesters = $builder->with('program:id,name,code')->latest()->get();
+        $semesters = $builder->with('program:id,name,code')->withCount('sections')->latest()->get();
 
         return inertia()->render('Admin/Semesters/index', compact('semesters'));
     }
@@ -42,6 +40,13 @@ class SemesterController extends Controller
         $programs   = $admin->institution->programs()->select('programs.id', 'programs.name', 'programs.code')->get();
 
         return response()->json(compact('programs'));
+    }
+
+    public function show(Semester $semester)
+    {
+        $semester->load(['program:id,name,code', 'sections', 'courses']);
+
+        return inertia()->render("Admin/Semesters/show", compact('semester'));
     }
 
     /**

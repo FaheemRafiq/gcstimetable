@@ -1,60 +1,55 @@
-import { useState } from "react";
-import {
-    EllipsisVertical,
-    Eye,
-    Pencil,
-    Trash,
-    User as UserIcon,
-} from "lucide-react";
+import React, { useEffect } from "react";
+import { EllipsisVertical, Eye, Pencil, Trash } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuPortal,
     DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Fragment } from "react/jsx-runtime";
-import { Link, router, useForm } from "@inertiajs/react";
-import toast from "react-hot-toast";
-import { Program, Room } from "@/types/database";
+import { router } from "@inertiajs/react";
+import { Semester } from "@/types/database";
 import DeleteConfirmationDialog from "@/Components/Dialog/DeleteConfirmationDialog";
-import { ProgramForm } from "./ProgramForm";
+import { SemesterForm } from "@/Components/Semesters/SemesterForm";
 
-export function Actions({ row }: { row: Program }) {
-    // Edit state
-    const [openEdit, setOpenEdit] = useState(false);
+export function Actions({ row }: { row: Semester }) {
+    // Edit State
+    const [openEdit, setOpenEdit] = React.useState(false);
 
-    // Delete state
-    const [openDelete, setOpenDelete] = useState(false);
-    const [deleting, setDeleting] = useState(false);
+    // Delete Action State
+    const [openConfirm, setOpenConfirm] = React.useState(false);
+    const [deleting, setDeleting] = React.useState(false);
 
-    const handleDelete = (row: Program) => {
+    const handleDelete = (row: Semester) => {
         setDeleting(true);
-        router.delete(route("programs.destroy", row.id), {
+        router.delete(route("semesters.destroy", row.id), {
             preserveScroll: true,
             preserveState: true,
+            onSuccess: () => {
+                setOpenConfirm(false);
+            },
             onFinish: () => {
                 setDeleting(false);
-            },
-            onSuccess: () => {
-                setOpenDelete(false);
             },
         });
     };
 
-    function handleView(row: Program) {
-        router.get(route("programs.show", row.id));
+    function handleView() {
+        router.get(route("semesters.show", row.id));
+    }
+
+    function handleCloseEdit() {
+        setOpenEdit(false);
+
+        setTimeout(() => {
+            document.body.style.removeProperty("pointer-events");
+        }, 1000);
     }
 
     return (
-        <Fragment>
+        <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild className="cursor-pointer">
                     <EllipsisVertical />
@@ -63,23 +58,17 @@ export function Actions({ row }: { row: Program }) {
                     <DropdownMenuLabel>Operations</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                        <DropdownMenuItem
-                            className="cursor-pointer"
-                            onClick={() => handleView(row)}
-                        >
+                        <DropdownMenuItem onClick={() => handleView()}>
                             <Eye className="mr-2 h-4 w-4" />
                             <span>View</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                            className="cursor-pointer"
-                            onClick={() => setOpenEdit(true)}
-                        >
+                        <DropdownMenuItem onClick={() => setOpenEdit(true)}>
                             <Pencil className="mr-2 h-4 w-4" />
                             <span>Edit</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             className="cursor-pointer"
-                            onClick={() => setOpenDelete(true)}
+                            onClick={() => setOpenConfirm(true)}
                         >
                             <Trash className="mr-2 h-4 w-4" />
                             <span>Delete</span>
@@ -88,23 +77,22 @@ export function Actions({ row }: { row: Program }) {
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Edit Program */}
-
-            <ProgramForm
+            {/* Edit Sheet */}
+            <SemesterForm
                 open={openEdit}
-                onClose={() => setOpenEdit(false)}
-                program={row}
+                onClose={handleCloseEdit}
+                semester={row}
             />
 
             {/* Delete Confirmation */}
             <DeleteConfirmationDialog
-                open={openDelete}
-                onClose={() => setOpenDelete(false)}
+                open={openConfirm}
+                onClose={() => setOpenConfirm(false)}
                 onDelete={() => handleDelete(row)}
-                title="Delete Program"
-                message="Are you sure you want to delete this program?"
                 processing={deleting}
+                title="Delete Semester?"
+                message={`Once ${row.name} is deleted, it cannot be recovered. Are you sure you want to delete this semester?`}
             />
-        </Fragment>
+        </>
     );
 }
