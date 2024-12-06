@@ -34,9 +34,13 @@ export default function Authenticated({
                 <AppSidebar user={user} />
                 <SidebarInset className="overflow-hidden">
                     <Header SidebarTrigger={SidebarTrigger} />
-                    <ScrollArea className={cn("flex flex-1 flex-col p-4 pt-0")}>
+                    <div
+                        className={cn(
+                            "flex flex-1 flex-col p-4 pt-0 overflow-y-auto"
+                        )}
+                    >
                         {children}
-                    </ScrollArea>
+                    </div>
                 </SidebarInset>
             </SidebarProvider>
         </AbilitiesProvider>
