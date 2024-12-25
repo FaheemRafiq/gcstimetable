@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Actions } from "./actions";
 import { Semester } from "@/types/database";
 import { getNumberWithOrdinal } from "@/utils/helper";
+import { IsActiveBadge } from "@/Components/IsActive";
 
 const columns: ColumnDef<Semester>[] = [
     {
@@ -25,15 +26,7 @@ const columns: ColumnDef<Semester>[] = [
         cell: ({ row }) => {
             const isActive = row.original.is_active === "active";
 
-            return (
-                <>
-                    {isActive ? (
-                        <Badge variant={"successOutline"}>Yes</Badge>
-                    ) : (
-                        <Badge variant={"destructiveOutline"}>No</Badge>
-                    )}
-                </>
-            );
+            return <IsActiveBadge isActive={isActive} />;
         },
     },
     {

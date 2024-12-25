@@ -3,87 +3,69 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Section;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
+use App\Http\Requests\SectionRequest;
 use Illuminate\Database\QueryException;
-use App\Http\Resources\SectionCollection;
-use App\Http\Requests\StoreSectionRequest;
 use App\Http\Requests\UpdateSectionRequest;
 
 class SectionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-
-        $semesterid = request()->input('semester_id');
-
-        try {
-            return response()->json(new SectionCollection(Section::all()->where('semester_id', $semesterid)->sortByDesc('updated_at')), 200); // 200 OK
-        } catch (QueryException $exception) {
-            return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
-        }
-
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+    public const ONLY = ['store', 'update', 'destroy'];
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreSectionRequest $request)
+    public function store(SectionRequest $request)
     {
+        $attributes = $request->validated();
+        $response = Gate::inspect('create', Section::class);
+        $message = '';
 
         try {
-            $section = Section::create($request->all());
+            if ($response->allowed()) {
+                Section::create($attributes);
 
-            return response()->json($section, 201); // 201 Created
+                return back()->with('success', 'Section successfully created');
+            } else {
+                $message = $response->message();
+            }
         } catch (QueryException $exception) {
-            return response()->json(['error' => 'Constraint violation or other database error'.$exception->getMessage()], 422);
-        }
-    }
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('sections')->error('QueryException', $logData);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Section $section)
-    {
-        // write show method like Day show method
-        if (! $section) {
-            return response()->json(['message' => 'Section not found'], 404);
+            $message = 'Database error 👉 Something went wrong!';
         }
 
-        return response()->json($section);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Section $section)
-    {
-        //
+        return back()->withErrors(['message' => $message]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSectionRequest $request, Section $section)
+    public function update(SectionRequest $request, Section $section)
     {
+        $attributes = $request->validated();
+        $response = Gate::inspect('update', $section);
+        $message = '';
 
         try {
-            $section->update($request->all());
+            if ($response->allowed()) {
+                $section->update($attributes);
 
-            return response()->json($section, 200); // 200 OK
+                return back()->with('success', 'Section successfully updated');
+            } else {
+                $message = $response->message();
+            }
         } catch (QueryException $exception) {
-            return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('sections')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
         }
+
+        return back()->withErrors(['message' => $message]);
     }
 
     /**
@@ -91,12 +73,24 @@ class SectionController extends Controller
      */
     public function destroy(Section $section)
     {
-        try {
-            $section->delete();
+        $response = Gate::inspect('delete', $section);
+        $message = '';
 
-            return response()->json(['section' => $section,  'message' => 'Resource successfully deleted'], 200);
+        try {
+            if ($response->allowed()) {
+                $section->delete();
+
+                return back()->with('success', 'Section successfully deleted');
+            } else {
+                $message = $response->message();
+            }
         } catch (QueryException $exception) {
-            return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('sections')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
         }
+
+        return back()->withErrors(['message' => $message]);
     }
 }

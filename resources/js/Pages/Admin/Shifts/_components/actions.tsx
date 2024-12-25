@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
     EllipsisVertical,
     Eye,
@@ -86,11 +86,13 @@ export function Actions({ row }: { row: Shift }) {
             </DropdownMenu>
 
             {/* Edit Shift */}
-            <ShiftForm
-                shift={row}
-                open={openEdit}
-                onClose={() => setOpenEdit(false)}
-            />
+            {openEdit && (
+                <ShiftForm
+                    shift={row}
+                    open={openEdit}
+                    onClose={() => setOpenEdit(false)}
+                />
+            )}
 
             {/* Shift Delete Confirmation */}
             <DeleteConfirmationDialog

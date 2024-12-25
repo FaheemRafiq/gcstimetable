@@ -59,13 +59,14 @@ export const RoomForm: React.FC<RoomFormProps> = ({
 
     React.useEffect(() => {
         if (isEditForm && room) {
-            setData({
+            setData((data) => ({
+                ...data,
                 name: room.name || "",
                 code: room.code || "",
                 capacity: room.capacity || 0,
                 type: room.type || "",
                 isavailable: room.isavailable ?? true,
-            });
+            }));
         }
     }, [room]);
 
@@ -85,7 +86,7 @@ export const RoomForm: React.FC<RoomFormProps> = ({
                 onClose?.();
             },
             onError: (error) => {
-                if(error.message){
+                if (error.message) {
                     toast.error(error.message);
                 }
             },

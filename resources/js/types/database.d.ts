@@ -115,6 +115,7 @@ export type Room = {
 export type Section = {
     id: number;
     name: string;
+    is_active: IsActive;
     semester_id: number;
     semester?: Semester;
     created_at: string;

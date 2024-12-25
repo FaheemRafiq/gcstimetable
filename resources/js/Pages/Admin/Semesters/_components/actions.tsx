@@ -78,11 +78,13 @@ export function Actions({ row }: { row: Semester }) {
             </DropdownMenu>
 
             {/* Edit Sheet */}
-            <SemesterForm
-                open={openEdit}
-                onClose={handleCloseEdit}
-                semester={row}
-            />
+            {openEdit && (
+                <SemesterForm
+                    open={openEdit}
+                    onClose={handleCloseEdit}
+                    semester={row}
+                />
+            )}
 
             {/* Delete Confirmation */}
             <DeleteConfirmationDialog

@@ -1,11 +1,10 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Badge } from "@/components/ui/badge";
 import { Actions } from "./actions";
-import { Semester } from "@/types/database";
-import { getNumberWithOrdinal } from "@/utils/helper";
-import { IsActiveBadge } from "../IsActive";
+import { Section } from "@/types/database";
+import { Badge } from "@/components/ui/badge";
+import { IsActiveBadge } from "@/Components/IsActive";
 
-const columns: ColumnDef<Semester>[] = [
+const columns: ColumnDef<Section>[] = [
     {
         accessorKey: "index",
         header: "#",
@@ -14,11 +13,6 @@ const columns: ColumnDef<Semester>[] = [
     {
         accessorKey: "name",
         header: "Name",
-    },
-    {
-        accessorKey: "number",
-        header: "No.",
-        cell: ({ row }) => getNumberWithOrdinal(row.original.number),
     },
     {
         accessorKey: "is_active",
@@ -35,6 +29,14 @@ const columns: ColumnDef<Semester>[] = [
         cell: ({ row }) => {
             return <Actions row={row.original} />;
         },
+    },
+    {
+        accessorKey: "created_at",
+        header: "Created At",
+    },
+    {
+        accessorKey: "updated_at",
+        header: "Updated At",
     },
 ];
 

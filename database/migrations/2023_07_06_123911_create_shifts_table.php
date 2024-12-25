@@ -19,7 +19,7 @@ return new class extends Migration
             // shifts of institution
             $table->foreignIdFor(Institution::class)->constrained()->cascadeOnDelete();
             $table->enum('type', ['Morning', 'Afternoon' ,'Evening'])->nullable();
-            $table->enum('is_active', ['active', 'inactive'])->default('active');
+            $table->is_active();
             // program type
             $table->enum('program_type', ['ADP', 'INTER', 'BS'])->default('BS');
 

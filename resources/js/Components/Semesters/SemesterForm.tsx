@@ -11,6 +11,7 @@ import { FormSheet } from "@/Components/FormSheet";
 import { IsActive } from "@/types";
 import { fetchWrapper } from "@/lib/fetchWrapper";
 import { AutoCompleteSelect } from "@/components/combobox";
+import { IsActiveSwitch } from "../IsActive";
 
 interface FormProps {
     name: string;
@@ -209,23 +210,11 @@ export const SemesterForm: React.FC<PageProps> = ({
 
                     {/* Is Active Field */}
                     <div>
-                        <Label htmlFor="is_active">Is Active</Label>
-                        <div className="flex items-center gap-2 mt-2">
-                            <Switch
-                                id="is_active"
-                                checked={data.is_active === "active"}
-                                onCheckedChange={(checked) =>
-                                    setData(
-                                        "is_active",
-                                        checked ? "active" : "inactive"
-                                    )
-                                }
-                            />
-                            <span>
-                                {data.is_active === "active" ? "Yes" : "No"}
-                            </span>
-                        </div>
-                        <InputError message={errors.is_active} />
+                        <IsActiveSwitch
+                            isActive={data.is_active}
+                            setIsActive={(value) => setData("is_active", value)}
+                            error={errors.is_active}
+                        />
                     </div>
                 </form>
             </FormSheet>

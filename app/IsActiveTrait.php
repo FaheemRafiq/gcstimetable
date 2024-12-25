@@ -8,29 +8,29 @@ trait IsActiveTrait
     public const INACTIVE = 'inactive';
 
     // Scopes
-    public function scopeWhereActive($query, $value)
+    public function scopeWhereActive($query)
     {
-        return $query->where('is_active', $value);
+        return $query->where('is_active', self::ACTIVE);
     }
 
     public function scopeActive($query)
     {
-        return $query->where('is_active', 'active');
+        return $query->where('is_active', self::ACTIVE);
     }
 
     public function scopeInactive($query)
     {
-        return $query->where('is_active', 'inactive');
+        return $query->where('is_active', self::INACTIVE);
     }
 
     // helpers
     public function isActive()
     {
-        return $this->is_active === 'active';
+        return $this->is_active === self::ACTIVE;
     }
 
     public function isInactive()
     {
-        return $this->is_active === 'inactive';
+        return $this->is_active === self::INACTIVE;
     }
 }

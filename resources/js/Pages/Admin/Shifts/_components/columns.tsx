@@ -4,6 +4,7 @@ import { Check, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Actions } from "./actions";
 import { Shift } from "@/types";
+import { IsActiveBadge } from "@/Components/IsActive";
 
 const columns: ColumnDef<Shift>[] = [
     {
@@ -25,15 +26,7 @@ const columns: ColumnDef<Shift>[] = [
         cell: ({ row }) => {
             const isActive = row.original.is_active === "active";
 
-            return (
-                <>
-                    {isActive ? (
-                        <Badge variant={"successOutline"}>Yes</Badge>
-                    ) : (
-                        <Badge variant={"destructiveOutline"}>No</Badge>
-                    )}
-                </>
-            );
+            return <IsActiveBadge isActive={isActive} />;
         },
     },
     {

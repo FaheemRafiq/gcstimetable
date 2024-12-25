@@ -15,6 +15,7 @@ import {
 import InputError from "@/Components/InputError";
 import { IsActive, Shift } from "@/types";
 import { Switch } from "@/components/ui/switch";
+import { IsActiveSwitch } from "@/Components/IsActive";
 
 export const types = ["Morning", "Afternoon", "Evening"];
 export const programs = ["INTER", "BS", "ADP"];
@@ -51,11 +52,24 @@ export const ShiftForm: React.FC<ShiftFormProps> = ({
 
     const { data, post, put, errors, processing, reset, setData } =
         useForm<FormProps>({
-            name: shift?.name || "",
-            type: shift?.type || "",
-            is_active: shift?.is_active || "active",
-            program_type: shift?.program_type || "",
+            name: "",
+            type: "",
+            is_active: "active",
+            program_type: "",
         });
+
+    useEffect(() => {
+        if (shift && isEditForm) {
+            console.log("data here =>", data);
+            setData((data) => ({
+                ...data,
+                name: shift.name,
+                type: shift.type,
+                is_active: shift.is_active,
+                program_type: shift.program_type,
+            }));
+        }
+    }, [shift, isEditForm]);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -178,23 +192,11 @@ export const ShiftForm: React.FC<ShiftFormProps> = ({
 
                     {/* Is Active Field */}
                     <div>
-                        <Label htmlFor="is_active">Is Active</Label>
-                        <div className="flex items-center gap-2 mt-2">
-                            <Switch
-                                id="is_active"
-                                checked={data.is_active === "active"}
-                                onCheckedChange={(checked) =>
-                                    setData(
-                                        "is_active",
-                                        checked ? "active" : "inactive"
-                                    )
-                                }
-                            />
-                            <span>
-                                {data.is_active === "active" ? "Yes" : "No"}
-                            </span>
-                        </div>
-                        <InputError message={errors.is_active} />
+                        <IsActiveSwitch
+                            isActive={data.is_active}
+                            setIsActive={(value) => setData("is_active", value)}
+                            error={errors.is_active}
+                        />
                     </div>
                 </form>
             </FormSheet>

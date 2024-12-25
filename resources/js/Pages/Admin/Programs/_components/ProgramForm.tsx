@@ -53,7 +53,7 @@ export const ProgramForm: React.FC<RoomFormProps> = ({
     const isEditForm = program !== undefined;
 
     // State
-    const [open, setOpen] = React.useState(openProp ?? false);
+    const [open, setOpen] = React.useState(false);
     const [pageStates, setPageStates] = React.useState<PageStateProps>({
         shifts: [],
         departments: [],
@@ -75,7 +75,7 @@ export const ProgramForm: React.FC<RoomFormProps> = ({
         return pageStates.shifts?.filter(
             (shift) => shift.program_type === data.type
         );
-    }, [data.type]);
+    }, [data.type, pageStates.shifts]);
 
     useEffect(() => {
         if (open === true && pageStates.isFetched === false) {
@@ -91,14 +91,15 @@ export const ProgramForm: React.FC<RoomFormProps> = ({
 
     useEffect(() => {
         if (isEditForm && program) {
-            setData({
-                name: program.name || "",
-                code: program.code || "",
-                duration: program.duration || 0,
-                type: program.type || "",
-                shift_id: program.shift_id || null,
-                department_id: program.department_id || null,
-            });
+            setData((data) => ({
+                ...data,
+                name: program.name,
+                code: program.code,
+                duration: program.duration,
+                type: program.type,
+                shift_id: program.shift_id,
+                department_id: program.department_id,
+            }));
         }
     }, [program]);
 
@@ -118,7 +119,7 @@ export const ProgramForm: React.FC<RoomFormProps> = ({
                 }
             });
         }
-    }, [data, errors]);
+    }, [data]);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -156,10 +157,10 @@ export const ProgramForm: React.FC<RoomFormProps> = ({
             url: route("programs.create"),
             method: "GET",
         })
-            .then((data) => {
+            .then((response) => {
                 setPageStates({
-                    ...data,
-                    types: data.program_types,
+                    ...response,
+                    types: response.program_types,
                     isFetched: true,
                 });
             })
@@ -289,14 +290,15 @@ export const ProgramForm: React.FC<RoomFormProps> = ({
                                 <SelectValue placeholder="Select shift" />
                             </SelectTrigger>
                             <SelectContent>
-                                {filteredShifts.map((shift) => (
-                                    <SelectItem
-                                        value={shift.id.toString()}
-                                        key={shift.id}
-                                    >
-                                        {shift.name}
-                                    </SelectItem>
-                                ))}
+                                {filteredShifts.length > 0 &&
+                                    filteredShifts.map((shift) => (
+                                        <SelectItem
+                                            value={shift.id.toString()}
+                                            key={shift.id}
+                                        >
+                                            {shift.name}
+                                        </SelectItem>
+                                    ))}
                             </SelectContent>
                         </Select>
                         <InputError message={errors.shift_id} />
@@ -306,10 +308,9 @@ export const ProgramForm: React.FC<RoomFormProps> = ({
                     <div>
                         <Label htmlFor="department_id">Department</Label>
                         <AutoCompleteSelect
-                            label="Select Course"
+                            label="Select Department"
                             value={data.department_id?.toString() ?? ""}
                             setValue={(value: string) => {
-                                console.log("value", value);
                                 setData("department_id", Number(value) ?? null);
                             }}
                             values={

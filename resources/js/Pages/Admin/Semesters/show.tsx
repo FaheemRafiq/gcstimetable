@@ -6,15 +6,16 @@ import { Button } from "@/components/ui/button";
 import { useBreadcrumb } from "@/components/providers/breadcrum-provider";
 import { useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Program, Semester } from "@/types/database";
-import { DataTable, SemesterForm } from "@/Components/Semesters";
+import { Section, Semester } from "@/types/database";
 import { getNumberWithOrdinal } from "@/utils/helper";
+import IndexPage from "./Sections";
 
 interface ShowRoomProps extends Record<string, unknown> {
     semester: Semester;
+    sections: Section[];
 }
 
-function ShowPage({ auth, semester }: PageProps<ShowRoomProps>) {
+function ShowPage({ auth, semester, sections }: PageProps<ShowRoomProps>) {
     const { setBreadcrumb } = useBreadcrumb();
 
     useEffect(() => {
@@ -97,17 +98,10 @@ function ShowPage({ auth, semester }: PageProps<ShowRoomProps>) {
 
                         <div className="bg-background text-foreground p-6 sm:rounded-lg shadow-lg">
                             <div className="mb-4">
-                                <div className="flex justify-between">
-                                    <h3 className="text-lg font-semibold mb-2">
-                                        Sections
-                                    </h3>
-                                    <span>
-                                        {/* <SemesterForm programId={program.id} /> */}
-                                    </span>
-                                </div>
-                                {/* <DataTable
-                                    semesters={program.semesters ?? []}
-                                /> */}
+                                <IndexPage
+                                    sections={sections ?? []}
+                                    semesterId={semester.id}
+                                />
                             </div>
                         </div>
                     </div>

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('number')->default(1);
             
             // Semester active or not
-            $table->enum('is_active', ['active', 'inactive'])->default('active');
+            $table->is_active();
 
             // foreign key to program
             $table->foreignId('program_id')->constrained()->onDelete('cascade');

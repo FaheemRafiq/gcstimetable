@@ -55,7 +55,7 @@ Route::prefix('admin')
         Route::resource('semesters', Admin\SemesterController::class)->only(Admin\SemesterController::ONLY);
 
         // Sections 📂
-        Route::resource('sections', Admin\SectionController::class);
+        Route::resource('sections', Admin\SectionController::class)->only(Admin\SectionController::ONLY);
 
         // slots 🎰
         Route::resource('slots', Admin\SlotController::class)->only(Admin\SlotController::ONLY);

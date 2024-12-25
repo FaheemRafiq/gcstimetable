@@ -75,4 +75,9 @@ enum PermissionEnum : string
     case EDIT_DAY           = 'edit day';
     case DELETE_DAY         = 'delete day';
     case VIEW_DAY           = 'view day';
+
+    case CREATE_SECTION     = 'create section';
+    case EDIT_SECTION       = 'edit section';
+    case DELETE_SECTION     = 'delete section';
+    case VIEW_SECTION       = 'view section';
 }

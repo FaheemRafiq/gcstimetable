@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Resources\SectionResouce;
 use App\Models\Semester;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -46,7 +47,9 @@ class SemesterController extends Controller
     {
         $semester->load(['program:id,name,code', 'sections', 'courses']);
 
-        return inertia()->render("Admin/Semesters/show", compact('semester'));
+        $sections = SectionResouce::collection($semester->sections)->toArray(request());
+
+        return inertia()->render("Admin/Semesters/show", compact('semester', 'sections'));
     }
 
     /**

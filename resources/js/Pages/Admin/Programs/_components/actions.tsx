@@ -90,11 +90,13 @@ export function Actions({ row }: { row: Program }) {
 
             {/* Edit Program */}
 
-            <ProgramForm
-                open={openEdit}
-                onClose={() => setOpenEdit(false)}
-                program={row}
-            />
+            {openEdit && (
+                <ProgramForm
+                    open={openEdit}
+                    onClose={() => setOpenEdit(false)}
+                    program={row}
+                />
+            )}
 
             {/* Delete Confirmation */}
             <DeleteConfirmationDialog

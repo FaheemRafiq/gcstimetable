@@ -169,6 +169,13 @@ return [
             'level' => 'debug',
             'days' => 30,
         ],
+
+        'sections' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/'.now()->toDateString().'/sections.log'),
+            'level' => 'debug',
+            'days' => 30,
+        ],
     ],
 
 ];

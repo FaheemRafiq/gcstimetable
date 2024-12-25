@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('sections', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->is_active();
             // Section belongs to  a Semester
             $table->foreignId('semester_id')->constrained();
 

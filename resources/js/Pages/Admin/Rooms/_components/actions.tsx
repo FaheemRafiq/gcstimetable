@@ -95,11 +95,13 @@ export function Actions({ row }: { row: Room }) {
 
             {/* Edit Room */}
 
-            <RoomForm
-                room={row}
-                open={openEdit}
-                onClose={() => setOpenEdit(false)}
-            />
+            {openEdit && (
+                <RoomForm
+                    room={row}
+                    open={openEdit}
+                    onClose={() => setOpenEdit(false)}
+                />
+            )}
 
             {/* Room Delete Confirmation */}
             <DeleteConfirmationDialog

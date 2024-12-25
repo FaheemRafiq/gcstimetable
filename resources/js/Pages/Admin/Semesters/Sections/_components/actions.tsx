@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { EllipsisVertical, Pencil, Trash } from "lucide-react";
+import React from "react";
+import { EllipsisVertical, Eye, Pencil, Trash } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,11 +10,11 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { router } from "@inertiajs/react";
-import { Slot } from "@/types/database";
-import { EditSlot } from "@/Components/Slots";
-import DeleteConfirmationDialog from "../Dialog/DeleteConfirmationDialog";
+import { Section } from "@/types/database";
+import DeleteConfirmationDialog from "@/Components/Dialog/DeleteConfirmationDialog";
+import { SectionForm } from "./SectionForm";
 
-export function Actions({ row }: { row: Slot }) {
+export function Actions({ row }: { row: Section }) {
     // Edit State
     const [openEdit, setOpenEdit] = React.useState(false);
 
@@ -22,11 +22,14 @@ export function Actions({ row }: { row: Slot }) {
     const [openConfirm, setOpenConfirm] = React.useState(false);
     const [deleting, setDeleting] = React.useState(false);
 
-    const handleDelete = (row: Slot) => {
+    const handleDelete = (row: Section) => {
         setDeleting(true);
-        router.delete(route("slots.destroy", row.id), {
+        router.delete(route("sections.destroy", row.id), {
             preserveScroll: true,
             preserveState: true,
+            onSuccess: () => {
+                setOpenConfirm(false);
+            },
             onFinish: () => {
                 setDeleting(false);
             },
@@ -66,23 +69,23 @@ export function Actions({ row }: { row: Slot }) {
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Edit Slot Sheet */}
+            {/* Edit Sheet */}
             {openEdit && (
-                <EditSlot
+                <SectionForm
                     open={openEdit}
                     onClose={handleCloseEdit}
-                    slot={row}
+                    section={row}
                 />
             )}
 
-            {/* Slot Delete Confirmation */}
+            {/* Delete Confirmation */}
             <DeleteConfirmationDialog
                 open={openConfirm}
                 onClose={() => setOpenConfirm(false)}
                 onDelete={() => handleDelete(row)}
                 processing={deleting}
-                title="Delete Time Slot?"
-                message={`Once this time slot ${row.name} is deleted, it cannot be recovered. Are you sure you want to delete this slot?`}
+                title="Delete Section?"
+                message={`Once ${row.name} is deleted, it cannot be recovered. Are you sure you want to delete this section?`}
             />
         </>
     );
