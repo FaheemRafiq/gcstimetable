@@ -79,8 +79,7 @@ const SidebarProvider = React.forwardRef<
             typeof value === "function" ? value(open) : value
           )
         }
-
-        // console.log("SetOpen", value, open)
+        
         _setOpen(value)
 
         // This sets the cookie to keep the sidebar state.

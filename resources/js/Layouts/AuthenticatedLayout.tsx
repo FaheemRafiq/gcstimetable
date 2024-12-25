@@ -20,7 +20,6 @@ export default function Authenticated({
     const { flash } = usePage<PageProps>().props;
 
     useEffect(() => {
-        console.log("flash", flash);
         if (flash?.error) {
             toast.error(flash?.error);
         } else if (flash?.success) {

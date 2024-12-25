@@ -60,7 +60,6 @@ export const ShiftForm: React.FC<ShiftFormProps> = ({
 
     useEffect(() => {
         if (shift && isEditForm) {
-            console.log("data here =>", data);
             setData((data) => ({
                 ...data,
                 name: shift.name,

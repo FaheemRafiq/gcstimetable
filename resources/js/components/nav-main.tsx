@@ -47,7 +47,7 @@ export function NavMain({
                                     <span>{item.title}</span>
                                 </Link>
                             </SidebarMenuButton>
-                            {item.items?.length ? (
+                            {item.navItems?.length ? (
                                 <>
                                     <CollapsibleTrigger asChild>
                                         <SidebarMenuAction className="data-[state=open]:rotate-90">
@@ -59,7 +59,7 @@ export function NavMain({
                                     </CollapsibleTrigger>
                                     <CollapsibleContent>
                                         <SidebarMenuSub>
-                                            {item.items?.map((subItem) => (
+                                            {item.navItems?.map((subItem) => (
                                                 <SidebarMenuSubItem
                                                     key={subItem.title}
                                                 >

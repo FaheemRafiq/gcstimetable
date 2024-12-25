@@ -15,7 +15,6 @@ export default function Students({
     useEffect(() => {
         setBreadcrumb({
             title: "Students",
-            backItems: [{ title: "Users", url: route("users.index") }],
         });
     }, [setBreadcrumb]);
 

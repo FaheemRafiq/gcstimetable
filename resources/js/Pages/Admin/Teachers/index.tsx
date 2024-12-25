@@ -17,7 +17,6 @@ export default function Teachers({
     useEffect(() => {
         setBreadcrumb({
             title: "Teachers",
-            backItems: [{ title: "Users", url: route("users.index") }],
         });
     }, [setBreadcrumb]);
 

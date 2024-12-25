@@ -64,8 +64,8 @@ export function CommandDialogDemo() {
 
     const resolveSideBarNavs = (item: NavItem, index: number) => {
         let NavItems: React.ReactNode[] = [];
-        if (item.items?.length) {
-            item.items.forEach((subItem, index) => {
+        if (item.navItems?.length) {
+            item.navItems.forEach((subItem, index) => {
                 NavItems.push(
                     <CommandItem
                         key={index + subItem.url}
@@ -125,17 +125,18 @@ export function CommandDialogDemo() {
                 />
                 <CommandList>
                     <CommandEmpty>No results found.</CommandEmpty>
-                    <CommandGroup heading="Administration">
-                        {NavData.navMain.map((item, index) =>
-                            resolveSideBarNavs(item, index)
-                        )}
-                    </CommandGroup>
-                    <CommandSeparator />
-                    <CommandGroup heading="Academic Structure">
-                        {NavData.navCurriculum.map((item, index) =>
-                            resolveSideBarNavs(item, index)
-                        )}
-                    </CommandGroup>
+                    {NavData.map((section) => {
+                        return (
+                            <CommandGroup
+                                key={section.label}
+                                heading={section.label}
+                            >
+                                {section.items.map((item, index) =>
+                                    resolveSideBarNavs(item, index)
+                                )}
+                            </CommandGroup>
+                        );
+                    })}
                     <CommandSeparator />
                     <CommandGroup heading="General">
                         <CommandItem onSelect={handleProfileNavigation}>

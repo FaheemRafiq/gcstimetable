@@ -50,115 +50,120 @@ export type NavItem = {
     isActive: boolean;
     collaped?: boolean;
     disabled?: boolean;
-    items?: NavItem[];
+    navItems?: NavItem[];
 };
 
-export type NavDataType = {
-    navMain: NavItem[];
-    navCurriculum: NavItem[];
-    academicStructure: NavItem[];
-    navSecondary: any;
-};
+export interface NavSection {
+    label: string;
+    items: NavItem[];
+}
 
-export const NavData: NavDataType = {
-    navMain: [
-        {
-            title: "Dashboard",
-            route: "dashboard",
-            url: route("dashboard"),
-            icon: LayoutDashboardIcon,
-            isActive: route().current("dashboard"),
-        },
-        {
-            title: "Users",
-            route: "users.index",
-            url: route("users.index"),
-            icon: UsersIcon,
-            isActive: route().current("users.index"),
-            collaped:
-                route().current("teachers.index") ||
-                route().current("students.index"),
-            items: [
-                {
-                    title: "Teachers",
-                    route: "teachers.index",
-                    url: route("teachers.index"),
-                    icon: UserIcon,
-                    isActive: route().current("teachers.index"),
-                },
-                {
-                    title: "Students",
-                    route: "students.index",
-                    url: route("students.index"),
-                    icon: GraduationCap,
-                    isActive: route().current("students.index"),
-                },
-            ],
-        },
-        {
-            title: "Time Tables",
-            route: "timetables.index",
-            url: route("timetables.index"),
-            isActive: route().current("timetables.index"),
-            icon: CalendarDays,
-        },
-        {
-            title: "Rooms",
-            route: "rooms.index",
-            url: route("rooms.index"),
-            isActive: route().current("rooms.index"),
-            icon: Building,
-        },
-        {
-            title: "Shifts",
-            route: "shifts.index",
-            url: route("shifts.index"),
-            isActive: route().current("shifts.index"),
-            icon: Hourglass,
-        },
-    ],
-    navCurriculum: [
-        {
-            title: "Programs",
-            route: "programs.index",
-            url: route("programs.index"),
-            icon: BookOpen,
-            isActive: route().current("programs.index"),
-        },
-        {
-            title: "Semesters",
-            route: "semesters.index",
-            url: route("semesters.index"),
-            icon: Command,
-            isActive: route().current("semesters.index"),
-        },
-        {
-            title: "Courses",
-            route: "courses.index",
-            url: route("courses.index"),
-            icon: Book,
-            isActive: route().current("courses.index"),
-        },
-    ],
-    academicStructure: [],
-    navSecondary: [
-        {
-            title: "Support",
-            url: "#",
-            icon: LifeBuoy,
-        },
-        {
-            title: "Feedback",
-            url: "#",
-            icon: Send,
-        },
-    ],
-};
+export type NavDataType = NavSection[];
+
+export const NavData: NavDataType = [
+    {
+        label: "Management",
+        items: [
+            {
+                title: "Dashboard",
+                route: "dashboard",
+                url: route("dashboard"),
+                icon: LayoutDashboardIcon,
+                isActive: route().current("dashboard"),
+            },
+            {
+                title: "Users",
+                route: "users.index",
+                url: route("users.index"),
+                icon: UsersIcon,
+                isActive: route().current("users.index"),
+            },
+            {
+                title: "Teachers",
+                route: "teachers.index",
+                url: route("teachers.index"),
+                icon: UserIcon,
+                isActive: route().current("teachers.index"),
+            },
+            {
+                title: "Students",
+                route: "students.index",
+                url: route("students.index"),
+                icon: GraduationCap,
+                isActive: route().current("students.index"),
+            },
+        ],
+    },
+    {
+        label: "Academics",
+        items: [
+            {
+                title: "Programs",
+                route: "programs.index",
+                url: route("programs.index"),
+                icon: BookOpen,
+                isActive: route().current("programs.index"),
+            },
+            {
+                title: "Semesters",
+                route: "semesters.index",
+                url: route("semesters.index"),
+                icon: Command,
+                isActive: route().current("semesters.index"),
+            },
+            {
+                title: "Courses",
+                route: "courses.index",
+                url: route("courses.index"),
+                icon: Book,
+                isActive: route().current("courses.index"),
+            },
+        ],
+    },
+    {
+        label: "Infrastructure",
+        items: [
+            {
+                title: "Rooms",
+                route: "rooms.index",
+                url: route("rooms.index"),
+                isActive: route().current("rooms.index"),
+                icon: Building,
+            },
+            {
+                title: "Time Tables",
+                route: "timetables.index",
+                url: route("timetables.index"),
+                isActive: route().current("timetables.index"),
+                icon: CalendarDays,
+            },
+            {
+                title: "Shifts",
+                route: "shifts.index",
+                url: route("shifts.index"),
+                isActive: route().current("shifts.index"),
+                icon: Hourglass,
+            },
+        ],
+    },
+];
+
+export const SecondaryNavData: any = [
+    {
+        title: "Support",
+        url: "#",
+        icon: LifeBuoy,
+    },
+    {
+        title: "Feedback",
+        url: "#",
+        icon: Send,
+    },
+];
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
     user: User;
 }
-
 export function AppSidebar({ user, ...props }: AppSidebarProps) {
     const checkActivity = React.useCallback((item: NavItem) => {
         let NewItem = {
@@ -167,24 +172,24 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
         };
 
         if (NewItem?.collaped !== undefined) {
-            NewItem.collaped = NewItem.items?.some((subItem) =>
+            NewItem.collaped = NewItem.navItems?.some((subItem) =>
                 route().current(subItem.route)
             );
         }
 
-        if (NewItem.items) {
-            NewItem.items = NewItem.items.map(checkActivity);
+        if (NewItem.navItems) {
+            NewItem.navItems = NewItem.navItems.map(checkActivity);
         }
 
         return NewItem;
     }, []);
 
-    const AdministrationRoutes = React.useMemo(() => {
-        return NavData.navMain.map(checkActivity);
-    }, [window.location.pathname]);
+    const NavigationData = React.useMemo(() => {
+        return NavData.map((section) => {
+            section.items.map(checkActivity);
 
-    const StructureRoutes = React.useMemo(() => {
-        return NavData.navCurriculum.map(checkActivity);
+            return section;
+        });
     }, [window.location.pathname]);
 
     return (
@@ -209,13 +214,14 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
-                <NavMain label="Administration" items={AdministrationRoutes} />
-                <NavMain label="Academic Structure" items={StructureRoutes} />
-                {/* <NavProjects projects={NavData.projects} /> */}
-                <NavSecondary
-                    items={NavData.navSecondary}
-                    className="mt-auto"
-                />
+                {NavigationData.map((section) => (
+                    <NavMain
+                        key={section.label}
+                        label={section.label}
+                        items={section.items}
+                    />
+                ))}
+                <NavSecondary items={SecondaryNavData} className="mt-auto" />
             </SidebarContent>
             <SidebarFooter>
                 <NavUser user={user} />
