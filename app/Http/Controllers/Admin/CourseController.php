@@ -3,30 +3,39 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Course;
+use App\Models\Semester;
+use App\Models\Institution;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\QueryException;
-use App\Http\Requests\StoreCourseRequest;
-use App\Http\Requests\UpdateCourseRequest;
-use App\Http\Resources\SemesterCollection;
+use App\Http\Requests\CourseRequest;
 
 class CourseController extends Controller
 {
+    public const ONLY = ['index', 'store', 'create', 'show', 'update', 'destroy'];
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+        $admin   = Auth::user();
+        $courses = [];
 
-        // get the query parameter from the URL
-        $semesterid = request()->input('semester_id');
-        Log::debug('semesterid: '.$semesterid);
+        if ($admin->isSuperAdmin()) {
+            $courses = Course::with('semester')->orderByDesc('created_at')->get();
 
-        try {
-            return response()->json(new SemesterCollection(Course::all()->where('semester_id', $semesterid)->sortByDesc('updated_at')), 200); // 200 OK
-        } catch (QueryException $exception) {
-            return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
+        } elseif ($admin->isInstitutionAdmin()) {
+            $institution = Institution::with('programs.courses.semester')->where('id', $admin->institution_id)->first();
+
+            $courses = $institution->programs->flatMap(function ($program) {
+                return $program->courses;
+            });
         }
+
+        return inertia()->render('Admin/Courses/index', compact('courses'));
     }
 
     /**
@@ -34,21 +43,49 @@ class CourseController extends Controller
      */
     public function create()
     {
-        //
+        $admin      = Auth::user();
+        $semesters  = [];
+        $types      = Course::TYPES;
+
+        if ($admin->isSuperAdmin()) {
+            $semesters = Semester::orderByDesc('created_at')->get();
+
+        } elseif ($admin->isInstitutionAdmin()) {
+            $institution = Institution::with('programs.semesters')->where('id', $admin->institution_id)->first();
+
+            $semesters = $institution->programs->flatMap(function ($program) {
+                return $program->semesters;
+            });
+        }
+
+        return response()->json(compact('semesters', 'types'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCourseRequest $request)
+    public function store(CourseRequest $request)
     {
-        try {
-            $semester = Course::create($request->all());
+        $attributes = $request->validated();
+        $response = Gate::inspect('create', Course::class);
+        $message = '';
 
-            return response()->json($semester, 201); // 201 Created
+        try {
+            if ($response->allowed()) {
+                Course::create($attributes);
+
+                return back()->with('success', 'Course successfully created');
+            } else {
+                $message = $response->message();
+            }
         } catch (QueryException $exception) {
-            return response()->json(['error' => 'Constraint violation or other database error'.$exception->getMessage()], 422);
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('courses')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
         }
+
+        return back()->withErrors(['message' => $message]);
     }
 
     /**
@@ -56,34 +93,36 @@ class CourseController extends Controller
      */
     public function show(Course $course)
     {
+        $course->load('semester');
 
-        if (! $course) {
-            return response()->json(['message' => 'Semester not found'], 404);
-        }
-
-        return response()->json($course);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Course $course)
-    {
-        //
+        return inertia()->render('Admin/Courses/show', compact('course'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCourseRequest $request, Course $course)
+    public function update(CourseRequest $request, Course $course)
     {
-        try {
-            $course->update($request->all());
+        $attributes = $request->validated();
+        $response = Gate::inspect('update', $course);
+        $message = '';
 
-            return response()->json($course, 200); // 200 OK
+        try {
+            if ($response->allowed()) {
+                $course->update($attributes);
+
+                return back()->with('success', 'Course successfully updated');
+            } else {
+                $message = $response->message();
+            }
         } catch (QueryException $exception) {
-            return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('courses')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
         }
+
+        return back()->withErrors(['message' => $message]);
     }
 
     /**
@@ -91,12 +130,24 @@ class CourseController extends Controller
      */
     public function destroy(Course $course)
     {
-        try {
-            $course->delete();
+        $response = Gate::inspect('delete', $course);
+        $message = '';
 
-            return response()->json(['course' => $course,  'message' => 'Resource successfully deleted'], 200);
+        try {
+            if ($response->allowed()) {
+                $course->delete();
+
+                return back()->with('success', 'Course successfully deleted');
+            } else {
+                $message = $response->message();
+            }
         } catch (QueryException $exception) {
-            return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
+            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            Log::channel('courses')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
         }
+
+        return back()->withErrors(['message' => $message]);
     }
 }

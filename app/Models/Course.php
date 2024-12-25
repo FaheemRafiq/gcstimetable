@@ -11,6 +11,11 @@ class Course extends Model
 {
     use HasFactory;
 
+    public const TYPES = [
+        'CLASS'  => 'Class',
+        'LAB'    => 'Lab',
+    ];
+
     // Course my Taught by many Teachers on Different Days
     public function teachers(): BelongsToMany
     {
@@ -39,5 +44,10 @@ class Course extends Model
     public function days(): BelongsToMany
     {
         return $this->belongsToMany(Day::class, 'allocations');
+    }
+
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class);
     }
 }

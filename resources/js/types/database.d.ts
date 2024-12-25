@@ -1,5 +1,7 @@
 import { IsActive, Shift } from ".";
 
+export type ClassType = "CLASS" | "LAB";
+
 export type Teacher = {
     id: number;
     name: string;
@@ -94,10 +96,12 @@ export type Course = {
     credit_hours: number;
     display_code: string;
     semester_id: number;
-    type: string;
+    type: ClassType;
     is_default: number;
     created_at: string;
     updated_at: string;
+
+    semester?: Semester;
 };
 
 export type Room = {

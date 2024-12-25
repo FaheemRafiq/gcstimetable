@@ -4,6 +4,8 @@ namespace App\Policies;
 
 use App\Models\Course;
 use App\Models\User;
+use App\PermissionEnum;
+use Illuminate\Auth\Access\Response;
 
 class CoursePolicy
 {
@@ -18,33 +20,41 @@ class CoursePolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Course $course): bool
+    public function view(User $user, Course $course): Response
     {
-        //
+        return $user->can(PermissionEnum::VIEW_COURSE, $course)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.view.error'));
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user): Response
     {
-        //
+        return $user->can(PermissionEnum::CREATE_COURSE)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Course $course): bool
+    public function update(User $user, Course $course): Response
     {
-        //
+        return $user->can(PermissionEnum::EDIT_COURSE, $course)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Course $course): bool
+    public function delete(User $user, Course $course): Response
     {
-        //
+        return $user->can(PermissionEnum::DELETE_COURSE, $course)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**

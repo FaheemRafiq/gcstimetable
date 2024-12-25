@@ -176,6 +176,13 @@ return [
             'level' => 'debug',
             'days' => 30,
         ],
+
+        'courses' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/'.now()->toDateString().'/courses.log'),
+            'level' => 'debug',
+            'days' => 30,
+        ],
     ],
 
 ];

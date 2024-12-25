@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class Program extends Model
@@ -19,7 +19,7 @@ class Program extends Model
         'BS'    => 'Bachelor',
         'ADP'   => 'Associate Degree Program',
     ];
-    
+
     // guarded
 
     // program belongs to a department
@@ -42,5 +42,10 @@ class Program extends Model
     public function institution(): HasOneThrough
     {
         return $this->hasOneThrough(Institution::class, Department::class, 'id', 'id', 'department_id', 'institution_id');
+    }
+
+    public function courses()
+    {
+        return $this->hasManyThrough(Course::class, Semester::class);
     }
 }

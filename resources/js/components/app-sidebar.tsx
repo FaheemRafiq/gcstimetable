@@ -20,6 +20,7 @@ import {
     LayoutDashboardIcon,
     GraduationCap,
     Hourglass,
+    Book,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -55,8 +56,8 @@ export type NavItem = {
 export type NavDataType = {
     navMain: NavItem[];
     navCurriculum: NavItem[];
+    academicStructure: NavItem[];
     navSecondary: any;
-    projects: any;
 };
 
 export const NavData: NavDataType = {
@@ -131,7 +132,15 @@ export const NavData: NavDataType = {
             icon: Command,
             isActive: route().current("semesters.index"),
         },
+        {
+            title: "Courses",
+            route: "courses.index",
+            url: route("courses.index"),
+            icon: Book,
+            isActive: route().current("courses.index"),
+        },
     ],
+    academicStructure: [],
     navSecondary: [
         {
             title: "Support",
@@ -142,23 +151,6 @@ export const NavData: NavDataType = {
             title: "Feedback",
             url: "#",
             icon: Send,
-        },
-    ],
-    projects: [
-        {
-            name: "Design Engineering",
-            url: "#",
-            icon: Frame,
-        },
-        {
-            name: "Sales & Marketing",
-            url: "#",
-            icon: PieChart,
-        },
-        {
-            name: "Travel",
-            url: "#",
-            icon: Map,
         },
     ],
 };

@@ -59,4 +59,7 @@ Route::prefix('admin')
 
         // slots 🎰
         Route::resource('slots', Admin\SlotController::class)->only(Admin\SlotController::ONLY);
+
+        // Courses 📖
+        Route::resource('courses', Admin\CourseController::class)->only(Admin\CourseController::ONLY);
     });

@@ -307,22 +307,20 @@ export default function CreateAllocation({
                                                         <>
                                                             <div className="text-sm flex items-center space-x-2">
                                                                 <Book className="w-4 h-4" />
-                                                                <span>
-                                                                    {
-                                                                        allocation
-                                                                            .course
-                                                                            ?.display_code
-                                                                    }
+                                                                <span className="truncate text-ellipsis ">
+                                                                    {allocation.course?.display_code?.substring(
+                                                                        0,
+                                                                        10
+                                                                    )}
                                                                 </span>
                                                             </div>
                                                             <div className="text-sm flex items-center space-x-2">
                                                                 <User className="w-4 h-4" />
                                                                 <span>
-                                                                    {
-                                                                        allocation
-                                                                            .teacher
-                                                                            ?.name
-                                                                    }
+                                                                    {allocation.teacher?.name?.substring(
+                                                                        0,
+                                                                        15
+                                                                    )}
                                                                 </span>
                                                             </div>
                                                             <div className="text-sm flex items-center space-x-2">

@@ -2,23 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Carbon\Carbon;
-use Exception;
 use App\Models\Slot;
 use Inertia\Inertia;
-use App\Models\Section;
 use App\Models\TimeTable;
 use App\Models\Allocation;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
 use App\Exceptions\AllocationException;
 use Illuminate\Database\QueryException;
 use App\Http\Repositories\SectionRepository;
-use App\Http\Resources\AllocationCollection;
 use App\Http\Requests\Allocation\AllocationRequest;
 
 class AllocationController extends Controller
