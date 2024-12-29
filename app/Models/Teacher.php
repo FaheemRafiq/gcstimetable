@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\IsActiveTrait;
+use App\Traits\IsActiveTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;

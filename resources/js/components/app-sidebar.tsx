@@ -185,12 +185,11 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
     }, []);
 
     const NavigationData = React.useMemo(() => {
-        return NavData.map((section) => {
-            section.items.map(checkActivity);
-
-            return section;
-        });
-    }, [window.location.pathname]);
+        return NavData.map((section) => ({
+            ...section,
+            items: section.items.map(checkActivity),
+        }));
+    }, []);
 
     return (
         <Sidebar variant="inset" collapsible="icon" {...props}>

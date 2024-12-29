@@ -4,7 +4,7 @@ namespace App\Policies;
 
 use App\Models\Student;
 use App\Models\User;
-use App\PermissionEnum;
+use App\Enums\PermissionEnum;
 
 class StudentPolicy
 {

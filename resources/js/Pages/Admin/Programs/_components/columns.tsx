@@ -1,6 +1,4 @@
 import { ColumnDef } from "@tanstack/react-table";
-import Tooltip from "@/components/ui/tooltip";
-import { Check, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Actions } from "./actions";
 import { Shift } from "@/types";

@@ -4,7 +4,7 @@ namespace App\Policies;
 
 use App\Models\Allocation;
 use App\Models\User;
-use App\PermissionEnum;
+use App\Enums\PermissionEnum;
 use Illuminate\Auth\Access\Response;
 
 class AllocationPolicy

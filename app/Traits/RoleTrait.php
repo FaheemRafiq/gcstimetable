@@ -1,6 +1,8 @@
 <?php
 
-namespace App;
+namespace App\Traits;
+
+use App\Enums\RoleEnum;
 
 trait RoleTrait
 {

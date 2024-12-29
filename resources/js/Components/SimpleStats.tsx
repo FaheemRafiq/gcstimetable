@@ -1,40 +1,68 @@
+import { useEffect, useState } from "react";
 import { Link } from "@inertiajs/react";
 import { ArrowUpRight } from "lucide-react";
 import Tooltip from "@/components/ui/tooltip";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
 
 export default function SimpleStats({
     title,
     value,
     navigation,
+    icon: Icon,
 }: {
     title: string;
     value: number;
     navigation?: string;
+    icon?: React.ElementType;
 }) {
-    return (
-        <div className="bg-card text-card-foreground border border-border overflow-hidden shadow sm:rounded-lg">
-            <div className="px-4 py-5 sm:p-6 relative">
-                <dl>
-                    <dt className="text-sm leading-5 font-medium truncate">
-                        {title}
-                    </dt>
-                    <dd className="mt-1 text-3xl leading-9 font-semibold text-primary">
-                        {value}
-                    </dd>
-                </dl>
+    const [count, setCount] = useState(0);
 
-                {navigation && (
-                    <div className="mt-5 absolute top-0 right-4">
-                        <Tooltip title="Show All">
-                            <div className="text-primary hover:opacity-80">
-                                <Link href={navigation}>
-                                    <ArrowUpRight />
-                                </Link>
-                            </div>
-                        </Tooltip>
-                    </div>
-                )}
-            </div>
-        </div>
+    useEffect(() => {
+        let start = 0;
+        const increment = Math.ceil(value / 50); // Adjust increment speed here
+        const interval = setInterval(() => {
+            start += increment;
+            if (start >= value) {
+                setCount(value);
+                clearInterval(interval);
+            } else {
+                setCount(start);
+            }
+        }, 20); // Adjust interval time here
+        return () => clearInterval(interval);
+    }, [value]);
+
+    return (
+        <Card>
+            <CardHeader className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 flex items-center justify-center bg-primary/20 text-primary rounded-full">
+                    {Icon && <Icon className="w-6 h-6" />}
+                </div>
+                <CardTitle className="mt-4 text-sm font-medium text-muted-foreground">
+                    {title}
+                </CardTitle>
+                <CardDescription className="mt-2 text-4xl font-extrabold text-primary">
+                    {count}
+                </CardDescription>
+            </CardHeader>
+            {navigation && (
+                <CardFooter className="absolute top-4 right-4">
+                    <Tooltip title="Show All">
+                        <div className="text-primary hover:opacity-80">
+                            <Link href={navigation}>
+                                <ArrowUpRight className="w-5 h-5" />
+                            </Link>
+                        </div>
+                    </Tooltip>
+                </CardFooter>
+            )}
+        </Card>
     );
 }

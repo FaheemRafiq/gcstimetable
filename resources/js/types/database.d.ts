@@ -7,7 +7,7 @@ export type Teacher = {
     name: string;
     personnel_number: string;
     email: string;
-    cnic: string;
+    cnic: string | null;
     phone_number: string;
     bank_iban: string;
     isMale: boolean;
@@ -24,9 +24,9 @@ export type Teacher = {
     degree_title: string;
     rank: string;
     position: string;
-    department_id: number;
+    department_id: number | null;
     isvisiting: boolean;
-    isActive: boolean;
+    is_active: IsActive;
     created_at: string;
     updated_at: string;
 };

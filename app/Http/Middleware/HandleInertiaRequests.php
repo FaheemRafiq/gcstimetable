@@ -2,9 +2,9 @@
 
 namespace App\Http\Middleware;
 
-use App\RoleEnum;
+use App\Enums\RoleEnum;
 use App\Models\User;
-use App\PermissionEnum;
+use App\Enums\PermissionEnum;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
 use Illuminate\Http\Request;
@@ -54,9 +54,13 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
         if ($user) {
-            $user->load('institution:id,name');
-            
-            return new UserResource($user);
+            $userId = $user->id;
+            $cacheKey = "user_{$userId}_with_relations";
+
+            return cache()->remember($cacheKey, 60, function () use ($user) {
+                $user->load(['institution:id,name', 'roles', 'permissions']);
+                return new UserResource($user);
+            });
         }
 
         return null;

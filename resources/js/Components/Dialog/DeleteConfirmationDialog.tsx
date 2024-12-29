@@ -1,3 +1,4 @@
+import React, { ReactNode } from "react";
 import Modal from "@/Components/AnimatedModal";
 import { Button } from "@/components/ui/button";
 
@@ -5,8 +6,8 @@ interface DeleteConfirmationDialogProps {
     open: boolean;
     onClose: () => void;
     onDelete: () => void;
-    title?: string; // Customizable dialog title
-    message?: string; // Customizable dialog message
+    title?: ReactNode | string; // Customizable dialog title
+    message?: ReactNode | string; // Customizable dialog message
     processing?: boolean; // Disable buttons while processing
     confirmButtonLabel?: string; // Custom label for confirm button
     cancelButtonLabel?: string; // Custom label for cancel button
@@ -33,7 +34,11 @@ function DeleteConfirmationDialog({
             >
                 <h2 className="text-lg font-medium text-foreground">{title}</h2>
 
-                <p className="mt-1 text-sm text-foreground/80">{message}</p>
+                {typeof message === "string" ? (
+                    <p className="mt-1 text-sm text-foreground/80">{message}</p>
+                ) : (
+                    <div className="mt-1 text-sm text-foreground/80">{message}</div>
+                )}
 
                 <div className="mt-6 flex justify-end">
                     {/* Cancel Button */}

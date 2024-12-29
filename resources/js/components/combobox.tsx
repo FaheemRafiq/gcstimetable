@@ -48,10 +48,10 @@ export function AutoCompleteSelect({
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className="justify-between w-full focus-visible::ring-transparent"
+                    className="justify-between w-full focus-visible::ring-0"
                     disabled={disabled}
                 >
-                    {value
+                    {Boolean(value)
                         ? (() => {
                               return values.find(
                                   (framework) => framework.value == value
