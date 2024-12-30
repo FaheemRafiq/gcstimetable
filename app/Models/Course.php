@@ -16,6 +16,13 @@ class Course extends Model
         'LAB'    => 'Lab',
     ];
 
+    // Scopes
+
+    public function scopeWhereInstitution($query, $institutionId)
+    {
+        return $query->where('institution_id', $institutionId);
+    }
+
     // Course my Taught by many Teachers on Different Days
     public function teachers(): BelongsToMany
     {
@@ -46,8 +53,8 @@ class Course extends Model
         return $this->belongsToMany(Day::class, 'allocations');
     }
 
-    public function semester()
+    public function semesters()
     {
-        return $this->belongsTo(Semester::class);
+        return $this->belongsToMany(Semester::class);
     }
 }

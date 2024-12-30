@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Institution;
+use App\Models\Semester;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -28,12 +30,13 @@ return new class extends Migration
             $table->string('display_code');
 
             $table->string('code');
+            
             // course credit hours
             $table->integer('credit_hours')->default(3);
             // course type
             $table->enum('type', ['CLASS', 'LAB'])->default('CLASS');
 
-            $table->foreignId('semester_id')->constrained('semesters')->nullOnDelete();
+            $table->foreignIdFor(Institution::class)->constrained()->cascadeOnDelete();
 
             $table->timestamps();
         });

@@ -39,6 +39,11 @@ class Institution extends Model
         return $this->hasManyThrough(TimeTable::class, Shift::class);
     }
 
+    public function courses()
+    {
+        return $this->hasMany(Course::class);
+    }
+
     // Institution has many days
     public function days(): HasMany
     {

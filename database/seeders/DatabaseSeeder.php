@@ -97,6 +97,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call(CourseSeeder::class);
 
+        $this->call(CourseSemesterSeeder::class);
+
         $this->call(TimeTableSeeder::class);
 
         $this->call(AllocationSeeder::class);

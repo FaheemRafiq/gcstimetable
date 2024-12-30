@@ -26,12 +26,12 @@ const columns: ColumnDef<Course>[] = [
         header: "Display Code",
     },
     {
-        accessorKey: "semester_id",
-        header: "Semester",
+        accessorKey: "semesters_count",
+        header: "No. Semesters",
         cell: ({ row }) => {
             return (
-                <Badge variant={"secondary"} className="capitalize">
-                    {row.original.semester?.name}
+                <Badge variant={"outline"} className="capitalize">
+                    {row.original.semesters_count}
                 </Badge>
             );
         },

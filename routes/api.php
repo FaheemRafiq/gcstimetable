@@ -2,19 +2,14 @@
 
 // for Restful API
 use App\Enums\RoleEnum;
+use App\Models\Course;
 use Illuminate\Support\Facades\Route;
+use Faker\Factory as Faker;
 
 
 Route::get('/testing', function () {
-    $students = $students = \App\Models\Student::all();
 
-    // update created_at of each student randomly
+    $faker = Faker::create();
 
-    foreach ($students as $student) {
-        $student->update([
-            'created_at' => now()->subDays(rand(1, 30))
-        ]);
-    }
-
-    return $students;
+    dd($faker->randomElement(array_keys(Course::TYPES)));
 });

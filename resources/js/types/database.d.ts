@@ -95,13 +95,14 @@ export type Course = {
     name: string;
     credit_hours: number;
     display_code: string;
-    semester_id: number;
+    institution_id: number;
     type: ClassType;
     is_default: number;
     created_at: string;
     updated_at: string;
 
-    semester?: Semester;
+    semesters?: Semester[];
+    semesters_count?: number
 };
 
 export type Room = {

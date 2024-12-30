@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { FormSheet } from "@/Components/FormSheet";
-import { useForm } from "@inertiajs/react";
+import { useForm, usePage } from "@inertiajs/react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,19 +13,10 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import InputError from "@/Components/InputError";
-import { ClassType, Course, Semester } from "@/types/database";
+import { ClassType, Course, Instituion, Semester } from "@/types/database";
 import { fetchWrapper } from "@/lib/fetchWrapper";
 import { AutoCompleteSelect } from "@/components/combobox";
-
-interface FormProps {
-    name: string;
-    code: string;
-    credit_hours: number;
-    display_code: string;
-    semester_id: number | null;
-    type: ClassType;
-    is_default: number;
-}
+import { useAbilities } from "@/components/abilities-provider";
 
 interface CourseFormProps {
     course?: Course;
@@ -34,7 +25,7 @@ interface CourseFormProps {
 }
 
 interface PageState {
-    semesters: Semester[];
+    institutions: Instituion[];
     types: { [key: string]: string };
     isFeteched: boolean;
 }
@@ -44,24 +35,26 @@ export const CourseForm: React.FC<CourseFormProps> = ({
     open: openProp = undefined,
     onClose,
 }) => {
+    const { isSuperAdmin } = useAbilities();
+
     // Constants
     const isEditForm = !!course;
 
     // State
     const [open, setOpen] = React.useState(openProp ?? false);
     const [pageState, setPageState] = React.useState<PageState>({
-        semesters: [],
+        institutions: [],
         types: {},
         isFeteched: false,
     });
 
     const { data, post, put, errors, processing, reset, setData } =
-        useForm<FormProps>({
+        useForm<Omit<Course, 'id' | 'created_at' | 'updated_at'>>({
             name: course?.name ?? "",
             code: course?.code ?? "",
             credit_hours: course?.credit_hours ?? 0,
             display_code: course?.display_code ?? "",
-            semester_id: course?.semester_id ?? null,
+            institution_id: course?.institution_id ?? 0,
             type: course?.type ?? "CLASS",
             is_default: course?.is_default ?? 0,
         });
@@ -140,9 +133,8 @@ export const CourseForm: React.FC<CourseFormProps> = ({
                         ? `Edit Course: ${course?.name}`
                         : "Create Course"
                 }
-                description={`Fill the required fields to ${
-                    isEditForm ? "update the course." : "create a new course."
-                }`}
+                description={`Fill the required fields to ${isEditForm ? "update the course." : "create a new course."
+                    }`}
                 footerActions={
                     <Button
                         disabled={processing}
@@ -216,26 +208,29 @@ export const CourseForm: React.FC<CourseFormProps> = ({
                     </div>
 
                     {/* Semester Field */}
-                    <div>
-                        <Label htmlFor="semester_id">Semester</Label>
-                        <AutoCompleteSelect
-                            label="Select Semester"
-                            value={data.semester_id?.toString() ?? ""}
-                            setValue={(value: string) => {
-                                setData("semester_id", Number(value) ?? null);
-                            }}
-                            values={
-                                pageState.semesters?.map((value) => {
-                                    return {
-                                        value: value.id.toString(),
-                                        label: value.name,
-                                    };
-                                }) ?? []
-                            }
-                            isError={Boolean(errors.semester_id)}
-                        />
-                        <InputError message={errors.semester_id} />
-                    </div>
+                    {
+                        isSuperAdmin() &&
+                        <div>
+                            <Label htmlFor="institution_id">Institution</Label>
+                            <AutoCompleteSelect
+                                label="Select Institution"
+                                value={data.institution_id?.toString() ?? ""}
+                                setValue={(value: string) => {
+                                    setData("institution_id", Number(value) ?? null);
+                                }}
+                                values={
+                                    pageState.institutions?.map((value) => {
+                                        return {
+                                            value: value.id.toString(),
+                                            label: value.name,
+                                        };
+                                    }) ?? []
+                                }
+                                isError={Boolean(errors.institution_id)}
+                            />
+                            <InputError message={errors.institution_id} />
+                        </div>
+                    }
 
                     {/* Type Field */}
                     <div>

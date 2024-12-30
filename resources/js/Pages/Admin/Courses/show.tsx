@@ -73,9 +73,9 @@ function ShowCourse({ auth, course }: PageProps<ShowCourseProps>) {
                             </div>
                             <div>
                                 <h3 className="text-lg font-semibold mb-2">
-                                    Semester
+                                    No. Semester
                                 </h3>
-                                <p>{course.semester?.name}</p>
+                                <p>{course.semesters?.length}</p>
                             </div>
                             <div>
                                 <h3 className="text-lg font-semibold mb-2">

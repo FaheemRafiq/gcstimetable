@@ -21,19 +21,14 @@ class CourseController extends Controller
      */
     public function index()
     {
-        $admin   = Auth::user();
-        $courses = [];
+        $admin = Auth::user();
+        $queryBuilder = Course::withCount('semesters')->orderByDesc('created_at');
 
-        if ($admin->isSuperAdmin()) {
-            $courses = Course::with('semester')->orderByDesc('created_at')->get();
-
-        } elseif ($admin->isInstitutionAdmin()) {
-            $institution = Institution::with('programs.courses.semester')->where('id', $admin->institution_id)->first();
-
-            $courses = $institution->programs->flatMap(function ($program) {
-                return $program->courses;
-            });
+        if (!$admin->isSuperAdmin()) {
+            $queryBuilder->whereInstitution($admin->institution_id);
         }
+
+        $courses = $queryBuilder->get();
 
         return inertia()->render('Admin/Courses/index', compact('courses'));
     }
@@ -43,22 +38,15 @@ class CourseController extends Controller
      */
     public function create()
     {
-        $admin      = Auth::user();
-        $semesters  = [];
-        $types      = Course::TYPES;
+        $admin          = Auth::user();
+        $institutions   = [];
+        $types          = Course::TYPES;
 
         if ($admin->isSuperAdmin()) {
-            $semesters = Semester::orderByDesc('created_at')->get();
-
-        } elseif ($admin->isInstitutionAdmin()) {
-            $institution = Institution::with('programs.semesters')->where('id', $admin->institution_id)->first();
-
-            $semesters = $institution->programs->flatMap(function ($program) {
-                return $program->semesters;
-            });
+            $institutions = Institution::orderByDesc('created_at')->get();
         }
 
-        return response()->json(compact('semesters', 'types'));
+        return response()->json(compact('institutions', 'types'));
     }
 
     /**
@@ -93,7 +81,7 @@ class CourseController extends Controller
      */
     public function show(Course $course)
     {
-        $course->load('semester');
+        $course->load('semesters');
 
         return inertia()->render('Admin/Courses/show', compact('course'));
     }

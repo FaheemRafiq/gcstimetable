@@ -8,6 +8,17 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class CourseRequest extends FormRequest
 {
+    public function prepareForValidation()
+    {
+        $admin = $this->user();
+
+        if(!$admin->isSuperAdmin()) {
+            $this->merge([
+                'institution_id' => $admin->institution_id,
+            ]);
+        }
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -25,11 +36,11 @@ class CourseRequest extends FormRequest
                 Rule::unique('courses', 'code')
                 ->ignore($this->route('course') ?? null),
             ],
-            'semester_id' => [
+            'institution_id' => [
                 'bail',
                 'required',
                 'integer',
-                'exists:semesters,id',
+                Rule::exists('institutions', 'id'),
             ],
             'name' => [
                 'required',
