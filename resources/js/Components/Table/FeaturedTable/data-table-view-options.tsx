@@ -14,7 +14,6 @@ import {
   DropdownMenuSub,
   DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu"
-import columns from "../../../Pages/Admin/Teachers/columns"
 
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>
@@ -23,7 +22,6 @@ interface DataTableViewOptionsProps<TData> {
 export function DataTableViewOptions<TData>({
   table,
 }: DataTableViewOptionsProps<TData>) {
-  console.log("DataTableViewOptions => ", table.getAllColumns())
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

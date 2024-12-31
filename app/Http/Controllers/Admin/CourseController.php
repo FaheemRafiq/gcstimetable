@@ -28,7 +28,7 @@ class CourseController extends Controller
             $queryBuilder->whereInstitution($admin->institution_id);
         }
 
-        $courses = $queryBuilder->get();
+        $courses = $queryBuilder->paginate(config('providers.pagination.per_page'));
 
         return inertia()->render('Admin/Courses/index', compact('courses'));
     }

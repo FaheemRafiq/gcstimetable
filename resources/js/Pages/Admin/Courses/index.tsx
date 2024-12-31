@@ -7,11 +7,12 @@ import { useBreadcrumb } from "@/components/providers/breadcrum-provider";
 import { useEffect } from "react";
 import { CourseForm } from "./_components/CourseForm";
 import { PageProps } from "@/types";
+import { LengthAwarePaginator } from "@/types/data-table";
 
 export default function Courses({
     auth,
     courses,
-}: PageProps<{ courses: Course[] }>) {
+}: PageProps<{ courses: LengthAwarePaginator<Course> }>) {
     const { setBreadcrumb } = useBreadcrumb();
 
     useEffect(() => {
@@ -29,13 +30,18 @@ export default function Courses({
                         <CourseForm />
                     </div>
                     <DataTable
-                        data={courses}
+                        data={courses.data}
                         columns={columns}
                         inputProps={{
                             searchFilter: true,
                             filterColumn: "name",
-                            pagination: true,
+                            pagination: false,
                         }}
+                        // caption="List of courses"
+                        totalCount={courses.total}
+                        pageLinks={courses.links}
+                        from={courses.from}
+                        to={courses.to}
                     />
                 </div>
             </div>

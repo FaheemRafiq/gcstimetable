@@ -40,7 +40,7 @@ class TeacherController extends Controller
                 ->with('department.institution');
         }
 
-        $teachers = $queyBuilder->paginate($request->input('per_page', config('providers.per_page')));
+        $teachers = $queyBuilder->paginate($request->input('per_page', config('providers.pagination.per_page')));
 
         return Inertia::render('Admin/Teachers/index', [
             'teachers' => TeacherResource::collection($teachers)

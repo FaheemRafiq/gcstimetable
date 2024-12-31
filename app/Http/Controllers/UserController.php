@@ -24,7 +24,7 @@ class UserController extends Controller
                 $query->whereDepartment($admin->department_id);
             })
             ->with('roles.permissions')
-            ->paginate($request->input('per_page', config('providers.per_page')));
+            ->paginate($request->input('per_page', config('providers.pagination.per_page')));
 
         return Inertia::render('Admin/Users/index', [
             'users' => UserResource::collection($users)

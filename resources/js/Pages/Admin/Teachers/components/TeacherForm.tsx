@@ -41,7 +41,6 @@ interface TeacherFormProps {
     positions: { [key: string]: string };
     departments: { [key: string]: string };
     qualifications: { [key: string]: string };
-
 }
 
 export function TeacherForm({
@@ -52,6 +51,7 @@ export function TeacherForm({
     qualifications
 }: TeacherFormProps) {
     const isEditing = Boolean(initialData);
+    const dateOfBirth = React.useRef<HTMLInputElement>(null);
 
     const { data, setData, errors, post, put, processing, setError } = useForm<Omit<Teacher, 'id' | 'created_at' | 'updated_at'>>({
         name: initialData?.name ?? "",
@@ -94,12 +94,7 @@ export function TeacherForm({
             value: key,
             label: value,
         })) ?? []
-    }, [departments])
-
-
-    React.useEffect(() => {
-        console.log("data => ", data);
-    }, [data])
+    }, [departments]);
 
     const formSections: FormSection[] = [
         {
@@ -157,7 +152,7 @@ export function TeacherForm({
                     </Select>
                     <InputError message={errors.isMale} />
                 </div>,
-                <div key="date_of_birth">
+                <div key="date_of_birth" ref={dateOfBirth}>
                     <InputLabel htmlFor="date_of_birth" value="Date of Birth" aria-required />
                     <DatePicker
                         className={"w-full"}
@@ -460,9 +455,16 @@ export function TeacherForm({
                 if (error.message) {
                     toast.error(error.message);
                 }
+            },
+            onFinish: () => {
+                if (dateOfBirth.current && (errors.date_of_birth || errors.personnel_number || errors.isMale || errors.cnic)) {
+                    dateOfBirth.current.scrollIntoView({ behavior: "smooth", block: "center" });
+                }
             }
         });
     };
+
+    console.log("data => ", data);
 
     return (
         <form onSubmit={handleSubmit}>

@@ -19,7 +19,6 @@ import { ProgramsPerDepartment as InterfaceProgramsPerDepartment } from "@/types
 interface ProgramsPerDepartmentProps extends InterfaceProgramsPerDepartment { }
 
 export function ProgramsPerDepartment({ data }: ProgramsPerDepartmentProps) {
-    console.log("ProgramsPerDepartment => props", data);
 
     // Sort data by programs_count in descending order als remove with zero program count
     const sortedData = data

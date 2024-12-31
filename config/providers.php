@@ -10,7 +10,9 @@ return [
         'readable'  => 'd M Y h:i a',
     ],
 
-    'per_page' => 15,
+    'pagination' => [
+        'per_page' => 15,
+    ],
 
     'permission' => [
         'action' => [
