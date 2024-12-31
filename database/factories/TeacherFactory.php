@@ -44,7 +44,7 @@ class TeacherFactory extends Factory
                 return \App\Models\Department::inRandomOrder()->first()->id; // Assuming you have a Department model and factory
             },
             'isvisiting' => $faker->boolean,
-            'isActive' => $faker->randomElement(['active', 'inactive']),
+            'is_active' => $faker->randomElement(['active', 'inactive']),
         ];
     }
 }

@@ -1,18 +1,33 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import { PageProps } from "@/types";
 import { ResourcePaginator } from "@/types/data-table";
 import { useBreadcrumb } from "@/components/providers/breadcrum-provider";
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { DataTable } from "@/Components/Table/FeaturedTable";
 import columns from "./components/columns";
 import { Teacher } from "@/types/database";
+import useTeacherStore from "@/store/Admin/useTeacherStore";
+import { TeacherToolbar } from "./components/TableToolbar";
+
+interface TeachersProps extends Record<string, unknown> {
+    teachers: ResourcePaginator<Teacher>;
+    ranks: { [key: string]: string };
+    positions: { [key: string]: string };
+    departments: { [key: string]: string };
+    qualifications: { [key: string]: string };
+}
 
 export default function Teachers({
     auth,
     teachers,
-}: PageProps<{ teachers: ResourcePaginator<Teacher> }>) {
+    ranks,
+    positions,
+    departments,
+}: PageProps<TeachersProps>) {
+    console.log("teachers => in Teachers", teachers);
+    const setRanks = useTeacherStore((state) => state.setRanks);
+
     const { setBreadcrumb } = useBreadcrumb();
 
     useEffect(() => {
@@ -20,6 +35,10 @@ export default function Teachers({
             title: "Teachers",
         });
     }, [setBreadcrumb]);
+
+    useEffect(() => {
+        setRanks(ranks);
+    }, [ranks, setRanks]);
 
     return (
         <AuthenticatedLayout user={auth.user}>
@@ -31,6 +50,17 @@ export default function Teachers({
                         data={teachers.data}
                         columns={columns}
                         pinnedColumns={{ right: ['actions'] }}
+                        DataTableToolbar={TeacherToolbar}
+                        pagination='server'
+                        currentPage={teachers.meta.current_page}
+                        totalItems={teachers.meta.total}
+                        pageSize={teachers.meta.per_page}
+                        navigationLinks={teachers.links}
+                        pageSizeOptions={[15, 30, 50, 100]}
+                        onPageSizeChange={(pageSize) => {
+                            console.log("pageSize => in Teachers", pageSize);
+                            router.replace(route('teachers.index', { page: 1, perPage: pageSize }));
+                        }}
                     />
                 </div>
             </div>

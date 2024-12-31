@@ -59,7 +59,8 @@
         "react-phone-number-input": "^3.4.10",
         "recharts": "^2.15.0",
         "tailwind-merge": "^2.5.2",
-        "tailwindcss-animate": "^1.0.7"
+        "tailwindcss-animate": "^1.0.7",
+        "zustand": "^5.0.2"
     },
     "volta": {
         "node": "20.17.0",

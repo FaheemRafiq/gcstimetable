@@ -11,7 +11,7 @@ interface WithoutSearchFilter {
     searchFilter: false
 }
 
-type InputProps =  WithoutSearchFilter | WithSearchFilter;
+type InputProps = WithoutSearchFilter | WithSearchFilter;
 
 export interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -50,7 +50,12 @@ export interface LengthAwarePaginator<T> {
 
 export interface ResourcePaginator<T> {
     data: T[],
-    links: string[],
+    links: {
+        first: string,
+        last: string,
+        prev: string | null,
+        next: string | null
+    },
     meta: {
         current_page: number,
         from: number,

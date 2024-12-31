@@ -160,3 +160,7 @@ export type Program = {
     department?: Department;
     semesters?: Semester[];
 };
+
+export type StringObject = {
+    [key: string]: string;
+};

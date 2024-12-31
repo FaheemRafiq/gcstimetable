@@ -27,6 +27,9 @@ class TeacherController extends Controller
     {
         $admin          = Auth::user();
         $queyBuilder    = Teacher::query();
+        $ranks          = TeacherRankEnum::toArray();
+        $positions      = TeacherPositionEnum::toArray();
+        $qualifications = TeacherQualificationEnum::toArray();
 
         if ($admin->isInstitutionAdmin()) {
 
@@ -40,10 +43,13 @@ class TeacherController extends Controller
                 ->with('department.institution');
         }
 
-        $teachers = $queyBuilder->paginate($request->input('per_page', config('providers.pagination.per_page')));
+        $teachers = $queyBuilder->paginate($request->input('perPage', config('providers.pagination.per_page')));
 
         return Inertia::render('Admin/Teachers/index', [
-            'teachers' => TeacherResource::collection($teachers)
+            'teachers' => TeacherResource::collection($teachers)->withQuery($request->query()),
+            'ranks' => $ranks,
+            'positions' => $positions,
+            'qualifications' => $qualifications
         ]);
     }
 
