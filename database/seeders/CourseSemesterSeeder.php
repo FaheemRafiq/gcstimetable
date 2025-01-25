@@ -13,18 +13,16 @@ class CourseSemesterSeeder extends Seeder
      */
     public function run(): void
     {
+        // Retrieve all courses and semesters
         $semesters = Semester::all();
         $courses   = Course::all();
 
         $semesters->each(function ($semester) use ($courses) {
-            // Take 5-6 random courses
-            $randomCourses = $courses->random(rand(5, 6));
+            // Ensure we get a fresh collection for random selection
+            $randomCourses = $courses->shuffle()->take(rand(5, 6));
 
-            // Create an array of course IDs to attach
-            $courseIds = $randomCourses->pluck('id')->toArray();
-
-            // Bulk attach courses to semester
-            $semester->courses()->attach($courseIds);
+            // Attach the selected random courses to the semester
+            $semester->courses()->syncWithoutDetaching($randomCourses->pluck('id'));
         });
     }
 }

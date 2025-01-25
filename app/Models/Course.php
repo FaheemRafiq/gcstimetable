@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -18,7 +19,7 @@ class Course extends Model
 
     // Scopes
 
-    public function scopeWhereInstitution($query, $institutionId)
+    public function scopeWhereInstitution($query, $institutionId): Builder
     {
         return $query->where('institution_id', $institutionId);
     }

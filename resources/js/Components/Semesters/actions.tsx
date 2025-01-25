@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { EllipsisVertical, Pencil, Trash } from "lucide-react";
+import { EllipsisVertical, Link, Pencil, Trash } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -13,6 +13,7 @@ import { router } from "@inertiajs/react";
 import { Semester } from "@/types/database";
 import DeleteConfirmationDialog from "../Dialog/DeleteConfirmationDialog";
 import { SemesterForm } from "./SemesterForm";
+import { SemesterAttachForm } from "./SemesterAttachCourses";
 
 export function Actions({ row }: { row: Semester }) {
     // Edit State
@@ -21,6 +22,9 @@ export function Actions({ row }: { row: Semester }) {
     // Delete Action State
     const [openConfirm, setOpenConfirm] = React.useState(false);
     const [deleting, setDeleting] = React.useState(false);
+
+    // Attach Courses
+    const [openAttach, setOpenAttach] = React.useState(false);
 
     const handleDelete = (row: Semester) => {
         setDeleting(true);
@@ -60,6 +64,13 @@ export function Actions({ row }: { row: Semester }) {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             className="cursor-pointer"
+                            onClick={() => setOpenAttach(true)}
+                        >
+                            <Link className="mr-2 h-4 w-4" />
+                            <span>Attach Courses</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            className="cursor-pointer"
                             onClick={() => setOpenConfirm(true)}
                         >
                             <Trash className="mr-2 h-4 w-4" />
@@ -74,6 +85,15 @@ export function Actions({ row }: { row: Semester }) {
                 <SemesterForm
                     open={openEdit}
                     onClose={handleCloseEdit}
+                    semester={row}
+                />
+            )}
+
+            {/* Attach Courses */}
+            {openAttach && (
+                <SemesterAttachForm
+                    open={openAttach}
+                    onClose={() => setOpenAttach(false)}
                     semester={row}
                 />
             )}

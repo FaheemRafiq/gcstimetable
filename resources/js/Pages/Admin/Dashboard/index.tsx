@@ -6,7 +6,6 @@ import { useBreadcrumb } from "@/components/providers/breadcrum-provider";
 import { useEffect } from "react";
 import { UsersIcon, GraduationCap, UserIcon } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { PieChartCard } from './_component/PieChartCard'
 import { TeacherWorkloadChart } from './_component/TeacherWorkload'
 import { ShiftCoverageBarChart } from './_component/ShiftCoverage'

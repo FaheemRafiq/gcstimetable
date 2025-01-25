@@ -72,4 +72,11 @@ class SemesterPolicy
     {
         //
     }
+
+    public function attach(User $user, Semester $semester): Response
+    {
+        return $user->can(PermissionEnum::COURSE_ATTACH_SEMESTER)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.action.error'));
+    }
 }

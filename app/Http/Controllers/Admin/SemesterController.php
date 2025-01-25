@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Course;
 use App\Models\Semester;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -80,6 +82,11 @@ class SemesterController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * 
+     * @param SemesterRequest $request
+     * @param Semester        $semester
+     * 
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     public function update(SemesterRequest $request, Semester $semester)
     {
@@ -106,6 +113,10 @@ class SemesterController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * 
+     * @param Semester $semester
+     * 
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Semester $semester)
     {
@@ -128,4 +139,64 @@ class SemesterController extends Controller
 
         return back()->with('error', $message);
     }
+
+    /**
+     * Attach Course to Semester
+     * 
+     * @param Semester $semester
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function attachCourse(Semester $semester)
+    {
+        $admin  = Auth::user();
+
+        $semester->load('courses');
+
+        $courses = [];
+
+        if ($admin->isSuperAdmin()) {
+            $courses = Course::select('id', 'name', 'code')->get();
+        } else if ($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()) {
+            $courses = Course::whereInstitution($admin->institution_id)->select('id', 'name', 'code')->get();
+        }
+
+        return response()->json(compact('courses', 'semester'));
+    }
+
+    /**
+     * Attach Course to Semester
+     * 
+     * @param Semester $semester
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function attach(Semester $semester, Request $request)
+    {
+        $request->validate([
+            'courses' => 'required|array',
+            'courses.*' => 'required|integer|exists:courses,id',
+        ]);
+
+        $response = Gate::inspect('attach', $semester);
+        $message  = '';
+
+        try {
+            if ($response->allowed()) {
+                $semester->courses()->sync(request()->input('courses', []));
+
+                return back()->with('success', 'Courses successfully attached to semester');
+            } else {
+                $message = $response->message();
+            }
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
+            Log::channel('semesters')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
+        }
+
+        return back()->withErrors(['message' => $message]);
+    }
+
 }

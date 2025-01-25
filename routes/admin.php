@@ -64,6 +64,10 @@ Route::prefix('admin')
 
         // Semesters 📅
         Route::resource('semesters', SemesterController::class)->only(SemesterController::ONLY);
+        Route::prefix('semesters')->group(function (): void {
+            Route::get('attach/{semester}', [SemesterController::class, 'attachCourse'])->name('semester.attach.courses');
+            Route::post('attach/{semester}', [SemesterController::class, 'attach'])->name('semester.attach');
+        });
 
         // Sections 📂
         Route::resource('sections', SectionController::class)->only(SectionController::ONLY);
