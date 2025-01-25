@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\Institution;
 use App\Models\User;
+use App\Models\Institution;
 
 class InstitutionPolicy
 {

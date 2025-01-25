@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use App\Traits\IsActiveTrait;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Semester extends Model
 {
@@ -29,5 +29,10 @@ class Semester extends Model
     public function program(): BelongsTo
     {
         return $this->belongsTo(Program::class);
+    }
+
+    public function allocations()
+    {
+        return $this->hasManyThrough(Allocation::class, Section::class);
     }
 }

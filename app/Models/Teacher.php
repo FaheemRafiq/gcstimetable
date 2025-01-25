@@ -13,12 +13,11 @@ class Teacher extends Model
     use IsActiveTrait;
 
     protected $casts = [
-        'date_of_birth' => 'date',
+        'date_of_birth'                   => 'date',
         'date_of_joining_in_this_college' => 'date',
-        'date_of_joining_govt_service' => 'date',
-        'date_of_joining_current_rank' => 'date'
+        'date_of_joining_govt_service'    => 'date',
+        'date_of_joining_current_rank'    => 'date',
     ];
-
 
     // Teacher Belongs to Department
     public function department()
@@ -33,7 +32,7 @@ class Teacher extends Model
     }
 
     // Teacher Belongs to some Institution
-    public function institution() : HasOneThrough
+    public function institution(): HasOneThrough
     {
         return $this->hasOneThrough(Institution::class, Department::class, 'id', 'id', 'department_id', 'institution_id');
     }

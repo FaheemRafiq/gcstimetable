@@ -14,17 +14,16 @@ class AllocationCollection extends ResourceCollection
      */
     public function toArray(Request $request): array
     {
-        return $this->collection->map(function ($allocation) {
+        return $this->collection->map(function ($allocation): array {
             return [
-                'id' => $allocation->id,
-                'name' => $allocation->name,
-                'course' => new CourseResource($allocation->course),
+                'id'      => $allocation->id,
+                'name'    => $allocation->name,
+                'course'  => new CourseResource($allocation->course),
                 'teacher' => new TeacherResource($allocation->teacher),
-                'room' => new RoomResource($allocation->room),
-                'day' => new DayResource($allocation->day),
-                'slot' => new SlotResource($allocation->slot),
+                'room'    => new RoomResource($allocation->room),
+                'day'     => new DayResource($allocation->day),
+                'slot'    => new SlotResource($allocation->slot),
             ];
         })->toArray();
-
     }
 }

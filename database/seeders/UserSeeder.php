@@ -2,12 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Enums\RoleEnum;
 use App\Models\User;
 use App\Models\Institution;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class UserSeeder extends Seeder
 {

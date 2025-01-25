@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Exception;
 use App\Enums\RoleEnum;
 use App\Traits\RoleTrait;
 use Laravel\Sanctum\HasApiTokens;
@@ -51,15 +52,14 @@ class User extends Authenticatable implements MustVerifyEmail
         'label',
     ];
 
-    public static function booted()
+    protected static function booted()
     {
-        parent::creating(function(User $user){
-            if(is_null($user->institution_id) && $user->email != 'sadmin@gmail.com'){
-                throw new \Exception('User must belongs to an instituion.');
+        parent::creating(function (User $user): void {
+            if (is_null($user->institution_id) && $user->email != 'sadmin@gmail.com') {
+                throw new Exception('User must belongs to an instituion.');
             }
         });
     }
-
 
     /**
      * Get the URL to the user's profile photo.
@@ -69,31 +69,31 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getProfilePhotoUrlAttribute()
     {
         return $this->profile_photo_path
-            ? asset("storage/$this->profile_photo_path")
+            ? asset('storage/'.$this->profile_photo_path)
             : generateAvatar($this->name);
     }
 
-    public function getLabelAttribute() : string 
+    public function getLabelAttribute(): string
     {
         return RoleEnum::getLabel($this->roles->first()->name ?? '');
     }
 
-    public function setPasswordAttribute($password)
+    public function setPasswordAttribute($password): void
     {
         $this->attributes['password'] = bcrypt($password);
     }
 
-    public function scopeWhereInstitution($query, $value)
+    public function scopeWhereInstitution($query, $value): void
     {
         $query->where('institution_id', $value);
     }
 
-    public function scopeWhereDepartment($query, $value)
+    public function scopeWhereDepartment($query, $value): void
     {
         $query->where('department_id', $value);
     }
 
-    public function scopeWhereDepartmentIn($query, array $value)
+    public function scopeWhereDepartmentIn($query, array $value): void
     {
         $query->whereIn('department_id', $value);
     }

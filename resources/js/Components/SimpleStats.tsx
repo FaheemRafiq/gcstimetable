@@ -40,7 +40,7 @@ export default function SimpleStats({
     }, [value]);
 
     return (
-        <Card>
+        <Card className="relative">
             <CardHeader className="flex flex-col items-center text-center">
                 <div className="w-12 h-12 flex items-center justify-center bg-primary/20 text-primary rounded-full">
                     {Icon && <Icon className="w-6 h-6" />}

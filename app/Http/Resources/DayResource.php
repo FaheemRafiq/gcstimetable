@@ -15,10 +15,10 @@ class DayResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'id'     => $this->id,
             'number' => $this->number,
-            'name' => $this->name,
-            'code' => $this->code,
+            'name'   => $this->name,
+            'code'   => $this->code,
         ];
     }
 }

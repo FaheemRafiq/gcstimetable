@@ -13,7 +13,9 @@ class Program extends Model
     use HasFactory;
 
     public const MIN_DURATION_YEARS = 1;
+
     public const MAX_DURATION_YEARS = 5;
+
     public const TYPES = [
         'INTER' => 'Intermediate',
         'BS'    => 'Bachelor',

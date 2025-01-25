@@ -14,16 +14,16 @@ class RoomCollection extends ResourceCollection
      */
     public function toArray(Request $request): array
     {
-        return $this->map(function ($room) {
+        return $this->map(function ($room): array {
             return [
-                'id'        => $room->id,
-                'name'      => $room->name,
-                'code'      => $room->code,
-                'capacity'  => $room->capacity,
+                'id'             => $room->id,
+                'name'           => $room->name,
+                'code'           => $room->code,
+                'capacity'       => $room->capacity,
                 'institution_id' => $room->institution_id,
-                'type'          => $room->type,
-                'isavailable' => $room->isavailable,
-                'createdAt' => $room->created_at?->format(config('providers.date.readable')),
+                'type'           => $room->type,
+                'isavailable'    => $room->isavailable,
+                'createdAt'      => $room->created_at?->format(config('providers.date.readable')),
             ];
         })->all();
     }

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Resources\SectionResouce;
 use App\Models\Semester;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\SemesterRequest;
+use App\Http\Resources\SectionResouce;
 use Illuminate\Database\QueryException;
 
 class SemesterController extends Controller
@@ -17,30 +17,30 @@ class SemesterController extends Controller
 
     public function index()
     {
-        $admin = Auth::user();
+        $admin   = Auth::user();
         $builder = Semester::query();
 
         if ($admin->isInstitutionAdmin()) {
-            $builder->whereHas('program', function ($query) use ($admin) {
+            $builder->whereHas('program', function ($query) use ($admin): void {
                 $query->whereIn('department_id', $admin->institution?->departments?->pluck('id')->toArray() ?? []);
             });
         } elseif ($admin->isDepartmentAdmin()) {
-            $builder->whereHas('program', function ($query) use ($admin) {
+            $builder->whereHas('program', function ($query) use ($admin): void {
                 $query->whereIn('department_id', [$admin->department_id]);
             });
         }
 
         $semesters = $builder->with('program:id,name,code')->withCount('sections')->latest()->get();
 
-        return inertia()->render('Admin/Semesters/index', compact('semesters'));
+        return inertia()->render('Admin/Semesters/index', ['semesters' => $semesters]);
     }
 
     public function create()
     {
-        $admin      = Auth::user();
-        $programs   = $admin->institution->programs()->select('programs.id', 'programs.name', 'programs.code')->get();
+        $admin    = Auth::user();
+        $programs = $admin->institution->programs()->select('programs.id', 'programs.name', 'programs.code')->get();
 
-        return response()->json(compact('programs'));
+        return response()->json(['programs' => $programs]);
     }
 
     public function show(Semester $semester)
@@ -49,7 +49,7 @@ class SemesterController extends Controller
 
         $sections = SectionResouce::collection($semester->sections)->toArray(request());
 
-        return inertia()->render("Admin/Semesters/show", compact('semester', 'sections'));
+        return inertia()->render('Admin/Semesters/show', ['semester' => $semester, 'sections' => $sections]);
     }
 
     /**
@@ -61,7 +61,6 @@ class SemesterController extends Controller
         $response   = Gate::inspect('create', Semester::class);
         $message    = '';
         try {
-
             if ($response->allowed()) {
                 Semester::create($attributes);
 
@@ -69,9 +68,8 @@ class SemesterController extends Controller
             } else {
                 $message = $response->message();
             }
-
-        } catch (QueryException $exception) {
-            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
             Log::channel('semesters')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';
@@ -89,7 +87,6 @@ class SemesterController extends Controller
         $response   = Gate::inspect('update', $semester);
         $message    = '';
         try {
-
             if ($response->allowed()) {
                 $semester->update($attributes);
 
@@ -97,9 +94,8 @@ class SemesterController extends Controller
             } else {
                 $message = $response->message();
             }
-
-        } catch (QueryException $exception) {
-            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
             Log::channel('semesters')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';
@@ -116,7 +112,6 @@ class SemesterController extends Controller
         $response = Gate::inspect('delete', $semester);
         $message  = '';
         try {
-
             if ($response->allowed()) {
                 $semester->delete();
 
@@ -124,9 +119,8 @@ class SemesterController extends Controller
             } else {
                 $message = $response->message();
             }
-
-        } catch (QueryException $exception) {
-            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
             Log::channel('semesters')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';

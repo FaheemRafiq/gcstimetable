@@ -24,7 +24,7 @@ return new class extends Migration
             $table->foreignIdFor(Institution::class)->nullable()->constrained()->cascadeOnDelete();
             // Also need Department Id for Department Admins
             $table->foreignIdFor(\App\Models\Department::class)->nullable()->constrained()->cascadeOnDelete();
-            
+
             $table->rememberToken();
             $table->timestamps();
         });

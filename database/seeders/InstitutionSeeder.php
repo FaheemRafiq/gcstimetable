@@ -12,7 +12,6 @@ class InstitutionSeeder extends Seeder
      */
     public function run(): void
     {
-
         // Define an array of institution data
         $institutions = [
             ['id' => 1, 'name' => 'Govt. Graduate College of Science', 'address' => 'P.O. Box 30197, Nairobi', 'phone' => '020-4910000', 'email' => 'admin@uol.com'],
@@ -23,6 +22,5 @@ class InstitutionSeeder extends Seeder
         foreach ($institutions as $institutionData) {
             Institution::create($institutionData);
         }
-
     }
 }

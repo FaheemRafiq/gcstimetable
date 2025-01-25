@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use stdClass;
 use App\Models\Room;
 use Inertia\Inertia;
-use App\Models\Shift;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\RoomResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\RoomCollection;
@@ -25,8 +24,8 @@ class RoomController extends Controller
      */
     public function index()
     {
-        $rooms    = [];
-        $admin    = Auth::user();
+        $rooms = [];
+        $admin = Auth::user();
 
         if ($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()) {
             $rooms = new RoomCollection(Room::where('institution_id', $admin->institution_id)->orderByDesc('created_at')->get());
@@ -36,8 +35,8 @@ class RoomController extends Controller
             return Inertia::render('Admin/Rooms/index', [
                 'rooms' => $rooms,
             ]);
-        } catch (QueryException $e) {
-            return back()->with('status', $e->getMessage());
+        } catch (QueryException $queryException) {
+            return back()->with('status', $queryException->getMessage());
         }
     }
 
@@ -51,12 +50,11 @@ class RoomController extends Controller
         $response   = Gate::inspect('create', Room::class);
         $message    = '';
         try {
-
             if ($response->allowed()) {
                 $exists = Room::where(['type' => $attributes['type'], 'code' => $attributes['code']])->whereInstitution($admin->institution_id)->exists();
 
                 if ($exists) {
-                    return back()->withErrors(['message' => $attributes['type'] . ' room already exists for ' . $attributes['code']]);
+                    return back()->withErrors(['message' => $attributes['type'].' room already exists for '.$attributes['code']]);
                 }
 
                 Room::create($attributes);
@@ -65,9 +63,8 @@ class RoomController extends Controller
             } else {
                 $message = $response->message();
             }
-
-        } catch (QueryException $exception) {
-            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
             Log::channel('rooms')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';
@@ -83,25 +80,24 @@ class RoomController extends Controller
     {
         $room = Room::whereKey($room)
             ->with([
-                'allocations' => function ($query) {
+                'allocations' => function ($query): void {
                     $query->select('id', 'room_id', 'day_id', 'slot_id', 'course_id')
                         ->with([
                             'day:id,name',
                             'slot:id,start_time,end_time',
                             'course:id,name,type',
                         ]);
-                }
+                },
             ])
             ->first();
 
-
-        $events = new \stdClass();
+        $events = new stdClass;
 
         foreach ($room->allocations as $allocation) {
             if (isset($allocation->day->name)) {
                 $key = strtolower($allocation->day->name);
 
-                if (!isset($events->$key)) {
+                if (! isset($events->$key)) {
                     $events->$key = [];
                 }
 
@@ -109,8 +105,8 @@ class RoomController extends Controller
                     'id'        => $allocation->id,
                     'name'      => $allocation->course->name ?? 'Course',
                     'type'      => $allocation->course->type ?? 'Lecture',
-                    'startTime' => "2024-11-17T" . $allocation->slot->start_time,
-                    'endTime'   => "2024-11-17T" . $allocation->slot->end_time,
+                    'startTime' => '2024-11-17T'.$allocation->slot->start_time,
+                    'endTime'   => '2024-11-17T'.$allocation->slot->end_time,
                 ];
             }
         }
@@ -131,12 +127,11 @@ class RoomController extends Controller
         $response   = Gate::inspect('update', $room);
         $message    = '';
         try {
-
             if ($response->allowed()) {
                 $exists = Room::where(['type' => $attributes['type'], 'code' => $attributes['code']])->whereInstitution($admin->institution_id)->where('id', '!=', $room->id)->exists();
 
                 if ($exists) {
-                    return back()->withErrors(['message' => $attributes['code'] . ' room already exists for ' . $attributes['type']]);
+                    return back()->withErrors(['message' => $attributes['code'].' room already exists for '.$attributes['type']]);
                 }
 
                 $room->update($attributes);
@@ -145,9 +140,8 @@ class RoomController extends Controller
             } else {
                 $message = $response->message();
             }
-
-        } catch (QueryException $exception) {
-            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
             Log::channel('rooms')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';
@@ -164,7 +158,6 @@ class RoomController extends Controller
         $response = Gate::inspect('delete', [Room::class, $room]);
 
         if ($response->allowed()) {
-
             try {
                 $room->delete();
             } catch (QueryException $exception) {

@@ -12,9 +12,9 @@ class SectionSeeder extends Seeder
      */
     public function run(): void
     {
-
         // create one section against every Semester
         $semesters = Semester::all();
+
         foreach ($semesters as $semester) {
             $semester->sections()->create([
                 'name' => 'A',

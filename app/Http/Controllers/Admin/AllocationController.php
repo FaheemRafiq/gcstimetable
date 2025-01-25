@@ -21,8 +21,7 @@ class AllocationController extends Controller
 
     public function __construct(
         protected SectionRepository $sectionRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Show the form for creating a new resource.
@@ -30,43 +29,40 @@ class AllocationController extends Controller
     public function create(Request $request)
     {
         $request->validate([
-            'slot_id'          => 'required',
-            'time_table_id'     => 'required'
+            'slot_id'       => 'required',
+            'time_table_id' => 'required',
         ]);
 
         try {
-
             $timetable = TimeTable::with('shift')->findOrFail($request->time_table_id);
             $shift     = $timetable->shift;
 
             $timetable->load([
                 'shift.institution.days',
-                'shift.institution.rooms' => function ($query) use ($shift) {
+                'shift.institution.rooms' => function ($query) use ($shift): void {
                     $query->select('rooms.id', 'rooms.name', 'rooms.type', 'rooms.institution_id')
-                    ->where(function ($query) use ($shift) {
-                        $query->where('rooms.type', $shift->program_type)
-                            ->orWhere('rooms.type', 'BOTH');
-                    })
-                    ->available();
+                        ->where(function ($query) use ($shift): void {
+                            $query->where('rooms.type', $shift->program_type)
+                                ->orWhere('rooms.type', 'BOTH');
+                        })
+                        ->available();
                 },
-                'shift.institution.teachers'  => function ($query) {
+                'shift.institution.teachers' => function ($query): void {
                     $query->select('teachers.id', 'teachers.name', 'teachers.email', 'teachers.department_id');
                 },
-                'shift.semesters.courses',
-                'allocations' => fn ($query) => $query->select('section_id', 'time_table_id')
+                'allocations' => fn ($query) => $query->select('section_id', 'time_table_id'),
             ]);
             $removeSections = $timetable->allocations?->groupBy('section_id')->keys()->toArray();
 
-            $slot      = Slot::find($request->slot_id);
-            $sections  = $this->sectionRepository->getAllByShiftId($timetable?->shift_id, $request->input('section_id'));
-            $courses     = $timetable?->shift?->semesters?->pluck('courses')->flatten();
+            $slot     = Slot::find($request->slot_id);
+            $sections = $this->sectionRepository->getAllByShiftId($timetable?->shift_id, $request->input('section_id'));
+            $courses  = $timetable?->shift?->institution?->courses()->with('semesters:id')->get();
 
             $allocations = [];
-            if ($request->has('section_id')) {
 
+            if ($request->has('section_id')) {
                 $allocations = Allocation::where(['time_table_id' => $timetable->id, 'slot_id' => $request->slot_id, 'section_id' => $request->section_id])->withAll()->latest()->get();
             } elseif (count($removeSections) > 0) {
-
                 // Remove Sections of that timetable when creating new allocation with no section
                 $sections = $sections->whereNotIn('id', $removeSections)->values();
             }
@@ -74,22 +70,19 @@ class AllocationController extends Controller
             // Remove the semesters relationship from the timetable object
             $timetable?->shift?->setRelation('semesters', collect());
 
-
             return Inertia::render('Admin/Allocations/create', [
                 'props' => [
-                    'timetable' => $timetable,
-                    'slot' => $slot,
-                    'sections' => $sections,
-                    'courses' => $courses,
+                    'timetable'   => $timetable,
+                    'slot'        => $slot,
+                    'sections'    => $sections,
+                    'courses'     => $courses,
                     'allocations' => $allocations,
-                    'haveSection' => $request->has('section_id')
+                    'haveSection' => $request->has('section_id'),
                 ],
             ]);
-
-        } catch (QueryException $exception) {
-            return back()->with('error', 'Database error'.$exception->getMessage());
+        } catch (QueryException $queryException) {
+            return back()->with('error', 'Database error'.$queryException->getMessage());
         }
-
     }
 
     /**
@@ -97,28 +90,25 @@ class AllocationController extends Controller
      */
     public function store(AllocationRequest $request)
     {
-
         $attributes = $request->validated();
         $response   = Gate::inspect('create', Allocation::class);
         $message    = '';
         try {
-
             if ($response->allowed()) {
                 $allocation = Allocation::create($attributes);
 
                 return redirect()->route('allocations.create', [
                     'time_table_id' => $allocation->time_table_id,
-                    'section_id' => $allocation->section_id,
-                    'slot_id' => $allocation->slot_id
+                    'section_id'    => $allocation->section_id,
+                    'slot_id'       => $allocation->slot_id,
                 ])->with('success', 'Resource successfully created');
             } else {
                 $message = $response->message();
             }
-
         } catch (AllocationException $exception) {
-            $message = 'Constraint violation 👉 '. $exception->getMessage();
+            $message = 'Constraint violation 👉 '.$exception->getMessage();
         } catch (QueryException $exception) {
-            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+            $logData = ['message' => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
             Log::channel('allocations')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';
@@ -138,15 +128,12 @@ class AllocationController extends Controller
 
         try {
             if ($response->allowed()) {
-
                 $allocation->update($attributes);
 
                 return back()->with('success', 'Resource successfully updated');
-
             } else {
                 $message = $response->message();
             }
-
         } catch (AllocationException $exception) {
             $message = 'Constraint violation 👉 '.$exception->getMessage();
         } catch (QueryException $exception) {

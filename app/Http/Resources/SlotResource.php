@@ -15,12 +15,12 @@ class SlotResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'code' => $this->code,
-            'name' => $this->name,
+            'id'             => $this->id,
+            'code'           => $this->code,
+            'name'           => $this->name,
             'institution_id' => $this->institution_id,
-            'start_time' => $this->start_time,
-            'end_time' => $this->end_time,
+            'start_time'     => $this->start_time,
+            'end_time'       => $this->end_time,
         ];
     }
 }

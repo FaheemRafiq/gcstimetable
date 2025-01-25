@@ -3,15 +3,16 @@
 namespace App\Http\Requests;
 
 use App\Models\Section;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 class SectionRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
@@ -23,9 +24,9 @@ class SectionRequest extends FormRequest
                 'string',
                 'max:255',
                 Rule::unique(Section::class)
-                ->where(function ($query) {
-                    return $query->where('semester_id', $this->semester_id);
-                })->ignore($this->route('section')),
+                    ->where(function ($query) {
+                        return $query->where('semester_id', $this->semester_id);
+                    })->ignore($this->route('section')),
             ],
         ];
     }

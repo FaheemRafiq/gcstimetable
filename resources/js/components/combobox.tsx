@@ -24,6 +24,7 @@ interface AutoCompleteProps {
     values: { value: string; label: string }[];
     disabled?: boolean;
     isError?: boolean;
+    popoverClassName?: string;
 }
 
 export function AutoCompleteSelect({
@@ -33,6 +34,7 @@ export function AutoCompleteSelect({
     values,
     disabled,
     isError = false,
+    popoverClassName,
 }: AutoCompleteProps) {
     const [open, setOpen] = React.useState(false);
 
@@ -53,15 +55,15 @@ export function AutoCompleteSelect({
                 >
                     {Boolean(value)
                         ? (() => {
-                              return values.find(
-                                  (framework) => framework.value == value
-                              )?.label;
-                          })()
+                            return values.find(
+                                (framework) => framework.value == value
+                            )?.label;
+                        })()
                         : label}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="p-0">
+            <PopoverContent className={cn("w-72 p-0", popoverClassName)}>
                 <Command
                     filter={(value, search, keywords = []) => {
                         const extendValue = value + " " + keywords.join(" ");

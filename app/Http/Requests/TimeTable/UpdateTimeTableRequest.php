@@ -3,6 +3,7 @@
 namespace App\Http\Requests\TimeTable;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 class UpdateTimeTableRequest extends FormRequest
 {
@@ -17,14 +18,14 @@ class UpdateTimeTableRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
         return [
-            'title'         => 'required|string|max:255',
-            'description'   => 'required|string',
-            'shift_id'      => 'required|exists:shifts,id',
+            'title'       => 'required|string|max:255',
+            'description' => 'required|string',
+            'shift_id'    => 'required|exists:shifts,id',
         ];
     }
 

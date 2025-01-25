@@ -12,22 +12,22 @@ use Illuminate\Support\Facades\Gate;
 class UserController extends Controller
 {
     public const ONLY = ['index', 'destroy'];
-    
+
     public function index(Request $request)
     {
-        $admin  = Auth::user();
-        $users  = User::select('id', 'name', 'email', 'email_verified_at', 'created_at')
-            ->when($admin->isInstitutionAdmin(), function ($query) use ($admin) {
+        $admin = Auth::user();
+        $users = User::select('id', 'name', 'email', 'email_verified_at', 'created_at')
+            ->when($admin->isInstitutionAdmin(), function ($query) use ($admin): void {
                 $query->whereInstitution($admin->institution_id);
             })
-            ->when($admin->isDepartmentAdmin(), function ($query) use ($admin) {
+            ->when($admin->isDepartmentAdmin(), function ($query) use ($admin): void {
                 $query->whereDepartment($admin->department_id);
             })
             ->with('roles.permissions')
             ->paginate($request->input('per_page', config('providers.pagination.per_page')));
 
         return Inertia::render('Admin/Users/index', [
-            'users' => UserResource::collection($users)
+            'users' => UserResource::collection($users),
         ]);
     }
 
@@ -35,16 +35,15 @@ class UserController extends Controller
     {
         $user = User::find($user_id);
 
-        if (!$user) {
-            return back()->with('error' , 'User not found.');
+        if (! $user) {
+            return back()->with('error', 'User not found.');
         }
 
         $response = Gate::inspect('delete', [User::class, $user]);
 
         if ($response->allowed()) {
-
-            if (!$user->isStudent() && !$user->isTeacher()) {
-                return back()->with('error' , "User, {$user->name} can't be deleted.");
+            if (! $user->isStudent() && ! $user->isTeacher()) {
+                return back()->with('error', sprintf("User, %s can't be deleted.", $user->name));
             }
 
             $user->delete();

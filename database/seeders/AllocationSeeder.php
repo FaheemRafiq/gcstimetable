@@ -3,12 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\TimeTable;
-use Exception;
 use App\Models\Allocation;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
 
 class AllocationSeeder extends Seeder
 {
@@ -18,27 +14,28 @@ class AllocationSeeder extends Seeder
     public function run(): void
     {
         $firstTimeTable = TimeTable::with([
-                'shift.institution.teachers' => function ($query) {
-                    $query->first();
-                },
-                'shift.institution.rooms' => function ($query) {
-                    $query->first();
-                },
-                'shift.institution.days',
-                'shift.semesters' => function ($query) {
-                    $query->with('sections', 'courses')->first();
-                },
-                'shift.slots'
-            ])->first();
+            'shift.institution.teachers' => function ($query) {
+                $query->first();
+            },
+            'shift.institution.rooms' => function ($query) {
+                $query->first();
+            },
+            'shift.institution.days',
+            'shift.semesters' => function ($query) {
+                $query->with('sections', 'courses')->first();
+            },
+            'shift.slots',
+        ])->first();
 
         // Fetch required entities
-        $teacherId = $firstTimeTable->shift->institution->teachers->first()->id;
-        $courseId = $firstTimeTable->shift->semesters->first()->courses->first()->id;
-        $roomId = $firstTimeTable->shift->institution->rooms->first()->id;
-        $sectionId = $firstTimeTable->shift->semesters->first()->sections->first()->id;
+        $teacherId   = $firstTimeTable->shift->institution->teachers->first()->id;
+        $courseId    = $firstTimeTable->shift->semesters->first()->courses->first()->id;
+        $roomId      = $firstTimeTable->shift->institution->rooms->first()->id;
+        $sectionId   = $firstTimeTable->shift->semesters->first()->sections->first()->id;
         $timeTableId = $firstTimeTable->id;
 
         $allocations = [];
+
         foreach ($firstTimeTable->shift->institution->days as $day) {
             foreach ($firstTimeTable->shift->slots as $slot) {
                 $allocations[] = [
@@ -55,8 +52,6 @@ class AllocationSeeder extends Seeder
             }
         }
 
-
-
         $secondTimeTable = TimeTable::with([
             'shift.institution.teachers' => function ($query) {
                 $query->first();
@@ -68,14 +63,14 @@ class AllocationSeeder extends Seeder
             'shift.semesters' => function ($query) {
                 $query->with('sections', 'courses')->first();
             },
-            'shift.slots'
+            'shift.slots',
         ])->skip(1)->first();
 
         // Fetch required entities
-        $teacherId = $secondTimeTable->shift->institution->teachers->first()->id;
-        $courseId = $secondTimeTable->shift->semesters->first()->courses->first()->id;
-        $roomId = $secondTimeTable->shift->institution->rooms->first()->id;
-        $sectionId = $secondTimeTable->shift->semesters->first()->sections->first()->id;
+        $teacherId   = $secondTimeTable->shift->institution->teachers->first()->id;
+        $courseId    = $secondTimeTable->shift->semesters->first()->courses->first()->id;
+        $roomId      = $secondTimeTable->shift->institution->rooms->first()->id;
+        $sectionId   = $secondTimeTable->shift->semesters->first()->sections->first()->id;
         $timeTableId = $secondTimeTable->id;
 
         foreach ($secondTimeTable->shift->institution->days as $day) {
@@ -93,9 +88,7 @@ class AllocationSeeder extends Seeder
                 ];
             }
         }
-        
-        Allocation::insert($allocations);
-        
 
+        Allocation::insert($allocations);
     }
 }

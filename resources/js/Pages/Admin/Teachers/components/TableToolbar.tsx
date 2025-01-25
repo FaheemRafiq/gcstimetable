@@ -23,7 +23,13 @@ export function TeacherToolbar<TData>({
         router.get(route('teachers.create'));
     }
 
-    console.log("ranks => in  TeacherToolbar", ranks);
+    // convert key => value into { label: key, value: value }
+    function getOptions(obj: { [key: string]: string }) {
+        return Object.keys(obj).map((key) => ({
+            label: obj[key],
+            value: key,
+        }));
+    }
 
     return (
         <div className="flex items-center justify-between">
@@ -36,20 +42,13 @@ export function TeacherToolbar<TData>({
                     }
                     className="w-[250px] lg:w-[350px] md:shadow-md"
                 />
-                {/* {table.getColumn("status") && (
-                <DataTableFacetedFilter
-                    column={table.getColumn("status")}
-                    title="Status"
-                    options={statuses}
-                />
+                {table.getColumn("rank") && (
+                    <DataTableFacetedFilter
+                        column={table.getColumn("rank")}
+                        title="Ranks"
+                        options={getOptions(ranks)}
+                    />
                 )}
-                {table.getColumn("priority") && (
-                <DataTableFacetedFilter
-                    column={table.getColumn("priority")}
-                    title="Priority"
-                    options={priorities}
-                />
-                )} */}
                 {isFiltered && (
                     <Button
                         variant="ghost"

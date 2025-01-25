@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Department;
 use App\Models\Teacher;
+use App\Models\Department;
 use Faker\Factory as Faker;
 use Illuminate\Database\Seeder;
 
@@ -14,29 +14,29 @@ class TeacherSeeder extends Seeder
      */
     public function run(): void
     {
-        //Teacher::factory()->count(10)->create();
+        // Teacher::factory()->count(10)->create();
         // create Teacher with name ' Abdul Wahab , Zeeshan , Sadaf ,  Ahsan Ghafoor
-        $faker = Faker::create();
+        $faker    = Faker::create();
         $teachers = [
             [
-                'name' => 'Abdul Wahab',
+                'name'             => 'Abdul Wahab',
                 'personnel_number' => $faker->unique()->randomNumber(8),
-                'department_id' => Department::where('code', 'BSCS')->first()->id,
+                'department_id'    => Department::where('code', 'BSCS')->first()->id,
             ],
             [
-                'name' => 'Zeeshan',
+                'name'             => 'Zeeshan',
                 'personnel_number' => $faker->unique()->randomNumber(8),
-                'department_id' => Department::where('code', 'BSCS')->first()->id,
+                'department_id'    => Department::where('code', 'BSCS')->first()->id,
             ],
             [
-                'name' => 'Sadaf',
+                'name'             => 'Sadaf',
                 'personnel_number' => $faker->unique()->randomNumber(8),
-                'department_id' => Department::where('code', 'BSCS')->first()->id,
+                'department_id'    => Department::where('code', 'BSCS')->first()->id,
             ],
             [
-                'name' => 'Ahsan Ghafoor',
+                'name'             => 'Ahsan Ghafoor',
                 'personnel_number' => $faker->unique()->randomNumber(8),
-                'department_id' => Department::where('code', 'BSCS')->first()->id,
+                'department_id'    => Department::where('code', 'BSCS')->first()->id,
             ],
 
         ];
@@ -44,8 +44,5 @@ class TeacherSeeder extends Seeder
         foreach ($teachers as $key => $teacher) {
             Teacher::create($teacher);
         }
-
-
-
     }
 }

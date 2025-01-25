@@ -24,9 +24,9 @@ class ShiftController extends Controller
 
         if ($admin->isSuperAdmin()) {
             $shifts = Shift::all();
+        }
 
-        } if ($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()) {
-
+        if ($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()) {
             $shifts = Shift::whereInstitution($admin->institution_id)->get();
         }
 
@@ -44,7 +44,6 @@ class ShiftController extends Controller
         $response   = Gate::inspect('create', Shift::class);
         $message    = '';
         try {
-
             if ($response->allowed()) {
                 Shift::create($attributes);
 
@@ -52,9 +51,8 @@ class ShiftController extends Controller
             } else {
                 $message = $response->message();
             }
-
-        } catch (QueryException $exception) {
-            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
             Log::channel('shifts')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';
@@ -99,9 +97,8 @@ class ShiftController extends Controller
             } else {
                 $message = $response->message();
             }
-
-        } catch (QueryException $exception) {
-            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
             Log::channel('shifts')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';
@@ -126,9 +123,8 @@ class ShiftController extends Controller
             } else {
                 $message = $response->message();
             }
-
-        } catch (QueryException $exception) {
-            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
             Log::channel('shifts')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';

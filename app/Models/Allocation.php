@@ -53,7 +53,7 @@ class Allocation extends Model
         return (bool) $this->slot_id;
     }
 
-    public function shouldCheckDuplicate()
+    public function shouldCheckDuplicate(): bool
     {
         return $this->hasDay() && $this->hasSlot() && $this->hasTeacher() && $this->hasCourse();
     }
@@ -106,7 +106,7 @@ class Allocation extends Model
     public function scopeConflictForDayAndTime($query, $dayId, $startTime, $endTime)
     {
         return $query->where('day_id', $dayId)
-                     ->whereHas('slot', fn ($q) => $q->timeOverlaps($startTime, $endTime));
+            ->whereHas('slot', fn ($q) => $q->timeOverlaps($startTime, $endTime));
     }
 
     public function scopeExcludeById($query, $excludeId = null)
@@ -114,10 +114,10 @@ class Allocation extends Model
         return $excludeId ? $query->where('id', '!=', $excludeId) : $query;
     }
 
-    public function scopeWhereInstitutionId(Builder $query, $institutionId)
+    public function scopeWhereInstitutionId(Builder $query, $institutionId): void
     {
-        $query->whereHas('timetable', function (Builder $query) use ($institutionId){
-            $query->whereHas('shift', function (Builder $query) use ($institutionId){
+        $query->whereHas('timetable', function (Builder $query) use ($institutionId): void {
+            $query->whereHas('shift', function (Builder $query) use ($institutionId): void {
                 $query->where('institution_id', $institutionId);
             });
         });

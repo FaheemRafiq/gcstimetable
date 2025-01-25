@@ -16,7 +16,6 @@ class DayController extends Controller
      */
     public function index()
     {
-
         // get the institution id from the request
         $institutionId = request()->input('institutionid');
 
@@ -25,16 +24,15 @@ class DayController extends Controller
             $days = new DayCollection(Day::all()->where('institution_id', $institutionId)->sortByDesc('updated_at'));
 
             return response()->json($days, 200); // 200 OK
-
-        } catch (QueryException $exception) {
-            return response()->json(['error' => 'Database error'.$exception->getMessage()], 500);
+        } catch (QueryException $queryException) {
+            return response()->json(['error' => 'Database error'.$queryException->getMessage()], 500);
         }
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): void
     {
         //
     }
@@ -48,8 +46,8 @@ class DayController extends Controller
             $day = Day::create($request->all());
 
             return response()->json($day, 201); // 201 Created
-        } catch (QueryException $exception) {
-            return response()->json(['error' => 'Constraint violation or other database error'.$exception->getMessage()], 422);
+        } catch (QueryException $queryException) {
+            return response()->json(['error' => 'Constraint violation or other database error'.$queryException->getMessage()], 422);
         }
     }
 
@@ -68,7 +66,7 @@ class DayController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Day $day)
+    public function edit(Day $day): void
     {
         //
     }
@@ -76,7 +74,7 @@ class DayController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateDayRequest $request, Day $day)
+    public function update(UpdateDayRequest $request, Day $day): Day
     {
         // save the request data and return it
         $day->update($request->all());

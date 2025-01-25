@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\Teacher;
 use App\Models\User;
+use App\Models\Teacher;
 use App\Enums\PermissionEnum;
 
 class TeacherPolicy

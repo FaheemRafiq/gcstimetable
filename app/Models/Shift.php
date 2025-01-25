@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use App\Traits\IsActiveTrait;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Shift extends Model
 {
@@ -34,7 +34,7 @@ class Shift extends Model
     public function scopeBothInterAndBsRoom($query)
     {
         return $query->where('name', 'LIKE', '%BS%')
-                     ->orWhereRaw('UPPER(name) LIKE ?', ['%INTER%']);
+            ->orWhereRaw('UPPER(name) LIKE ?', ['%INTER%']);
     }
 
     public function scopeWhereInstitution($query, $value)
@@ -62,5 +62,10 @@ class Shift extends Model
     public function semesters()
     {
         return $this->hasManyThrough(Semester::class, Program::class);
+    }
+
+    public function allocations()
+    {
+        return $this->hasManyThrough(Allocation::class, TimeTable::class);
     }
 }

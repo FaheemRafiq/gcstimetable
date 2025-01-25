@@ -56,7 +56,7 @@ const ModeToggle = React.forwardRef<HTMLButtonElement, ButtonProps>(({ className
                     <span className="sr-only">Toggle theme</span>
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent align="end" className="w-[160px]">
                 <DropdownMenuCheckboxItem
                     checked={theme === "light"}
                     onCheckedChange={(checked) => {

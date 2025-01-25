@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Institution extends Model
@@ -29,7 +29,7 @@ class Institution extends Model
         return $this->hasManyThrough(Teacher::class, Department::class);
     }
 
-    public function programs()
+    public function programs(): HasManyThrough
     {
         return $this->hasManyThrough(Program::class, Department::class);
     }

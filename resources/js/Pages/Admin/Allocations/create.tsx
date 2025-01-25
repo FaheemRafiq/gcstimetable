@@ -171,9 +171,8 @@ export default function CreateAllocation({
     }
 
     function getSectionLabel(section: ModifiedSection) {
-        return `${
-            section?.SemesterNo ? getNumberWithOrdinal(section.SemesterNo) : ""
-        } - ${section?.name ?? ""} - ${section?.SemesterName ?? ""}`;
+        return `${section?.SemesterNo ? getNumberWithOrdinal(section.SemesterNo) : ""
+            } - ${section?.name ?? ""} - ${section?.SemesterName ?? ""}`;
     }
 
     const filteredCourse: Course[] | [] = useMemo(() => {
@@ -182,7 +181,7 @@ export default function CreateAllocation({
                 (section: ModifiedSection) => section.id === data.section_id
             );
             return props?.courses?.filter(
-                (course) => course.semester_id === semester?.SemesterId
+                (course) => course.semesters?.find((sem) => sem.id === semester?.SemesterId)
             );
         }
 
@@ -271,7 +270,7 @@ export default function CreateAllocation({
                                     const isSelected =
                                         data.day_id === day.id &&
                                         data.allocation_id ===
-                                            (allocation ? allocation.id : null);
+                                        (allocation ? allocation.id : null);
 
                                     const handleClick = () => {
                                         setData((prevData) => ({
@@ -335,9 +334,9 @@ export default function CreateAllocation({
                                                             </div>
                                                         </>
                                                     ) : (data.course_id ||
-                                                          data.teacher_id ||
-                                                          data.room_id) &&
-                                                      data.day_id === day.id ? (
+                                                        data.teacher_id ||
+                                                        data.room_id) &&
+                                                        data.day_id === day.id ? (
                                                         <>
                                                             {data.course_id && (
                                                                 <div className="text-sm flex items-center space-x-2">
@@ -571,11 +570,9 @@ export default function CreateAllocation({
                                                             value: section.id.toString(),
                                                             label: `${getNumberWithOrdinal(
                                                                 section.SemesterNo
-                                                            )} - ${
-                                                                section.name
-                                                            } - ${
-                                                                section.SemesterName
-                                                            }`,
+                                                            )} - ${section.name
+                                                                } - ${section.SemesterName
+                                                                }`,
                                                         };
                                                     }
                                                 ) ?? []

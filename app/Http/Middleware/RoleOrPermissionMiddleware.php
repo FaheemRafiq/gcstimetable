@@ -4,8 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use App\Enums\RoleEnum;
-use App\Enums\PermissionEnum;
 use Illuminate\Http\Request;
+use App\Enums\PermissionEnum;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,7 +14,7 @@ class RoleOrPermissionMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request):Response  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -23,7 +23,7 @@ class RoleOrPermissionMiddleware
         // Check if the user is SUPER_ADMIN or has the required permission
         if ($user->hasRole(RoleEnum::SUPER_ADMIN->value) ||
             (
-                $user->can(PermissionEnum::CAN_ACCESS_DAHSBOARD->value) && 
+                $user->can(PermissionEnum::CAN_ACCESS_DAHSBOARD->value) &&
                 $user->hasRole([RoleEnum::INSTITUTION_ADMIN->value, RoleEnum::DEPARTMENT_ADMIN->value])
             )
         ) {

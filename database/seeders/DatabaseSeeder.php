@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Enums\RoleEnum;
 use App\Models\User;
+use App\Enums\RoleEnum;
 use App\Models\Institution;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
@@ -14,9 +14,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(RoleAndPermissionSeeder::class);
 
-        $superadmin_role        = Role::where('name', RoleEnum::SUPER_ADMIN)->first();
-        $institute_admin_role   = Role::where('name', RoleEnum::INSTITUTION_ADMIN)->first();
-        $department_admin_role  = Role::where('name', RoleEnum::DEPARTMENT_ADMIN)->first();
+        $superadmin_role       = Role::where('name', RoleEnum::SUPER_ADMIN)->first();
+        $institute_admin_role  = Role::where('name', RoleEnum::INSTITUTION_ADMIN)->first();
+        $department_admin_role = Role::where('name', RoleEnum::DEPARTMENT_ADMIN)->first();
 
         // Institutions
         $this->call(InstitutionSeeder::class);
@@ -24,32 +24,32 @@ class DatabaseSeeder extends Seeder
         // Super Admin
         $superAdmin = User::factory()
             ->create([
-                'name' => 'superadmin',
-                'email' => 'sadmin@gmail.com',
+                'name'     => 'superadmin',
+                'email'    => 'sadmin@gmail.com',
                 'password' => 'asdf1234',
             ]);
 
         $superAdmin->assignRole($superadmin_role);
 
         // ========================= Institution Admin ============================
-        $firstInstitution = Institution::with(['departments' => fn($q) => $q->limit(1)])->find(1);
+        $firstInstitution = Institution::with(['departments' => fn ($q) => $q->limit(1)])->find(1);
         $institutionAdmin = User::create([
-                'name' => 'iadmin',
-                'email' => 'iadmin@gmail.com',
-                'password' => 'asdf1234',
-                'institution_id' => 1,
+            'name'           => 'iadmin',
+            'email'          => 'iadmin@gmail.com',
+            'password'       => 'asdf1234',
+            'institution_id' => 1,
         ]);
 
         $institutionAdmin->assignRole($institute_admin_role);
         $institutionAdmin->markEmailAsVerified();
 
-        $lastInstitution = Institution::with(['departments' => fn($q) => $q->limit(1)])->find(2);
+        $lastInstitution   = Institution::with(['departments' => fn ($q) => $q->limit(1)])->find(2);
         $institutionAdmin2 = User::create([
-                'name' => 'iadmin2',
-                'email' => 'iadmin2@gmail.com',
-                'password' => 'asdf1234',
-                'institution_id' => 2,
-            ]);
+            'name'           => 'iadmin2',
+            'email'          => 'iadmin2@gmail.com',
+            'password'       => 'asdf1234',
+            'institution_id' => 2,
+        ]);
 
         $institutionAdmin2->assignRole($institute_admin_role);
         $institutionAdmin2->markEmailAsVerified();
@@ -58,22 +58,22 @@ class DatabaseSeeder extends Seeder
 
         // ============================ Department Admin ===========================
         $departmentAdmin = User::create([
-                'name' => 'dadmin',
-                'email' => 'dadmin@gmail.com',
-                'password' => 'asdf1234',
-                'institution_id' => 1,
-                'department_id' => $firstInstitution->departments->first()->id ?? null,
-            ]);
+            'name'           => 'dadmin',
+            'email'          => 'dadmin@gmail.com',
+            'password'       => 'asdf1234',
+            'institution_id' => 1,
+            'department_id'  => $firstInstitution->departments->first()->id ?? null,
+        ]);
 
         $departmentAdmin->assignRole($department_admin_role);
         $departmentAdmin->markEmailAsVerified();
 
         $departmentAdmin = User::create([
-            'name' => 'dadmin2',
-            'email' => 'dadmin2@gmail.com',
-            'password' => 'asdf1234',
+            'name'           => 'dadmin2',
+            'email'          => 'dadmin2@gmail.com',
+            'password'       => 'asdf1234',
             'institution_id' => 2,
-            'department_id' => $lastInstitution->departments->first()->id ?? null,
+            'department_id'  => $lastInstitution->departments->first()->id ?? null,
         ]);
 
         $departmentAdmin->assignRole($department_admin_role);

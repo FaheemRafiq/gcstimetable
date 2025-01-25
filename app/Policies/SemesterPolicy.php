@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\Semester;
 use App\Models\User;
+use App\Models\Semester;
 use App\Enums\PermissionEnum;
 use Illuminate\Auth\Access\Response;
 

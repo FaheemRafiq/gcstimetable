@@ -54,7 +54,7 @@ class RoomPolicy
             ? Response::allow()
             : Response::deny(config('providers.permission.action.error'));
     }
-    
+
     /**
      * Determine whether the user can restore the model.
      */

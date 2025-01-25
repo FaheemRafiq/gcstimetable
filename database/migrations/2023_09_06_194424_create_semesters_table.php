@@ -18,7 +18,7 @@ return new class extends Migration
 
             // Semester Number which could either be 1 to 8
             $table->integer('number')->default(1);
-            
+
             // Semester active or not
             $table->is_active();
 

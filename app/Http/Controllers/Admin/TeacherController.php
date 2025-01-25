@@ -8,11 +8,11 @@ use App\Models\Department;
 use Illuminate\Http\Request;
 use App\Enums\TeacherRankEnum;
 use App\Enums\TeacherPositionEnum;
-use App\Enums\TeacherQualificationEnum;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\TeacherRequest;
+use App\Enums\TeacherQualificationEnum;
 use App\Http\Resources\TeacherResource;
 use Illuminate\Database\QueryException;
 
@@ -32,9 +32,8 @@ class TeacherController extends Controller
         $qualifications = TeacherQualificationEnum::toArray();
 
         if ($admin->isInstitutionAdmin()) {
-
             $queyBuilder
-                ->whereHas('department', function ($query) use ($admin) {
+                ->whereHas('department', function ($query) use ($admin): void {
                     $query->where('institution_id', $admin->institution_id);
                 })
                 ->with('department.institution');
@@ -46,10 +45,10 @@ class TeacherController extends Controller
         $teachers = $queyBuilder->paginate($request->input('perPage', config('providers.pagination.per_page')));
 
         return Inertia::render('Admin/Teachers/index', [
-            'teachers' => TeacherResource::collection($teachers)->withQuery($request->query()),
-            'ranks' => $ranks,
-            'positions' => $positions,
-            'qualifications' => $qualifications
+            'teachers'       => TeacherResource::collection($teachers)->withQuery($request->query()),
+            'ranks'          => $ranks,
+            'positions'      => $positions,
+            'qualifications' => $qualifications,
         ]);
     }
 
@@ -58,11 +57,11 @@ class TeacherController extends Controller
      */
     public function create()
     {
-        $admin = Auth::user();
-        $ranks = TeacherRankEnum::toArray();
-        $positions = TeacherPositionEnum::toArray();
+        $admin          = Auth::user();
+        $ranks          = TeacherRankEnum::toArray();
+        $positions      = TeacherPositionEnum::toArray();
         $qualifications = TeacherQualificationEnum::toArray();
-        $departments = [];
+        $departments    = [];
 
         if ($admin->isInstitutionAdmin()) {
             $departments = Department::where('institution_id', $admin->institution_id)->pluck('name', 'id');
@@ -70,7 +69,7 @@ class TeacherController extends Controller
             $departments = Department::where('id', $admin->department_id)->pluck('name', 'id');
         }
 
-        return Inertia::render('Admin/Teachers/create', compact('ranks', 'positions', 'departments', 'qualifications'));
+        return Inertia::render('Admin/Teachers/create', ['ranks' => $ranks, 'positions' => $positions, 'departments' => $departments, 'qualifications' => $qualifications]);
     }
 
     /**
@@ -79,16 +78,17 @@ class TeacherController extends Controller
     public function store(TeacherRequest $request)
     {
         $attributes = $request->validated();
-        $message = '';
+        $message    = '';
 
         try {
             Teacher::create($attributes);
+
             return back()->with('success', 'Teacher successfully created');
-        } catch (QueryException $exception) {
+        } catch (QueryException $queryException) {
             Log::channel('teachers')->error('QueryException', [
-                "message" => $exception->getMessage(),
-                'file' => $exception->getFile(),
-                'line' => $exception->getLine()
+                'message' => $queryException->getMessage(),
+                'file'    => $queryException->getFile(),
+                'line'    => $queryException->getLine(),
             ]);
             $message = 'Database error 👉 Something went wrong!';
         }
@@ -101,11 +101,11 @@ class TeacherController extends Controller
      */
     public function edit(Teacher $teacher)
     {
-        $admin = Auth::user();
-        $ranks = TeacherRankEnum::toArray();
-        $positions = TeacherPositionEnum::toArray();
+        $admin          = Auth::user();
+        $ranks          = TeacherRankEnum::toArray();
+        $positions      = TeacherPositionEnum::toArray();
         $qualifications = TeacherQualificationEnum::toArray();
-        $departments = [];
+        $departments    = [];
 
         if ($admin->isInstitutionAdmin()) {
             $departments = Department::where('institution_id', $admin->institution_id)->pluck('name', 'id');
@@ -114,11 +114,11 @@ class TeacherController extends Controller
         }
 
         return Inertia::render('Admin/Teachers/edit', [
-            'teacher' => new TeacherResource($teacher),
-            'ranks' => $ranks,
-            'positions' => $positions,
-            'departments' => $departments,
-            'qualifications' => $qualifications
+            'teacher'        => new TeacherResource($teacher),
+            'ranks'          => $ranks,
+            'positions'      => $positions,
+            'departments'    => $departments,
+            'qualifications' => $qualifications,
         ]);
     }
 
@@ -128,16 +128,17 @@ class TeacherController extends Controller
     public function update(TeacherRequest $request, Teacher $teacher)
     {
         $attributes = $request->validated();
-        $message = '';
+        $message    = '';
 
         try {
             $teacher->update($attributes);
+
             return back()->with('success', 'Teacher successfully updated');
-        } catch (QueryException $exception) {
+        } catch (QueryException $queryException) {
             Log::channel('teachers')->error('QueryException', [
-                "message" => $exception->getMessage(),
-                'file' => $exception->getFile(),
-                'line' => $exception->getLine()
+                'message' => $queryException->getMessage(),
+                'file'    => $queryException->getFile(),
+                'line'    => $queryException->getLine(),
             ]);
             $message = 'Database error 👉 Something went wrong!';
         }
@@ -154,12 +155,13 @@ class TeacherController extends Controller
 
         try {
             $teacher->delete();
+
             return back()->with('success', 'Teacher successfully deleted');
-        } catch (QueryException $exception) {
+        } catch (QueryException $queryException) {
             Log::channel('teachers')->error('QueryException', [
-                "message" => $exception->getMessage(),
-                'file' => $exception->getFile(),
-                'line' => $exception->getLine()
+                'message' => $queryException->getMessage(),
+                'file'    => $queryException->getFile(),
+                'line'    => $queryException->getLine(),
             ]);
             $message = 'Database error 👉 Something went wrong!';
         }

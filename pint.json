@@ -1,0 +1,62 @@
+{
+    "preset": "laravel",
+    "exclude": [
+        "vendor",
+        "node_modules",
+        "public",
+        "storage",
+        "bootstrap",
+        "database/migrations",
+        "resources",
+        "tests",
+        "scripts"
+    ],
+    "rules": {
+        "ordered_imports": {
+            "sort_algorithm": "length",
+            "imports_order": [
+                "class",
+                "function",
+                "const"
+            ]
+        },
+        "binary_operator_spaces": {
+            "default": "align_single_space",
+            "operators": {
+                "=": "align_single_space",
+                "=>": "align_single_space"
+            }
+        },
+        "align_multiline_comment": true,
+        "array_indentation": true,
+        "trim_array_spaces": true,
+        "blank_line_before_statement": {
+            "statements": [
+                "return",
+                "if",
+                "for",
+                "foreach",
+                "while",
+                "do",
+                "switch"
+            ]
+        },
+        "no_extra_blank_lines": {
+            "tokens": [
+                "extra",
+                "curly_brace_block",
+                "parenthesis_brace_block"
+            ]
+        },
+        "braces": {
+            "allow_single_line_closure": true,
+            "position_after_functions_and_oop_constructs": "next"
+        },
+        "array_syntax": {
+            "syntax": "short"
+        },
+        "indentation_type": true,
+        "line_ending": true,
+        "no_unused_imports": true
+    }
+}

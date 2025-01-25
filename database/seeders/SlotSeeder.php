@@ -14,7 +14,7 @@ class SlotSeeder extends Seeder
     {
         // Define an array of slot data
         $slots = [
-            
+
             // Morning INTER
             ['name' => '8:00-9:00', 'code' => 'p1', 'start_time' => '08:00:00', 'end_time' => '09:00:00', 'shift_id' => 1],
             ['name' => '9:00-10:00', 'code' => 'p2', 'start_time' => '09:00:00', 'end_time' => '10:00:00', 'shift_id' => 1],
@@ -68,6 +68,5 @@ class SlotSeeder extends Seeder
         foreach ($slots as $slot) {
             Slot::create($slot);
         }
-
     }
 }

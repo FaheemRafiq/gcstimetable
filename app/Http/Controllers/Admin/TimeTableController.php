@@ -22,23 +22,23 @@ class TimeTableController extends Controller
         $tables = [];
 
         if ($admin->isInstitutionAdmin()) {
-            $tables = TimeTable::whereHas('institution', function ($query) use ($admin) {
+            $tables = TimeTable::whereHas('institution', function ($query) use ($admin): void {
                 $query->where('institutions.id', $admin->institution_id);
             })->latest()->get();
         } elseif ($admin->isDepartmentAdmin()) {
-            $tables = TimeTable::whereHas('institution.department', function ($query) use ($admin) {
+            $tables = TimeTable::whereHas('institution.department', function ($query) use ($admin): void {
                 $query->where('departments.id', $admin->department_id);
             })->latest()->get();
         }
 
         return Inertia::render('Admin/TimeTables/index', [
-            'timeTables' => $tables
+            'timeTables' => $tables,
         ]);
     }
 
     public function create()
     {
-        $admin = Auth::user();
+        $admin  = Auth::user();
         $shifts = [];
 
         if ($admin->isInstitutionAdmin()) {
@@ -46,7 +46,7 @@ class TimeTableController extends Controller
         }
 
         return Inertia::render('Admin/TimeTables/create', [
-            'shifts' => $shifts
+            'shifts' => $shifts,
         ]);
     }
 
@@ -57,11 +57,9 @@ class TimeTableController extends Controller
         $response = Gate::inspect('create', TimeTable::class);
 
         if ($response->allowed()) {
-
             $timetable = TimeTable::create($attributes);
 
             return redirect(route('timetables.add.allocations', $timetable->id))->with('success', 'Time Table created successfully.');
-
         }
 
         return back()->with('error', $response->message());
@@ -74,7 +72,7 @@ class TimeTableController extends Controller
 
         return Inertia::render('Admin/TimeTables/edit', [
             'timetable' => $timetable,
-            'shifts' => $shifts
+            'shifts'    => $shifts,
         ]);
     }
 
@@ -85,7 +83,6 @@ class TimeTableController extends Controller
         $response = Gate::inspect('update', $timetable);
 
         if ($response->allowed()) {
-
             $timetable->update($attributes);
 
             return redirect()->back()->with('success', 'Time Table updated successfully.');
@@ -96,8 +93,8 @@ class TimeTableController extends Controller
 
     public function addAllocations($timetable)
     {
-        $timetable   = TimeTable::where('id', $timetable)->with(['shift.slots', 'allocations' => fn ($q) => $q->withAll()])->firstOrFail();
-        $sections    = [];
+        $timetable = TimeTable::where('id', $timetable)->with(['shift.slots', 'allocations' => fn ($q) => $q->withAll()])->firstOrFail();
+        $sections  = [];
 
         if ($timetable->allocations) {
             $sectionIds = $timetable->allocations?->groupby('section_id')->keys();
@@ -106,17 +103,16 @@ class TimeTableController extends Controller
                 // Getting Table Sections
                 $sections = Section::whereIn('id', $sectionIds)
                     ->whereHas('semester', fn ($q) => $q->active())
-                    ->with(['semester' => function ($query) {
+                    ->with(['semester' => function ($query): void {
                         $query->select('id', 'name', 'number');
                     }])
                     ->get();
-
             }
         }
 
         return Inertia::render('Admin/TimeTables/addAllocations', [
             'timetable' => $timetable,
-            'sections' => $sections
+            'sections'  => $sections,
         ]);
     }
 }

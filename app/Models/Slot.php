@@ -28,13 +28,14 @@ class Slot extends Model
     {
         timeaddminutes($startTime);
         timeaddminutes($endTime, -1);
-        return $query->where(function ($q) use ($startTime, $endTime) {
+
+        return $query->where(function ($q) use ($startTime, $endTime): void {
             $q->whereBetween('start_time', [$startTime, $endTime])
-              ->orWhereBetween('end_time', [$startTime, $endTime])
-              ->orWhere(function ($q2) use ($startTime, $endTime) {
-                  $q2->where('start_time', '<=', $startTime)
-                     ->where('end_time', '>=', $endTime);
-              });
+                ->orWhereBetween('end_time', [$startTime, $endTime])
+                ->orWhere(function ($q2) use ($startTime, $endTime): void {
+                    $q2->where('start_time', '<=', $startTime)
+                        ->where('end_time', '>=', $endTime);
+                });
         });
     }
 

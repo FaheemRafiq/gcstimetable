@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\SectionRequest;
 use Illuminate\Database\QueryException;
-use App\Http\Requests\UpdateSectionRequest;
 
 class SectionController extends Controller
 {
@@ -20,8 +19,8 @@ class SectionController extends Controller
     public function store(SectionRequest $request)
     {
         $attributes = $request->validated();
-        $response = Gate::inspect('create', Section::class);
-        $message = '';
+        $response   = Gate::inspect('create', Section::class);
+        $message    = '';
 
         try {
             if ($response->allowed()) {
@@ -31,8 +30,8 @@ class SectionController extends Controller
             } else {
                 $message = $response->message();
             }
-        } catch (QueryException $exception) {
-            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
             Log::channel('sections')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';
@@ -47,8 +46,8 @@ class SectionController extends Controller
     public function update(SectionRequest $request, Section $section)
     {
         $attributes = $request->validated();
-        $response = Gate::inspect('update', $section);
-        $message = '';
+        $response   = Gate::inspect('update', $section);
+        $message    = '';
 
         try {
             if ($response->allowed()) {
@@ -58,8 +57,8 @@ class SectionController extends Controller
             } else {
                 $message = $response->message();
             }
-        } catch (QueryException $exception) {
-            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
             Log::channel('sections')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';
@@ -74,7 +73,7 @@ class SectionController extends Controller
     public function destroy(Section $section)
     {
         $response = Gate::inspect('delete', $section);
-        $message = '';
+        $message  = '';
 
         try {
             if ($response->allowed()) {
@@ -84,8 +83,8 @@ class SectionController extends Controller
             } else {
                 $message = $response->message();
             }
-        } catch (QueryException $exception) {
-            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
             Log::channel('sections')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';

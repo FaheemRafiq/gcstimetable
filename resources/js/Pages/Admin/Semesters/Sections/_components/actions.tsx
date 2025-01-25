@@ -50,7 +50,7 @@ export function Actions({ row }: { row: Section }) {
                 <DropdownMenuTrigger asChild className="cursor-pointer">
                     <EllipsisVertical />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56">
+                <DropdownMenuContent align="end" className="w-[160px]">
                     <DropdownMenuLabel>Operations</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>

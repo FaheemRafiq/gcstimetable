@@ -28,7 +28,7 @@ class RoomFactory extends Factory
 
             // capacity to be a random number between 50 and 100
             'capacity' => $this->faker->numberBetween(50, 100),
-            'type' => $this->faker->randomElement(['intermediate', 'bs', 'both']),
+            'type'     => $this->faker->randomElement(['intermediate', 'bs', 'both']),
             // all rooms are available
             'isavailable' => true,
 

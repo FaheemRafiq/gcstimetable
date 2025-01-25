@@ -3,8 +3,8 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Enums\PermissionEnum;
 use App\Models\TimeTable;
+use App\Enums\PermissionEnum;
 use Illuminate\Auth\Access\Response;
 
 class TimeTablePolicy

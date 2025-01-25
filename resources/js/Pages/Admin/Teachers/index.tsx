@@ -25,8 +25,9 @@ export default function Teachers({
     positions,
     departments,
 }: PageProps<TeachersProps>) {
-    console.log("teachers => in Teachers", teachers);
     const setRanks = useTeacherStore((state) => state.setRanks);
+    const setPositions = useTeacherStore((state) => state.setPositions);
+    const setDepartments = useTeacherStore((state) => state.setDepartments);
 
     const { setBreadcrumb } = useBreadcrumb();
 
@@ -38,6 +39,8 @@ export default function Teachers({
 
     useEffect(() => {
         setRanks(ranks);
+        setPositions(positions);
+        setDepartments(departments);
     }, [ranks, setRanks]);
 
     return (

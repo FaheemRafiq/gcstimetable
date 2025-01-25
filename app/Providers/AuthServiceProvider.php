@@ -3,6 +3,10 @@
 namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
+use App\Models\User;
+use App\Models\TimeTable;
+use App\Policies\UserPolicy;
+use App\Policies\TimeTablePolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -13,8 +17,8 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        \App\Models\User::class => \App\Policies\UserPolicy::class,
-        \App\Models\TimeTable::class => \App\Policies\TimeTablePolicy::class,
+        User::class      => UserPolicy::class,
+        TimeTable::class => TimeTablePolicy::class,
     ];
 
     /**

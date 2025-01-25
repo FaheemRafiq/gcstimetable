@@ -12,7 +12,6 @@ class DaySeeder extends Seeder
      */
     public function run(): void
     {
-
         // Define an array of day data
         $days = [
             ['name' => 'Monday', 'code' => 'MON', 'number' => 1],
@@ -38,6 +37,5 @@ class DaySeeder extends Seeder
             $dayData['institution_id'] = $insitution_id;
             Day::create($dayData);
         }
-
     }
 }

@@ -43,7 +43,7 @@ return new class extends Migration
             $table->enum('qualification', ['MSc', 'BS(Hons)', 'MPhil', 'PhD'])->default('MPhil');
             // Teacher Highest Degree Awarding Institute with should by default nullable
             $table->string('highest_degree_awarding_institute')->nullable();
-            //Teacher Highest Degree Awarding Country with should by default nullable
+            // Teacher Highest Degree Awarding Country with should by default nullable
             $table->string('highest_degree_awarding_country')->nullable();
             // Highest Degree Awarding Year with should by default nullable
             $table->integer('highest_degree_awarding_year')->nullable();
@@ -53,12 +53,12 @@ return new class extends Migration
             // teacher could either be Lecturer , Assistant Professor , Associate Professor or Professor
             $table->enum('rank', ['Lecturer', 'Assistant Professor', 'Associate Professor', 'Professor'])->default('Lecturer');
 
-            //Teacher can be HOD , Vice Principal or a Principal
+            // Teacher can be HOD , Vice Principal or a Principal
             $table->enum('position', ['HOD', 'Regular', 'Vice Principal', 'Principal'])->nullable()->default('Regular');
 
             // teacher belongs to some department
             $table->foreignId('department_id')->constrained('departments');
-            //isvisiting
+            // isvisiting
             $table->boolean('isvisiting')->default(false);
 
             // isActive

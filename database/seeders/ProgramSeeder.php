@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Department;
 use App\Models\Program;
+use App\Models\Department;
 use Illuminate\Database\Seeder;
 
 class ProgramSeeder extends Seeder
@@ -13,7 +13,6 @@ class ProgramSeeder extends Seeder
      */
     public function run(): void
     {
-
         // BS Morning Shift = 2
         $programs = [
             ['name' => 'BS BSCS', 'pcode' => 'BSCS', 'dcode' => 'BSCS',    'shift_id' => 2],
@@ -64,25 +63,22 @@ class ProgramSeeder extends Seeder
 
         // Create records for programs using the array
         foreach ($programs as $programData) {
-            
             $pcode = $programData['pcode'];
             $pname = $programData['name'];
             $pType = $programData['type'] ?? 'BS';
 
-            if(str_contains($pcode, 'Inter')) {
-                $pType  = 'INTER';
+            if (str_contains($pcode, 'Inter')) {
+                $pType = 'INTER';
             }
 
             // Create a program of type 'BS'
             Program::create([
-                'name' => $pname,
-                'code' => $pcode,
+                'name'          => $pname,
+                'code'          => $pcode,
                 'department_id' => Department::where('code', $programData['dcode'])->first()->id,
                 'type'          => $pType,
                 'shift_id'      => $programData['shift_id'],
             ]);
-
         }
-
     }
 }

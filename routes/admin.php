@@ -3,7 +3,19 @@
 use App\Http\Controllers\Admin;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Admin\RoomController;
+use App\Http\Controllers\Admin\SlotController;
+use App\Http\Controllers\Admin\ShiftController;
+use App\Http\Controllers\Admin\CourseController;
+use App\Http\Controllers\Admin\ProgramController;
+use App\Http\Controllers\Admin\SectionController;
+use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\TeacherController;
+use App\Http\Controllers\Admin\SemesterController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\TimeTableController;
 use App\Http\Middleware\RoleOrPermissionMiddleware;
+use App\Http\Controllers\Admin\AllocationController;
 
 /*
     |----------------Resource Controllers----------------|
@@ -22,44 +34,47 @@ use App\Http\Middleware\RoleOrPermissionMiddleware;
 // Admin Routes 🔒
 Route::prefix('admin')
     ->middleware(['auth', 'verified', RoleOrPermissionMiddleware::class])
-    ->group(function () {
-
-        Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('dashboard');
+    ->group(function (): void {
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Users 🧑‍🤝‍🧑
         Route::resource('users', UserController::class)->only(UserController::ONLY);
 
         // Students 🧑‍🎓
-        Route::resource('students', Admin\StudentController::class)->only(Admin\StudentController::ONLY);
+        Route::resource('students', StudentController::class)->only(StudentController::ONLY);
 
         // Teachers 🧑‍🏫
-        Route::resource('teachers', Admin\TeacherController::class)->only(Admin\TeacherController::ONLY);
+        Route::resource('teachers', TeacherController::class)->only(TeacherController::ONLY);
 
         // Time Table Resource 📆
-        Route::resource('timetables', Admin\TimeTableController::class)->only(Admin\TimeTableController::ONLY);
-        Route::get('/timetables/{timetable}/add/allocations', [Admin\TimeTableController::class, 'addAllocations'])->name('timetables.add.allocations');
+        Route::resource('timetables', TimeTableController::class)->only(TimeTableController::ONLY);
+        Route::get('/timetables/{timetable}/add/allocations', [TimeTableController::class, 'addAllocations'])->name('timetables.add.allocations');
 
         // Allocations 🔹
-        Route::resource('allocations', Admin\AllocationController::class)->only(Admin\AllocationController::ONLY);
+        Route::resource('allocations', AllocationController::class)->only(AllocationController::ONLY);
 
         // Rooms 🏫
-        Route::resource('rooms', Admin\RoomController::class)->only(Admin\RoomController::ONLY);
+        Route::resource('rooms', RoomController::class)->only(RoomController::ONLY);
 
         // Shifts ⏲️
-        Route::resource('shifts', Admin\ShiftController::class)->only(Admin\ShiftController::ONLY);
+        Route::resource('shifts', ShiftController::class)->only(ShiftController::ONLY);
 
         // Programs 📚
-        Route::resource('programs', Admin\ProgramController::class)->only(Admin\ProgramController::ONLY);
+        Route::resource('programs', ProgramController::class)->only(ProgramController::ONLY);
 
         // Semesters 📅
-        Route::resource('semesters', Admin\SemesterController::class)->only(Admin\SemesterController::ONLY);
+        Route::resource('semesters', SemesterController::class)->only(SemesterController::ONLY);
 
         // Sections 📂
-        Route::resource('sections', Admin\SectionController::class)->only(Admin\SectionController::ONLY);
+        Route::resource('sections', SectionController::class)->only(SectionController::ONLY);
 
         // slots 🎰
-        Route::resource('slots', Admin\SlotController::class)->only(Admin\SlotController::ONLY);
+        Route::resource('slots', SlotController::class)->only(SlotController::ONLY);
 
         // Courses 📖
-        Route::resource('courses', Admin\CourseController::class)->only(Admin\CourseController::ONLY);
+        Route::resource('courses', CourseController::class)->only(CourseController::ONLY);
+        Route::prefix('courses')->group(function (): void {
+            Route::get('attach/{course}', [CourseController::class, 'attachSemester'])->name('courses.attach.semester');
+            Route::post('attach/{course}', [CourseController::class, 'attach'])->name('courses.attach');
+        });
     });

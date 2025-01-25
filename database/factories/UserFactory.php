@@ -26,7 +26,7 @@ class UserFactory extends Factory
             'password'          => 'asdf1234', // password
             // 'two_factor_secret' => null,
             // 'two_factor_recovery_codes' => null,
-            'remember_token'    => Str::random(10),
+            'remember_token' => Str::random(10),
             //            'profile_photo_path' => null,
 
         ];

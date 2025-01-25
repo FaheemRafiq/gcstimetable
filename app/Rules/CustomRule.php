@@ -3,8 +3,8 @@
 namespace App\Rules;
 
 use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 class CustomRule implements ValidationRule
 {
@@ -31,6 +31,5 @@ class CustomRule implements ValidationRule
         // if ($count > 0) {
         //     $fail('The selected combination of day, slot, teacher, and course is not unique.');
         // }
-
     }
 }

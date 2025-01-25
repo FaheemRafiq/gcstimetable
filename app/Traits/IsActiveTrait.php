@@ -5,6 +5,7 @@ namespace App\Traits;
 trait IsActiveTrait
 {
     public const ACTIVE = 'active';
+
     public const INACTIVE = 'inactive';
 
     // Scopes
@@ -24,12 +25,12 @@ trait IsActiveTrait
     }
 
     // helpers
-    public function isActive()
+    public function isActive(): bool
     {
         return $this->is_active === self::ACTIVE;
     }
 
-    public function isInactive()
+    public function isInactive(): bool
     {
         return $this->is_active === self::INACTIVE;
     }

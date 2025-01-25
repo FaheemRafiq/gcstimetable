@@ -5,14 +5,15 @@ namespace App\Http\Requests;
 use App\Models\Course;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 class CourseRequest extends FormRequest
 {
-    public function prepareForValidation()
+    protected function prepareForValidation()
     {
         $admin = $this->user();
 
-        if(!$admin->isSuperAdmin()) {
+        if (! $admin->isSuperAdmin()) {
             $this->merge([
                 'institution_id' => $admin->institution_id,
             ]);
@@ -22,7 +23,7 @@ class CourseRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
@@ -34,7 +35,7 @@ class CourseRequest extends FormRequest
                 'string',
                 'max:255',
                 Rule::unique('courses', 'code')
-                ->ignore($this->route('course') ?? null),
+                    ->ignore($this->route('course') ?? null),
             ],
             'institution_id' => [
                 'bail',
@@ -45,7 +46,7 @@ class CourseRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
             ],
             'credit_hours' => [
                 'required',

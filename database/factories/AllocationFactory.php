@@ -2,11 +2,11 @@
 
 namespace Database\Factories;
 
-use App\Models\Course;
 use App\Models\Day;
 use App\Models\Room;
-use App\Models\Section;
 use App\Models\Slot;
+use App\Models\Course;
+use App\Models\Section;
 use App\Models\Teacher;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,7 +22,6 @@ class AllocationFactory extends Factory
      */
     public function definition(): array
     {
-
         $faker = $this->faker;
 
         $faker->seed(1234);

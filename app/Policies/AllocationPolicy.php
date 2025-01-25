@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\Allocation;
 use App\Models\User;
+use App\Models\Allocation;
 use App\Enums\PermissionEnum;
 use Illuminate\Auth\Access\Response;
 

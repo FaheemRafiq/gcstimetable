@@ -16,13 +16,12 @@ class CourseFactory extends Factory
      */
     public function definition(): array
     {
-
         return [
-            'name' => $this->faker->words(3, true),
-            'code' => $this->faker->unique()->regexify('[A-Z]{3}[0-9]{3}'),
+            'name'         => $this->faker->words(3, true),
+            'code'         => $this->faker->unique()->regexify('[A-Z]{3}[0-9]{3}'),
             'display_code' => $this->faker->unique()->regexify('[A-Z]{3}[0-9]{3}'),
             'credit_hours' => $this->faker->numberBetween(1, 3),
-            'semester_id' => $this->faker->numberBetween(1, 10),
+            'semester_id'  => $this->faker->numberBetween(1, 10),
         ];
     }
 }

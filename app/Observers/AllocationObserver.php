@@ -11,7 +11,7 @@ class AllocationObserver
     /**
      * Handle the Allocation "creating" event.
      */
-    public function creating(Allocation $allocation)
+    public function creating(Allocation $allocation): void
     {
         $this->validateAllocation($allocation, 'store');
     }
@@ -19,44 +19,42 @@ class AllocationObserver
     /**
      * Handle the Allocation "updating" event.
      */
-    public function updating(Allocation $allocation)
+    public function updating(Allocation $allocation): void
     {
         $this->validateAllocation($allocation, 'update');
     }
 
-    public function validateAllocation(Allocation $allocation, string $action)
+    public function validateAllocation(Allocation $allocation, string $action): void
     {
-        $institutionId = auth()->user()->institution_id;
+        auth()->user()->institution_id;
         /**
          * Required in Request Validation
          * 1. Time Table
          * 2. Slot
          * 3. Section
          */
-
         $excludeId = $action === 'update' ? $allocation->id : null;
         $allocation->load('slot');
         $currentSlot = $allocation->slot;
 
-        if(!$allocation->hasDay()){
+        if (! $allocation->hasDay()) {
             throw new AllocationException('Allocation must have a day.');
         }
 
-        if ($allocation->hasRoom() && (!$allocation->hasTeacher() || !$allocation->hasCourse())) {
+        if ($allocation->hasRoom() && (! $allocation->hasTeacher() || ! $allocation->hasCourse())) {
             throw new AllocationException('Room allocation must have a 🧑‍🏫 teacher and a 📘 course.');
         }
 
-        if ($allocation->hasTeacher() && !$allocation->hasCourse()) {
+        if ($allocation->hasTeacher() && ! $allocation->hasCourse()) {
             throw ValidationException::withMessages(['course_id' => 'Teacher allocation must have a course.']);
         }
 
-        if ($allocation->hasCourse() && !$allocation->hasSection()) {
+        if ($allocation->hasCourse() && ! $allocation->hasSection()) {
             throw new AllocationException('Course allocation must have a section.');
         }
 
         // 1. Prevent Double Booking for Rooms
         if ($allocation->hasRoom()) {
-
             $roomConflict = Allocation::where('room_id', $allocation->room_id)
                 ->conflictForDayAndTime($allocation->day_id, $currentSlot->start_time, $currentSlot->end_time)
                 ->excludeById($excludeId)
@@ -70,7 +68,6 @@ class AllocationObserver
 
         // 2. Restrict Teacher’s Availability Across Shifts
         if ($allocation->hasTeacher()) {
-
             $teacherConflict = Allocation::where('teacher_id', $allocation->teacher_id)
                 ->conflictForDayAndTime($allocation->day_id, $currentSlot->start_time, $currentSlot->end_time)
                 ->excludeById($excludeId)
@@ -84,7 +81,6 @@ class AllocationObserver
 
         // 3. Limit Courses Per Section Per Slot
         if ($allocation->hasCourse() && $allocation->hasSection()) {
-
             $sectionConflict = Allocation::whereSection($allocation->section_id)
                 ->conflictForDayAndTime($allocation->day_id, $currentSlot->start_time, $currentSlot->end_time)
                 ->excludeById($excludeId)
@@ -98,7 +94,6 @@ class AllocationObserver
 
         // 4. Section Conflict Across Timetables
         if ($allocation->hasSection()) {
-            
             $sectionTimeTableConflict = Allocation::whereSection($allocation->section_id)
                 ->where('time_table_id', '!=', $allocation->time_table_id)
                 ->excludeById($excludeId)
@@ -116,6 +111,7 @@ class AllocationObserver
                 ->excludeById($excludeId)
                 // ->whereInstitutionId($institutionId)
                 ->exists();
+
             if ($duplicate) {
                 throw new AllocationException('Allocation already exists with the same teacher, room, day, and course.');
             }

@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use ReflectionEnum;
 use App\Enums\RoleEnum;
 use App\Enums\PermissionEnum;
-use ReflectionEnum;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -16,16 +16,16 @@ class RoleAndPermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        $superadmin_role        = Role::create(['name' => RoleEnum::SUPER_ADMIN->value]);
-        $institute_admin_role   = Role::create(['name' => RoleEnum::INSTITUTION_ADMIN->value]);
-        $department_admin_role  = Role::create(['name' => RoleEnum::DEPARTMENT_ADMIN->value]);
-        $student_role           = Role::create(['name' => RoleEnum::STUDENT->value]);
-        $teacher_role           = Role::create(['name' => RoleEnum::TEACHER->value]);
+        $superadmin_role       = Role::create(['name' => RoleEnum::SUPER_ADMIN->value]);
+        $institute_admin_role  = Role::create(['name' => RoleEnum::INSTITUTION_ADMIN->value]);
+        $department_admin_role = Role::create(['name' => RoleEnum::DEPARTMENT_ADMIN->value]);
+        $student_role          = Role::create(['name' => RoleEnum::STUDENT->value]);
+        $teacher_role          = Role::create(['name' => RoleEnum::TEACHER->value]);
 
         // Create Permissions for Modules
 
-        $reflection     = new ReflectionEnum(PermissionEnum::class);
-        $permissions    = $reflection->getCases();
+        $reflection  = new ReflectionEnum(PermissionEnum::class);
+        $permissions = $reflection->getCases();
 
         foreach ($permissions as $permission) {
             $key = $permission->getValue();
@@ -34,7 +34,6 @@ class RoleAndPermissionSeeder extends Seeder
                 Permission::create(['name' => $key->value]);
             }
         }
-
 
         // Assign Permissions to Roles
 

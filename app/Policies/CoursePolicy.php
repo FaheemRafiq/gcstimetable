@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\Course;
 use App\Models\User;
+use App\Models\Course;
 use App\Enums\PermissionEnum;
 use Illuminate\Auth\Access\Response;
 
@@ -71,5 +71,15 @@ class CoursePolicy
     public function forceDelete(User $user, Course $course): bool
     {
         //
+    }
+
+    /**
+     * Determine whether the user can attach semester to the course.
+     */
+    public function attach(User $user, Course $course): Response
+    {
+        return $user->can(PermissionEnum::COURSE_ATTACH_SEMESTER, $course)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.action.error'));
     }
 }

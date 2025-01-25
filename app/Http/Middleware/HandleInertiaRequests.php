@@ -2,9 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Enums\RoleEnum;
-use App\Models\User;
-use App\Enums\PermissionEnum;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
 use Illuminate\Http\Request;
@@ -22,7 +19,7 @@ class HandleInertiaRequests extends Middleware
     /**
      * Determine the current asset version.
      */
-    public function version(Request $request): string|null
+    public function version(Request $request): ?string
     {
         return parent::version($request);
     }
@@ -40,12 +37,12 @@ class HandleInertiaRequests extends Middleware
                 'user' => $this->currentUser($request),
             ],
             'ziggy' => fn () => [
-                ...(new Ziggy())->toArray(),
+                ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
             'flash' => [
                 'success' => fn () => session('success'),
-                'error' => fn () => session('error')
+                'error'   => fn () => session('error'),
             ],
         ];
     }
@@ -53,12 +50,14 @@ class HandleInertiaRequests extends Middleware
     private function currentUser(Request $request)
     {
         $user = $request->user();
-        if ($user) {
-            $userId = $user->id;
-            $cacheKey = "user_{$userId}_with_relations";
 
-            return cache()->remember($cacheKey, 60, function () use ($user) {
+        if ($user) {
+            $userId   = $user->id;
+            $cacheKey = sprintf('user_%s_with_relations', $userId);
+
+            return cache()->remember($cacheKey, 60, function () use ($user): UserResource {
                 $user->load(['institution:id,name', 'roles', 'permissions']);
+
                 return new UserResource($user);
             });
         }

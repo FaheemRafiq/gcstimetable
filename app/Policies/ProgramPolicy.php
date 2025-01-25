@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\Program;
 use App\Models\User;
+use App\Models\Program;
 use App\Enums\PermissionEnum;
 use Illuminate\Auth\Access\Response;
 

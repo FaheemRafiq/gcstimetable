@@ -4,7 +4,6 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Log;
 
 class RoomResource extends JsonResource
 {
@@ -15,14 +14,13 @@ class RoomResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'code' => $this->code,
-            'capacity' => $this->capacity,
-            'type' => $this->type,
-            'isavailable' => $this->isavailable,
+            'id'             => $this->id,
+            'name'           => $this->name,
+            'code'           => $this->code,
+            'capacity'       => $this->capacity,
+            'type'           => $this->type,
+            'isavailable'    => $this->isavailable,
             'institution_id' => $this->institution_id,
         ];
     }

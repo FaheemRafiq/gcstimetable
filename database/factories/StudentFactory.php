@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Program;
-use App\Models\Semester;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,15 +17,15 @@ class StudentFactory extends Factory
      */
     public function definition(): array
     {
-        $program = Program::inRandomOrder()->whereHas('semesters')->with(['semesters' => fn($q) => $q->inRandomOrder()->first(), 'institution'])->first();
+        $program = Program::inRandomOrder()->whereHas('semesters')->with(['semesters' => fn ($q) => $q->inRandomOrder()->first(), 'institution'])->first();
 
         return [
-            'name'          => fake()->name(),
-            'email'         => fake()->unique()->safeEmail(),
-            'mobile'        => fake()->phoneNumber(),
-            'program_id'    => $program->id ?? null,
-            'semester_id'   => $program->semesters?->first()->id ?? null,
-            'institution_id'=> $program->institution->id,
+            'name'           => fake()->name(),
+            'email'          => fake()->unique()->safeEmail(),
+            'mobile'         => fake()->phoneNumber(),
+            'program_id'     => $program->id                      ?? null,
+            'semester_id'    => $program->semesters?->first()->id ?? null,
+            'institution_id' => $program->institution->id,
         ];
     }
 }

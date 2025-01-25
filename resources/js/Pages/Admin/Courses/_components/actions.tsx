@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { EllipsisVertical, Eye, Pencil, Trash } from "lucide-react";
+import { EllipsisVertical, Eye, Link, Pencil, Trash } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -15,10 +15,14 @@ import toast from "react-hot-toast";
 import { Course } from "@/types/database";
 import DeleteConfirmationDialog from "@/Components/Dialog/DeleteConfirmationDialog";
 import { CourseForm } from "./CourseForm";
+import { CourseAttachForm } from "./CourseAttachForm";
 
 export function Actions({ row }: { row: Course }) {
     // Edit State
     const [openEdit, setOpenEdit] = useState(false);
+
+    // attach course to semester
+    const [openAttach, setOpenAttach] = useState(false);
 
     // Delete Action State
     const [openConfirm, setOpenConfirm] = useState(false);
@@ -46,7 +50,7 @@ export function Actions({ row }: { row: Course }) {
                 <DropdownMenuTrigger asChild className="cursor-pointer">
                     <EllipsisVertical />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56">
+                <DropdownMenuContent align="end" className="w-[200px]">
                     <DropdownMenuLabel>Operations</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
@@ -63,6 +67,13 @@ export function Actions({ row }: { row: Course }) {
                         >
                             <Pencil className="mr-2 h-4 w-4" />
                             <span>Edit</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={() => setOpenAttach(true)}
+                        >
+                            <Link className="mr-2 h-4 w-4" />
+                            <span>Attach to Semester</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             className="cursor-pointer"
@@ -84,6 +95,16 @@ export function Actions({ row }: { row: Course }) {
                     onClose={() => setOpenEdit(false)}
                 />
             )}
+
+            {
+                openAttach && (
+                    <CourseAttachForm
+                        open={openAttach}
+                        onClose={() => setOpenAttach(false)}
+                        course={row}
+                    />
+                )
+            }
 
             {/* Course Delete Confirmation */}
             <DeleteConfirmationDialog

@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,15 +15,15 @@ class TeacherResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'                => $this->id,
-            'name'              => $this->name,
-            'personnel_number'  => $this->personnel_number,
-            'email'             => $this->email,
-            'cnic'              => $this->cnic,
-            'phone_number'      => $this->phone_number,
-            'bank_iban'         => $this->bank_iban,
-            'isMale'            => $this->isMale,
-            'date_of_birth'     => $this->date_of_birth?->format('Y-m-d'),
+            'id'               => $this->id,
+            'name'             => $this->name,
+            'personnel_number' => $this->personnel_number,
+            'email'            => $this->email,
+            'cnic'             => $this->cnic,
+            'phone_number'     => $this->phone_number,
+            'bank_iban'        => $this->bank_iban,
+            'isMale'           => $this->isMale,
+            'date_of_birth'    => $this->date_of_birth?->format('Y-m-d'),
 
             'date_of_joining_in_this_college'   => $this->date_of_joining_in_this_college?->format('Y-m-d'),
             'date_of_joining_govt_service'      => $this->date_of_joining_govt_service?->format('Y-m-d'),
@@ -43,7 +42,7 @@ class TeacherResource extends JsonResource
             'department'    => $this->whenLoaded('department') ? $this->department : null,
             'isvisiting'    => $this->isvisiting,
             'is_active'     => $this->is_active,
-            'created_at'    => $this->created_at?->format(config('providers.date.format'))
+            'created_at'    => $this->created_at?->format(config('providers.date.format')),
         ];
     }
 }

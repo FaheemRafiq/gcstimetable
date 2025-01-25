@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -25,35 +26,35 @@ class TruncateDBTables extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
-
-        if(app()->environment() !== 'local'){
-            throw new \Exception('Command only available in Local environment.');
+        if (app()->environment() !== 'local') {
+            throw new Exception('Command only available in Local environment.');
         }
 
         $this->truncateAllTables();
     }
 
-    public function truncateAllTables()
+    public function truncateAllTables(): void
     {
         Schema::disableForeignKeyConstraints();
 
-        $modelName      = $this->option('model');
-        $modelClass     = sprintf("App\\Models\\%s", $modelName);
-        $modelInstance  = null;
-        
-        if($modelName){
+        $modelName     = $this->option('model');
+        $modelClass    = sprintf('App\\Models\\%s', $modelName);
+        $modelInstance = null;
+
+        if ($modelName) {
             if (class_exists($modelClass)) {
                 $modelInstance = resolve($modelClass);
             } else {
-                $this->fail("Model {$modelName} does not exist.");
+                $this->fail(sprintf('Model %s does not exist.', $modelName));
             }
         }
-        $singleTable    = $modelInstance?->getTable();
 
-        $tables = DB::select('SHOW TABLES');
-        $tableKey = 'Tables_in_' . env('DB_DATABASE');
+        $singleTable = $modelInstance?->getTable();
+
+        $tables   = DB::select('SHOW TABLES');
+        $tableKey = 'Tables_in_'.env('DB_DATABASE');
 
         foreach ($tables as $table) {
             $tableName = $table->$tableKey;
@@ -67,6 +68,6 @@ class TruncateDBTables extends Command
 
         Schema::enableForeignKeyConstraints();
 
-        $this->info($singleTable ? "Table {$singleTable} truncated successfully." : 'All tables truncated successfully.');
+        $this->info($singleTable ? sprintf('Table %s truncated successfully.', $singleTable) : 'All tables truncated successfully.');
     }
 }

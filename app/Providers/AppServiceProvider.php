@@ -2,21 +2,17 @@
 
 namespace App\Providers;
 
-use App\Models\Allocation;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
      */
-    public function register(): void
-    {
-    }
+    public function register(): void {}
 
     /**
      * Bootstrap any application services.
@@ -27,10 +23,8 @@ class AppServiceProvider extends ServiceProvider
 
         JsonResource::withoutWrapping();
 
-        Blueprint::macro('is_active', function () {
+        Blueprint::macro('is_active', function (): void {
             $this->enum('is_active', ['active', 'inactive'])->default('active');
         });
-
-
     }
 }

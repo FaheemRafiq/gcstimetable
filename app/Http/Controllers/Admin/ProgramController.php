@@ -12,8 +12,6 @@ use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\ProgramRequest;
 use Illuminate\Database\QueryException;
 use App\Http\Resources\ProgramCollection;
-use App\Http\Requests\StoreProgramRequest;
-use App\Http\Requests\UpdateProgramRequest;
 
 class ProgramController extends Controller
 {
@@ -24,17 +22,14 @@ class ProgramController extends Controller
      */
     public function index()
     {
-        $admin      = Auth::user();
-        $builder    = Program::query();
+        $admin   = Auth::user();
+        $builder = Program::query();
 
         if ($admin->isInstitutionAdmin()) {
-
-            $builder->whereHas("institution", function ($q) use ($admin) {
+            $builder->whereHas('institution', function ($q) use ($admin): void {
                 $q->where('institutions.id', $admin->institution_id);
             });
-
         } elseif ($admin->isDepartmentAdmin()) {
-
             $programs = $builder->where('department_id', $admin->department_id);
         }
 
@@ -66,7 +61,6 @@ class ProgramController extends Controller
         $response   = Gate::inspect('create', Program::class);
         $message    = '';
         try {
-
             if ($response->allowed()) {
                 Program::create($attributes);
 
@@ -74,9 +68,8 @@ class ProgramController extends Controller
             } else {
                 $message = $response->message();
             }
-
-        } catch (QueryException $exception) {
-            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
             Log::channel('programs')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';
@@ -112,7 +105,6 @@ class ProgramController extends Controller
         $response   = Gate::inspect('update', $program);
         $message    = '';
         try {
-
             if ($response->allowed()) {
                 $program->update($attributes);
 
@@ -120,9 +112,8 @@ class ProgramController extends Controller
             } else {
                 $message = $response->message();
             }
-
-        } catch (QueryException $exception) {
-            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
             Log::channel('programs')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';
@@ -139,7 +130,6 @@ class ProgramController extends Controller
         $response = Gate::inspect('delete', $program);
         $message  = '';
         try {
-
             if ($response->allowed()) {
                 $program->delete();
 
@@ -147,9 +137,8 @@ class ProgramController extends Controller
             } else {
                 $message = $response->message();
             }
-
-        } catch (QueryException $exception) {
-            $logData = ["message" => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()];
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
             Log::channel('programs')->error('QueryException', $logData);
 
             $message = 'Database error 👉 Something went wrong!';
