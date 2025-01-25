@@ -15,12 +15,13 @@ class DepartmentResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'             => $this->id,
-            'name'           => $this->name,
-            'code'           => $this->code,
-            'institution_id' => $this->institution_id,
-            'created_at'     => $this->created_at,
-            'updated_at'     => $this->updated_at,
+            'id'              => $this->id,
+            'name'            => $this->name,
+            'code'            => $this->code,
+            'institution_id'  => $this->institution_id,
+            'institution'     => $this->institution,
+            'created_at'      => $this->created_at?->format(config('providers.date.readable')),
+            'updated_at'      => $this->updated_at?->format(config('providers.date.readable')),
         ];
     }
 }

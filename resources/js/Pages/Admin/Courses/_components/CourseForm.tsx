@@ -13,7 +13,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import InputError from "@/Components/InputError";
-import { ClassType, Course, Instituion, Semester } from "@/types/database";
+import { ClassType, Course, Institution, Semester } from "@/types/database";
 import { fetchWrapper } from "@/lib/fetchWrapper";
 import { AutoCompleteSelect } from "@/components/combobox";
 import { useAbilities } from "@/components/abilities-provider";
@@ -25,7 +25,7 @@ interface CourseFormProps {
 }
 
 interface PageState {
-    institutions: Instituion[];
+    institutions: Institution[];
     types: { [key: string]: string };
     isFeteched: boolean;
 }

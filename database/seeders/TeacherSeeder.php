@@ -38,11 +38,12 @@ class TeacherSeeder extends Seeder
                 'personnel_number' => $faker->unique()->randomNumber(8),
                 'department_id'    => Department::where('code', 'BSCS')->first()->id,
             ],
-
         ];
 
         foreach ($teachers as $key => $teacher) {
             Teacher::create($teacher);
         }
+
+        Teacher::factory()->count(100)->create();
     }
 }

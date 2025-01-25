@@ -82,10 +82,8 @@ class SemesterController extends Controller
 
     /**
      * Update the specified resource in storage.
-     * 
-     * @param SemesterRequest $request
-     * @param Semester        $semester
-     * 
+     *
+     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     public function update(SemesterRequest $request, Semester $semester)
@@ -113,9 +111,8 @@ class SemesterController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     * 
-     * @param Semester $semester
-     * 
+     *
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Semester $semester)
@@ -142,9 +139,8 @@ class SemesterController extends Controller
 
     /**
      * Attach Course to Semester
-     * 
-     * @param Semester $semester
-     * 
+     *
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function attachCourse(Semester $semester)
@@ -157,7 +153,7 @@ class SemesterController extends Controller
 
         if ($admin->isSuperAdmin()) {
             $courses = Course::select('id', 'name', 'code')->get();
-        } else if ($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()) {
+        } elseif ($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()) {
             $courses = Course::whereInstitution($admin->institution_id)->select('id', 'name', 'code')->get();
         }
 
@@ -166,15 +162,14 @@ class SemesterController extends Controller
 
     /**
      * Attach Course to Semester
-     * 
-     * @param Semester $semester
-     * 
+     *
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function attach(Semester $semester, Request $request)
     {
         $request->validate([
-            'courses' => 'required|array',
+            'courses'   => 'required|array',
             'courses.*' => 'required|integer|exists:courses,id',
         ]);
 
@@ -198,5 +193,4 @@ class SemesterController extends Controller
 
         return back()->withErrors(['message' => $message]);
     }
-
 }

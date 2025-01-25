@@ -21,6 +21,8 @@ import {
     GraduationCap,
     Hourglass,
     Book,
+    Landmark,
+    Hotel,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -124,6 +126,20 @@ export const NavData: NavDataType = [
         label: "Infrastructure",
         items: [
             {
+                title: "Institutions",
+                route: "institutions.index",
+                url: route("institutions.index"),
+                isActive: route().current("institutions.index"),
+                icon: Landmark,
+            },
+            {
+                title: "Departments",
+                route: "departments.index",
+                url: route("departments.index"),
+                isActive: route().current("departments.index"),
+                icon: Hotel,
+            },
+            {
                 title: "Rooms",
                 route: "rooms.index",
                 url: route("rooms.index"),
@@ -165,6 +181,8 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
     user: User;
 }
 export function AppSidebar({ user, ...props }: AppSidebarProps) {
+    const { isSuperAdmin } = useAbilities();
+
     const checkActivity = React.useCallback((item: NavItem) => {
         let NewItem = {
             ...item,
@@ -187,9 +205,11 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
     const NavigationData = React.useMemo(() => {
         return NavData.map((section) => ({
             ...section,
-            items: section.items.map(checkActivity),
+            items: section.items
+                .filter((item) => isSuperAdmin() || item.route !== "institutions.index")
+                .map((item) => checkActivity(item))
         }));
-    }, []);
+    }, [isSuperAdmin, checkActivity]);
 
     return (
         <Sidebar variant="inset" collapsible="icon" {...props}>

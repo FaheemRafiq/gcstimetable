@@ -153,32 +153,29 @@ class CourseController extends Controller
         $admin = Auth::user();
 
         $course->load('semesters');
+        $semesters = [];
 
-        $key = 'semesters_' . $admin->id . '_' . $course->id;
-
-        $semesters = Cache::remember($key, now()->addMinutes(5), function () use ($admin, $course) {
-            if ($admin->isSuperAdmin()) {
-                return Semester::query()
-                    ->select('id as value', 'name as label')
-                    ->orderByDesc('created_at')
-                    ->get();
-            } elseif ($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()) {
-                return $admin->institution()->with([
-                    'programs.semesters' => function ($query) use ($course) {
-                        $query->whereNotIn('id', $course->semesters->pluck('id')->toArray())
-                            ->orderByDesc('created_at');
-                    }
-                ])
-                    ->first()
-                    ->programs
-                    ->pluck('semesters')
-                    ->flatten()
-                    ->unique('id')
-                    ->map(function ($semester) {
-                        return ['value' => $semester->id, 'label' => $semester->name];
-                    });
-            }
-        });
+        if ($admin->isSuperAdmin()) {
+            $semesters = Semester::query()
+                ->select('id as value', 'name as label')
+                ->orderByDesc('created_at')
+                ->get();
+        } elseif ($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()) {
+            $semesters = $admin->institution()->with([
+                'programs.semesters' => function ($query) use ($course) {
+                    $query->whereNotIn('id', $course->semesters->pluck('id')->toArray())
+                        ->orderByDesc('created_at');
+                },
+            ])
+                ->first()
+                ->programs
+                ->pluck('semesters')
+                ->flatten()
+                ->unique('id')
+                ->map(function ($semester) {
+                    return ['value' => $semester->id, 'label' => $semester->name];
+                });
+        }
 
         return response()->json(compact('semesters'));
     }
@@ -193,7 +190,6 @@ class CourseController extends Controller
 
         try {
             if ($response->allowed()) {
-
                 if ($course->semesters()->where('semester_id', $request->semester_id)->exists()) {
                     return back()->withErrors(['message' => 'Semester already attached']);
                 }

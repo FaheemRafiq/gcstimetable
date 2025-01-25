@@ -18,7 +18,7 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import InputError from "@/Components/InputError";
-import { ClassType, Course, Instituion, Semester } from "@/types/database";
+import { ClassType, Course, Institution, Semester } from "@/types/database";
 import { fetchWrapper } from "@/lib/fetchWrapper";
 import { useAbilities } from "@/components/abilities-provider";
 import Modal from "@/Components/Modal";

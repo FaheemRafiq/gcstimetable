@@ -1,5 +1,5 @@
 import { Config } from "ziggy-js";
-import { Allocation, Instituion, Slot } from "./database";
+import { Allocation, Institution, Slot } from "./database";
 
 export type IsActive = "active" | "inactive";
 
@@ -25,7 +25,7 @@ export interface User {
     email_verified_at?: string;
 
     // relations
-    institution?: Instituion;
+    institution?: Institution;
 }
 
 export type UserType = User & {

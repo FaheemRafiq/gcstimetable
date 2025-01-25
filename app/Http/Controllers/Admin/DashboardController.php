@@ -12,14 +12,11 @@ use App\Models\Teacher;
 use App\Models\Semester;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
     /**
      * Display the dashboard page.
-     *
-     * @return \Inertia\Response
      */
     public function index(): \Inertia\Response
     {
@@ -36,38 +33,36 @@ class DashboardController extends Controller
             $departmentId = $admin->department_id;
         }
 
-        $cacheKey = 'dashboard_statistics_'.$admin->id;
-
-        $statistics = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($institutionId, $departmentId, $admin): array {
+        $statistics = (function () use ($institutionId, $departmentId, $admin): array {
             $userQuery = User::query()
-                ->when($institutionId, function ($query, $institutionId): void {
-                    $query->whereInstitution($institutionId);
-                })
-                ->when($departmentId, function ($query, $departmentId): void {
-                    $query->whereDepartment($departmentId);
-                });
+            ->when($institutionId, function ($query, $institutionId): void {
+                $query->whereInstitution($institutionId);
+            })
+            ->when($departmentId, function ($query, $departmentId): void {
+                $query->whereDepartment($departmentId);
+            });
 
             $studentQuery = Student::query()
-                ->when($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin(), function ($query) use ($admin): void {
-                    $query->where('institution_id', $admin->institution_id);
-                });
+            ->when($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin(), function ($query) use ($admin): void {
+                $query->where('institution_id', $admin->institution_id);
+            });
 
             $teacherQuery = Teacher::query()
-                ->when($institutionId, function ($query, $institutionId): void {
-                    $query->whereHas('institution', function ($query) use ($institutionId): void {
-                        $query->where('institutions.id', $institutionId);
-                    });
-                })
-                ->when($departmentId, function ($query, $departmentId): void {
-                    $query->where('department_id', $departmentId);
+            ->when($institutionId, function ($query, $institutionId): void {
+                $query->whereHas('institution', function ($query) use ($institutionId): void {
+                $query->where('institutions.id', $institutionId);
                 });
+            })
+            ->when($departmentId, function ($query, $departmentId): void {
+                $query->where('department_id', $departmentId);
+            });
 
             return [
-                'users'    => $userQuery->count(),
-                'students' => $studentQuery->count(),
-                'teachers' => $teacherQuery->count(),
+            'users'    => $userQuery->count(),
+            'students' => $studentQuery->count(),
+            'teachers' => $teacherQuery->count(),
             ];
-        });
+        })();
 
         return Inertia::render('Admin/Dashboard/index', [
             'statistics'         => $statistics,

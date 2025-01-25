@@ -10,6 +10,7 @@ import { PieChartCard } from './_component/PieChartCard'
 import { TeacherWorkloadChart } from './_component/TeacherWorkload'
 import { ShiftCoverageBarChart } from './_component/ShiftCoverage'
 import { StudentEnrollmentChart } from "./_component/StudentEnrollment";
+import { Progress } from "@/components/ui/progress";
 
 // Type definitions
 interface CourseTypes {
@@ -110,17 +111,12 @@ export default function Dashboard({
                             <div key={semester.semester} className="mb-4">
                                 <h4 className="text-sm font-medium mb-2">{semester.semester}</h4>
                                 <div className="flex items-center gap-2">
-                                    <div className="w-full bg-gray-200 rounded-full h-2">
-                                        <div
-                                            className="bg-blue-500 rounded-full h-2"
-                                            style={{
-                                                width: `${(semester.allocated / semester.total) * 100}%`,
-                                                transition: 'width 0.5s ease-in-out'
-                                            }}
-                                        />
-                                    </div>
+                                    <Progress
+                                        value={(semester.allocated / Math.max(semester.total, 1)) * 100}
+                                        className="w-full"
+                                    />
                                     <span className="text-sm text-gray-500">
-                                        {Math.round((semester.allocated / semester.total) * 100)}%
+                                        {Math.min(100, Math.round((semester.allocated / Math.max(semester.total, 1)) * 100))}%
                                     </span>
                                 </div>
                             </div>

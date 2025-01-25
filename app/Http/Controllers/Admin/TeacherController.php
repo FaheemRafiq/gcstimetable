@@ -34,7 +34,7 @@ class TeacherController extends Controller
         if ($admin->isInstitutionAdmin()) {
             $queyBuilder
                 ->whereHas('department', function ($query) use ($admin): void {
-                    $query->where('institution_id', $admin->institution_id);
+                    $query->where('departments.institution_id', $admin->institution_id);
                 })
                 ->with('department.institution');
         } elseif ($admin->isDepartmentAdmin()) {

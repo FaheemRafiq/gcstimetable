@@ -16,10 +16,9 @@ return new class extends Migration
             $table->string('name');
             // unique code for each department  is department code
             $table->string('code');
-
-            $institution_id = 1;
+            
             // belongs to some institution
-            $table->foreignId('institution_id')->default($institution_id)->constrained()->onDelete('cascade');
+            $table->foreignId('institution_id')->constrained()->onDelete('cascade');
 
             // Define a unique constraint for 'code' and 'institution_id' combination
             $table->unique(['code', 'institution_id']);

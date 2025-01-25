@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Admin\RoomController;
@@ -16,6 +15,8 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TimeTableController;
 use App\Http\Middleware\RoleOrPermissionMiddleware;
 use App\Http\Controllers\Admin\AllocationController;
+use App\Http\Controllers\Admin\DepartmentController;
+use App\Http\Controllers\Admin\InstitutionController;
 
 /*
     |----------------Resource Controllers----------------|
@@ -52,6 +53,12 @@ Route::prefix('admin')
 
         // Allocations 🔹
         Route::resource('allocations', AllocationController::class)->only(AllocationController::ONLY);
+
+        // Institutions 🏢
+        Route::resource('institutions', InstitutionController::class)->only(InstitutionController::ONLY);
+
+        // Departments 🏢
+        Route::resource('departments', DepartmentController::class)->only(DepartmentController::ONLY);
 
         // Rooms 🏫
         Route::resource('rooms', RoomController::class)->only(RoomController::ONLY);

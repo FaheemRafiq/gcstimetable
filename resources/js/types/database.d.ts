@@ -35,11 +35,14 @@ export type Department = {
     id: number;
     name: string;
     code: string;
+    institution_id: number;
     created_at: string;
     updated_at: string;
+
+    institution?: Institution;
 };
 
-export type Instituion = {
+export type Institution = {
     id: number;
     name: string;
     email: string;
@@ -66,7 +69,7 @@ export type Day = {
     number: number;
     name: string;
     code: string;
-    institution?: Instituion;
+    institution?: Institution;
 };
 
 export type Allocation = {

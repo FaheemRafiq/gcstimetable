@@ -13,79 +13,46 @@ class AllocationSeeder extends Seeder
      */
     public function run(): void
     {
-        $firstTimeTable = TimeTable::with([
-            'shift.institution.teachers' => function ($query) {
-                $query->first();
-            },
-            'shift.institution.rooms' => function ($query) {
-                $query->first();
-            },
+        $timeTables = TimeTable::with([
+            'shift.institution.teachers',
+            'shift.institution.rooms',
             'shift.institution.days',
             'shift.semesters' => function ($query) {
-                $query->with('sections', 'courses')->first();
+                $query->with('sections', 'courses');
             },
             'shift.slots',
-        ])->first();
-
-        // Fetch required entities
-        $teacherId   = $firstTimeTable->shift->institution->teachers->first()->id;
-        $courseId    = $firstTimeTable->shift->semesters->first()->courses->first()->id;
-        $roomId      = $firstTimeTable->shift->institution->rooms->first()->id;
-        $sectionId   = $firstTimeTable->shift->semesters->first()->sections->first()->id;
-        $timeTableId = $firstTimeTable->id;
+        ])->get();
 
         $allocations = [];
 
-        foreach ($firstTimeTable->shift->institution->days as $day) {
-            foreach ($firstTimeTable->shift->slots as $slot) {
-                $allocations[] = [
-                    'time_table_id' => $timeTableId,
-                    'section_id'    => $sectionId,
-                    'teacher_id'    => $teacherId,
-                    'course_id'     => $courseId,
-                    'room_id'       => $roomId,
-                    'day_id'        => $day->id,
-                    'slot_id'       => $slot->id,
-                    'created_at'    => now(),
-                    'updated_at'    => now(),
-                ];
-            }
-        }
+        foreach ($timeTables as $timeTable) {
+            $teachers  = $timeTable->shift->institution->teachers;
+            $rooms     = $timeTable->shift->institution->rooms;
+            $days      = $timeTable->shift->institution->days;
+            $semesters = $timeTable->shift->semesters;
+            $slots     = $timeTable->shift->slots;
 
-        $secondTimeTable = TimeTable::with([
-            'shift.institution.teachers' => function ($query) {
-                $query->first();
-            },
-            'shift.institution.rooms' => function ($query) {
-                $query->first();
-            },
-            'shift.institution.days',
-            'shift.semesters' => function ($query) {
-                $query->with('sections', 'courses')->first();
-            },
-            'shift.slots',
-        ])->skip(1)->first();
+            foreach ($days as $day) {
+                foreach ($slots as $slot) {
+                    // Randomize teacher, course, and room for each allocation
+                    $randomSemester = $semesters->random();
+                    $teacher        = $teachers->random();
+                    $room           = $rooms->random();
+                    $course         = $randomSemester->courses->random();
+                    $section        = $randomSemester->sections->random();
 
-        // Fetch required entities
-        $teacherId   = $secondTimeTable->shift->institution->teachers->first()->id;
-        $courseId    = $secondTimeTable->shift->semesters->first()->courses->first()->id;
-        $roomId      = $secondTimeTable->shift->institution->rooms->first()->id;
-        $sectionId   = $secondTimeTable->shift->semesters->first()->sections->first()->id;
-        $timeTableId = $secondTimeTable->id;
-
-        foreach ($secondTimeTable->shift->institution->days as $day) {
-            foreach ($secondTimeTable->shift->slots as $slot) {
-                $allocations[] = [
-                    'time_table_id' => $timeTableId,
-                    'section_id'    => $sectionId,
-                    'teacher_id'    => $teacherId,
-                    'course_id'     => $courseId,
-                    'room_id'       => $roomId,
-                    'day_id'        => $day->id,
-                    'slot_id'       => $slot->id,
-                    'created_at'    => now(),
-                    'updated_at'    => now(),
-                ];
+                    $allocations[] = [
+                        'time_table_id' => $timeTable->id,
+                        'section_id'    => $section->id,
+                        'teacher_id'    => $teacher->id,
+                        'course_id'     => $course->id,
+                        'room_id'       => $room->id,
+                        'day_id'        => $day->id,
+                        'slot_id'       => $slot->id,
+                        'created_at'    => now(),
+                        'updated_at'    => now(),
+                    ];
+                }
             }
         }
 

@@ -4,6 +4,8 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\Department;
+use App\Enums\PermissionEnum;
+use Illuminate\Auth\Access\Response;
 
 class DepartmentPolicy
 {
@@ -18,33 +20,41 @@ class DepartmentPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Department $department): bool
+    public function view(User $user, Department $department): Response
     {
-        //
+        return $user->can(PermissionEnum::VIEW_DEPARTMENT->value)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.view.error'));
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user): Response
     {
-        return true;
+        return $user->can(PermissionEnum::CREATE_DEPARTMENT->value)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Department $department): bool
+    public function update(User $user, Department $department): Response
     {
-        return true;
+        return $user->can(PermissionEnum::EDIT_DEPARTMENT->value)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Department $department): bool
+    public function delete(User $user, Department $department): Response
     {
-        return true;
+        return $user->can(PermissionEnum::DELETE_DEPARTMENT->value)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**

@@ -19,15 +19,17 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $name = $this->faker->name();
+
         return [
-            'name'              => $this->faker->name(),
+            'name'              => $name,
             'email'             => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password'          => 'asdf1234', // password
             // 'two_factor_secret' => null,
             // 'two_factor_recovery_codes' => null,
-            'remember_token' => Str::random(10),
-            //            'profile_photo_path' => null,
+            'remember_token'     => Str::random(10),
+            'profile_photo_path' => generateAvatar($name),
 
         ];
     }

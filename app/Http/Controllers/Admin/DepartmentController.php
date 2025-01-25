@@ -3,100 +3,147 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Department;
+use App\Models\Institution;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\QueryException;
-use App\Http\Resources\DepartmentCollection;
-use App\Http\Requests\StoreDepartmentRequest;
-use App\Http\Requests\UpdateDepartmentRequest;
+use App\Http\Requests\DepartmentRequest;
+use App\Http\Resources\DepartmentResource;
 
 class DepartmentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public const ONLY = ['index', 'show', 'create', 'store', 'update', 'destroy'];
+
     public function index()
     {
-        // get the institution id from the request
-        $institutionId = request()->input('institutionid');
-
-        // return DEpartments with proper Exception Handling
+        $admin = Auth::user();
         try {
-            return response()->json(new DepartmentCollection(Department::all()->where('institution_id', $institutionId)->sortByDesc('updated_at')), 200); // 200 OK
+            $departments = [];
+
+            if ($admin->isSuperAdmin()) {
+                $departments = Department::with('institution:id,name')->orderBy('updated_at', 'desc')->get();
+            } else {
+                $departments = Department::with('institution:id,name')->where('institution_id', $admin->institution_id)
+                    ->orderBy('updated_at', 'desc')
+                    ->get();
+            }
+
+            return inertia()->render('Admin/Departments/index', [
+                'departments' => DepartmentResource::collection($departments),
+            ]);
         } catch (QueryException $queryException) {
-            return response()->json(['error' => 'Database error'.$queryException->getMessage()], 500);
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
+            Log::channel('departments')->error('QueryException', $logData);
+
+            return back()->withErrors(['message' => 'Database error 👉 Something went wrong!']);
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(): void
+    public function create()
     {
-        //
-    }
+        $response    = Gate::inspect('create', Department::class);
+        $message     = '';
+        $institution = Institution::all();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreDepartmentRequest $request)
-    {
-        try {
-            $department = Department::create($request->all());
-
-            return response()->json($department, 201); //
-        } catch (QueryException $queryException) {
-            return response()->json(['error' => 'Constraint violation or other database error'.$queryException->getMessage()], 422);
+        if ($response->allowed()) {
+            return inertia()->render('Admin/Departments/create', [
+                'institution' => $institution,
+            ]);
+        } else {
+            $message = $response->message();
         }
+
+        return back()->withErrors(['message' => $message]);
     }
 
-    /**
-     * Display the specified resource.
-     */
+    public function store(DepartmentRequest $request)
+    {
+        $attributes = $request->validated();
+        $response   = Gate::inspect('create', Department::class);
+        $message    = '';
+
+        try {
+            if ($response->allowed()) {
+                Department::create($attributes);
+
+                return back()->with('success', 'Department successfully created');
+            } else {
+                $message = $response->message();
+            }
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
+            Log::channel('departments')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
+        }
+
+        return back()->withErrors(['message' => $message]);
+    }
+
     public function show(Department $department)
-    {        // write show method like Day show method
-        if (! $department) {
-            return response()->json(['message' => 'Department not found'], 404);
+    {
+        $response = Gate::inspect('view', $department);
+        $message  = '';
+
+        $department->load('institution:id,name');
+
+        if ($response->allowed()) {
+            return inertia()->render('Admin/Departments/show', [
+                'department' => new DepartmentResource($department),
+            ]);
+        } else {
+            $message = $response->message();
         }
 
-        // return response()->json($department);
-        return response()->json($department, 200);
+        return back()->with('error', $message);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Department $department): void
+    public function update(DepartmentRequest $request, Department $department)
     {
-        //
-    }
+        $attributes = $request->validated();
+        $response   = Gate::inspect('update', $department);
+        $message    = '';
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateDepartmentRequest $request, Department $department)
-    {
-        // write update method like Day update method
         try {
-            $department->update($request->all());
+            if ($response->allowed()) {
+                $department->update($attributes);
 
-            return response()->json($department, 200); // 200 OK
+                return back()->with('success', 'Resource successfully updated');
+            } else {
+                $message = $response->message();
+            }
         } catch (QueryException $queryException) {
-            return response()->json(['error' => 'Database error'.$queryException->getMessage()], 500);
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
+            Log::channel('departments')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
         }
+
+        return back()->withErrors(['message' => $message]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Department $department)
     {
-        // write destroy method like Day destroy method
-        try {
-            $department->delete();
+        $response = Gate::inspect('delete', $department);
+        $message  = '';
 
-            return response()->json(['department' => $department,  'message' => 'Resource successfully deleted'], 200);
+        try {
+            if ($response->allowed()) {
+                $department->delete();
+
+                return back()->with('success', 'Resource successfully deleted');
+            } else {
+                $message = $response->message();
+            }
         } catch (QueryException $queryException) {
-            return response()->json(['error' => 'Database error'.$queryException->getMessage()], 500);
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
+            Log::channel('departments')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
         }
+
+        return back()->with('error', $message);
     }
 }

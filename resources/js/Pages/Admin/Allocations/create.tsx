@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
     Day,
-    Instituion,
+    Institution,
     Room,
     Slot,
     Teacher,
@@ -87,7 +87,7 @@ interface CreateAllocationProps {
     props: {
         timetable: TimeTable & {
             shift: Shift & {
-                institution: Instituion & {
+                institution: Institution & {
                     days?: Day[];
                     rooms?: Room[];
                     teachers?: Teacher[];

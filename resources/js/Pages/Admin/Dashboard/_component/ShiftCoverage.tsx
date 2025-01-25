@@ -58,7 +58,6 @@ export function ShiftCoverageBarChart({ shiftCoverage }: BarChartCardProps) {
         <ChartContainer config={chartConfig}>
           <BarChart
             data={shiftCoverage}
-            margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
             <XAxis

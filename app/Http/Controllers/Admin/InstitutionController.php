@@ -2,92 +2,153 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\RoleEnum;
 use App\Models\Institution;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\QueryException;
-use App\Http\Requests\StoreInstitutionRequest;
-use App\Http\Requests\UpdateInstitutionRequest;
+use App\Http\Requests\InstitutionRequest;
+use App\Http\Resources\InstitutionResource;
 
 class InstitutionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public const ONLY = ['index', 'show', 'store', 'update', 'destroy'];
+
+    public function __construct()
     {
-        // return all institutions with proper exception handling
-        try {
-            return response()->json(Institution::all()->sortByDesc('updated_at'), 200); // 200 OK
-        } catch (QueryException $queryException) {
-            return response()->json(['error' => 'Database error'.$queryException->getMessage()], 500);
-        }
+        $this->middleware('role:'.RoleEnum::SUPER_ADMIN->value);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display a listing of the resource.
+     *
+     * @return \Inertia\Response
      */
-    public function create(): void
+    public function index()
     {
-        //
+        try {
+            $institutions = Institution::orderBy('name', 'asc')->get();
+
+            return inertia()->render('Admin/Institutions/index', [
+                'institutions' => InstitutionResource::collection($institutions),
+            ]);
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
+            Log::channel('institutions')->error('QueryException', $logData);
+
+            return back()->withErrors(['message' => 'Database error 👉 Something went wrong!']);
+        }
     }
 
     /**
      * Store a newly created resource in storage.
+     *
+     *
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(StoreInstitutionRequest $request)
+    public function store(InstitutionRequest $request)
     {
-        try {
-            $institution = Institution::create($request->all());
+        $attributes = $request->validated();
+        $response   = Gate::inspect('create', Institution::class);
+        $message    = '';
 
-            return response()->json($institution, 201); // 201 Created
+        try {
+            if ($response->allowed()) {
+                Institution::create($attributes);
+
+                return back()->with('success', 'Institution successfully created');
+            } else {
+                $message = $response->message();
+            }
         } catch (QueryException $queryException) {
-            return response()->json(['error' => 'Constraint violation or other database error'.$queryException->getMessage()], 422);
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
+            Log::channel('institutions')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
         }
+
+        return back()->withErrors(['message' => $message]);
     }
 
     /**
      * Display the specified resource.
+     *
+     *
+     * @return \Inertia\Response|\Illuminate\Http\RedirectResponse
      */
     public function show(Institution $institution)
     {
-        if (! $institution) {
-            return response()->json(['message' => 'Institution not found'], 404);
+        $response = Gate::inspect('view', $institution);
+        $message  = '';
+
+        if ($response->allowed()) {
+            return inertia()->render('Admin/Institutions/show', [
+                'institution' => new InstitutionResource($institution),
+            ]);
+        } else {
+            $message = $response->message();
         }
 
-        return response()->json($institution);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Institution $institution): void
-    {
-        //
+        return back()->with('error', $message);
     }
 
     /**
      * Update the specified resource in storage.
+     *
+     *
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(UpdateInstitutionRequest $request, Institution $institution): Institution
+    public function update(InstitutionRequest $request, Institution $institution)
     {
-        // save the request data and return it
-        $institution->update($request->all());
+        $attributes = $request->validated();
+        $response   = Gate::inspect('update', $institution);
+        $message    = '';
 
-        return $institution;
+        try {
+            if ($response->allowed()) {
+                $institution->update($attributes);
+
+                return back()->with('success', 'Resource successfully updated');
+            } else {
+                $message = $response->message();
+            }
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
+            Log::channel('institutions')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
+        }
+
+        return back()->withErrors(['message' => $message]);
     }
 
     /**
      * Remove the specified resource from storage.
+     *
+     *
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Institution $institution)
     {
-        if (! $institution) {
-            return response()->json(['message' => 'Institution not found'], 404);
+        $response = Gate::inspect('delete', $institution);
+        $message  = '';
+
+        try {
+            if ($response->allowed()) {
+                $institution->delete();
+
+                return back()->with('success', 'Resource successfully deleted');
+            } else {
+                $message = $response->message();
+            }
+        } catch (QueryException $queryException) {
+            $logData = ['message' => $queryException->getMessage(), 'file' => $queryException->getFile(), 'line' => $queryException->getLine()];
+            Log::channel('institutions')->error('QueryException', $logData);
+
+            $message = 'Database error 👉 Something went wrong!';
         }
 
-        $institution->delete();
-
-        // return response()->json($institution);
-        return response()->json(['institution' => $institution, 'message' => 'Resource successfully deleted'], 200);
+        return back()->with('error', $message);
     }
 }
