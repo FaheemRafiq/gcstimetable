@@ -131,9 +131,10 @@ export function DataTable<TData, TValue>({
                                     ?.getFilterValue() as string) ?? ""
                             }
                             onChange={(event) =>
-                                table
-                                    .getColumn(finalProps.filterColumn)
-                                    ?.setFilterValue(event.target.value)
+                                finalProps.search === 'server' 
+                                    ? finalProps.onSearch?.(event.target.value) 
+                                    : table.getColumn(finalProps.filterColumn)
+                                        ?.setFilterValue(event.target.value)
                             }
                             className="md:shadow-md"
                             autoFocus
@@ -142,18 +143,18 @@ export function DataTable<TData, TValue>({
                             .getColumn(finalProps.filterColumn)
                             ?.getFilterValue() as string) ??
                             "") && (
-                            <button
-                                className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-                                aria-label="Clear input"
-                                onClick={handleClearInput}
-                            >
-                                <X
-                                    size={18}
-                                    strokeWidth={2}
-                                    aria-hidden="true"
-                                />
-                            </button>
-                        )}
+                                <button
+                                    className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                                    aria-label="Clear input"
+                                    onClick={handleClearInput}
+                                >
+                                    <X
+                                        size={18}
+                                        strokeWidth={2}
+                                        aria-hidden="true"
+                                    />
+                                </button>
+                            )}
                     </div>
                 ) : (
                     <div />
@@ -173,10 +174,10 @@ export function DataTable<TData, TValue>({
                         paramTo={
                             finalProps.pagination
                                 ? Math.min(
-                                      (pagination.pageIndex + 1) *
-                                          pagination.pageSize,
-                                      table.getRowCount()
-                                  )
+                                    (pagination.pageIndex + 1) *
+                                    pagination.pageSize,
+                                    table.getRowCount()
+                                )
                                 : to
                         }
                     />
@@ -205,10 +206,10 @@ export function DataTable<TData, TValue>({
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
-                                                      header.column.columnDef
-                                                          .header,
-                                                      header.getContext()
-                                                  )}
+                                                    header.column.columnDef
+                                                        .header,
+                                                    header.getContext()
+                                                )}
                                         </TableHead>
                                     );
                                 })}

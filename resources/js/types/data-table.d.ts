@@ -2,8 +2,10 @@ import { ColumnDef } from "@tanstack/react-table";
 
 interface WithSearchFilter {
     pagination?: boolean;
+    search?: 'server' | 'client',
     searchFilter: true,
-    filterColumn: string
+    filterColumn: string,
+    onSearch?: (value: string) => void
 }
 
 interface WithoutSearchFilter {

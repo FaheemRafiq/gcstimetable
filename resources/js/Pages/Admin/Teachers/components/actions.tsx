@@ -70,7 +70,7 @@ export function DataTableRowActions({
             onSelect={() => setOpenDelete(true)}
           >
             Delete
-            <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+            {/* <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut> */}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

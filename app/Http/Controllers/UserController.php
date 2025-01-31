@@ -15,13 +15,36 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $admin = Auth::user();
+        $admin  = Auth::user();
+
+        $search     = $request->query('s');
+        $verified   = $request->query('verified', 1);
+        $unverified = $request->query('unverified', 1);
+        $start_date = $request->query('start_date', null);
+        $end_date   = $request->query('end_date', null);
+
         $users = User::select('id', 'name', 'email', 'email_verified_at', 'created_at')
             ->when($admin->isInstitutionAdmin(), function ($query) use ($admin): void {
                 $query->whereInstitution($admin->institution_id);
             })
             ->when($admin->isDepartmentAdmin(), function ($query) use ($admin): void {
                 $query->whereDepartment($admin->department_id);
+            })
+            ->when($search, function ($query) use ($search): void {
+                $query->where('name', 'like', "%$search%")
+                    ->orWhere('email', 'like', "%$search%");
+            })
+            ->when($verified == 0, function ($query) {
+                $query->whereNull('email_verified_at');
+            })
+            ->when($unverified == 0, function ($query) {
+                $query->whereNotNull('email_verified_at');
+            })
+            ->when($start_date, function ($query) use ($start_date) {
+                $query->where('created_at', '>=', $start_date);
+            })
+            ->when($end_date, function ($query) use ($end_date) {
+                $query->where('created_at', '<=', $end_date);
             })
             ->with('roles.permissions')
             ->paginate($request->input('per_page', config('providers.pagination.per_page')));
@@ -33,6 +56,7 @@ class UserController extends Controller
 
     public function destroy($user_id)
     {
+        $auth = Auth::user();
         $user = User::find($user_id);
 
         if (! $user) {

@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use App\Types\TimeSlot;
+use Illuminate\Support\Uri;
 
 function DaystoText($days): string
 {
@@ -22,18 +23,18 @@ function DaystoText($days): string
         if ($days[$i] == $end + 1) {
             $end = $days[$i];
         } else {
-            $ranges[] = $start == $end ? $start : $start.'-'.$end;
+            $ranges[] = $start == $end ? $start : $start . '-' . $end;
 
             $start = $days[$i];
             $end   = $days[$i];
         }
     }
 
-    $ranges[] = $start == $end ? $start : $start.'-'.$end;
+    $ranges[] = $start == $end ? $start : $start . '-' . $end;
 
     // Format the result
     $formattedRanges = array_map(function (string $range): string {
-        return '('.$range.')';
+        return '(' . $range . ')';
     }, $ranges);
 
     return implode(' ', $formattedRanges);
@@ -59,13 +60,14 @@ if (! function_exists('generateAvatar')) {
         $initials = collect(explode(' ', $name))
             ->map(function ($word) {
                 return strtoupper(substr($word, 0, 1));
-            })->take(2)
+            })
+            ->take(2)
             ->implode('');
 
-        return 'https://ui-avatars.com/api/?name='.urlencode($initials).
-                     '&size='.$size.
-                     '&background='.$background.
-                     '&color='.$color;
+        return 'https://ui-avatars.com/api/?name=' . urlencode($initials) .
+            '&size=' . $size .
+            '&background=' . $background .
+            '&color=' . $color;
     }
 }
 
