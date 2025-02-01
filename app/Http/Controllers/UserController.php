@@ -31,13 +31,15 @@ class UserController extends Controller
                 $query->whereDepartment($admin->department_id);
             })
             ->when($search, function ($query) use ($search): void {
-                $query->where('name', 'like', "%$search%")
+                $query->where(function ($wQuery) use ($search) {
+                    $wQuery->where('name', 'like', "%$search%")
                     ->orWhere('email', 'like', "%$search%");
+                });
             })
-            ->when($verified == 0, function ($query) {
+            ->when($verified == 'false', function ($query) {
                 $query->whereNull('email_verified_at');
             })
-            ->when($unverified == 0, function ($query) {
+            ->when($unverified == "false", function ($query) {
                 $query->whereNotNull('email_verified_at');
             })
             ->when($start_date, function ($query) use ($start_date) {

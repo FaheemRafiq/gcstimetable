@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button"; // Add this import
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LoaderCircle, Search } from "lucide-react";
 import { useEffect, useId, useState } from "react";
@@ -8,32 +8,63 @@ import { useEffect, useId, useState } from "react";
 interface SearchInputProps {
     label?: string;
     placeholder?: string;
-    value: string;
+    value?: string; // Made value optional
+    setValue?: (key: string) => void;
     onSearch: (query: string) => void;
     className?: string;
+    autoSearch?: boolean; // New prop to control behavior
+    debounceDelay?: number; // New prop for debounce delay
 }
 
 export default function SearchInput({
     label = "Search",
     placeholder = "Search...",
-    value,
+    value: inputValue = "", // Default to an empty string if not provided
+    setValue: setInputValue = () => {},
     onSearch,
-    className
+    className,
+    autoSearch = false, // Default to false
+    debounceDelay = 300 // Default debounce delay
 }: SearchInputProps) {
     const id = useId();
     const [isLoading, setIsLoading] = useState(false);
-    const [inputValue, setInputValue] = useState(value);
+    
+    // Debounce function
+    const debounce = (func: Function, delay: number) => {
+        let timeoutId: NodeJS.Timeout;
+        return (...args: any[]) => {
+            if (timeoutId) clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                func(...args);
+            }, delay);
+        };
+    };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSearch = (query: string) => {
         setIsLoading(true);
-        onSearch(inputValue);
+        onSearch(query);
         setIsLoading(false);
     };
 
-    useEffect(() => {
-        setInputValue(value);
-    }, [value]);
+    // Handle input change
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        setInputValue(newValue);
+
+        if (autoSearch) {
+            debouncedSearch(newValue);
+        }
+    };
+
+    // Create a debounced version of the search function
+    const debouncedSearch = debounce(handleSearch, debounceDelay);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!autoSearch) {
+            handleSearch(inputValue);
+        }
+    };
 
     return (
         <div className="space-y-2">
@@ -46,7 +77,7 @@ export default function SearchInput({
                         placeholder={placeholder}
                         type="search"
                         value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
+                        onChange={handleChange}
                     />
                     <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
                         {isLoading ? (
@@ -62,9 +93,11 @@ export default function SearchInput({
                         )}
                     </div>
                 </div>
-                <Button type="submit" disabled={isLoading}>
-                    Search
-                </Button>
+                {!autoSearch && (
+                    <Button type="submit" disabled={isLoading}>
+                        Search
+                    </Button>
+                )}
             </form>
         </div>
     );
