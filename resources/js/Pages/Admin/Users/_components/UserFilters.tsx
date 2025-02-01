@@ -47,7 +47,7 @@ function UserFilters() {
                 queryParams[key] = value;
             }
         });
-        router.get(route("users.index"), queryParams);
+        router.get(route("users.index"), { ...queryParams, page: 1 });
     };
 
     // Handle date changes
