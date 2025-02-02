@@ -113,13 +113,9 @@ export function NavUser({ user }: { user: User }) {
                                 <BadgeCheck size={16} className="mr-2" />
                                 Account
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <CreditCard size={16} className="mr-2" />
-                                Billing
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem disabled>
                                 <Bell size={16} className="mr-2" />
-                                Notifications
+                                Notifications (coming soon)
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator className="bg-sidebar dark:bg-muted" />

@@ -1,155 +1,200 @@
+import React from 'react';
 import { Link, Head } from "@inertiajs/react";
-import { PageProps } from "@/types";
 import {
     Calendar,
     Clock,
     CheckCircle,
     ChevronRight,
     UserPlus,
+    ArrowRight,
+    Star,
+    Users
 } from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
+import { PageProps } from '@/types';
+import { useIsMobile } from "@/hooks/use-mobile";
 
-export default function LandingPage({
-    auth,
-    appVersion,
-    phpVersion,
-}: PageProps<{ appVersion: string; phpVersion: string }>) {
+function LandingPage({
+    auth
+}: PageProps) {
+    const isMobile = useIsMobile();
     return (
         <>
-            {/* SEO and Metadata */}
             <Head>
-                <title>
-                    Timetable Generator - Organize Your Time Effectively
-                </title>
+                <title>Timetable Generator - Organize Your Time Effectively</title>
                 <meta
                     name="description"
                     content="Timetable Generator is the perfect tool to help you create and manage timetables effortlessly. Maximize your productivity and streamline your schedule today!"
                 />
-                <meta
-                    name="keywords"
-                    content="Timetable Generator, schedule, productivity, time management, app"
-                />
             </Head>
 
-            <div className="bg-background text-foreground">
-                {/* Background Wave */}
-                <div className="relative min-h-screen flex flex-col items-center justify-center text-center p-8">
-                    {/* Toggle move */}
-                    <div className="absolute top-3 right-3">
-                        <ModeToggle variant={'outline'} size={'lg'} className="w-10 h-10" />
-                    </div>
-                    {/* Hero Section */}
-                    <header className="flex flex-col items-center justify-center py-12">
-                        <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-4">
-                            Boost Your Productivity with Timetable Generator
-                        </h1>
-                        <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-                            Create your personalized schedule in minutes. Stay
-                            organized, focused, and ahead of your tasks.
-                        </p>
-
-                        <div className="flex gap-4">
-                            {auth.user ? (
-                                <Link
-                                    href={route("dashboard")}
-                                    className="px-6 py-3 bg-primary text-primary-foreground rounded-full text-lg font-semibold shadow hover:opacity-90 transition"
-                                >
-                                    Go to Dashboard
-                                </Link>
-                            ) : (
-                                <>
+            <div className="min-h-screen bg-background">
+                {/* Navbar */}
+                <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-sm border-b border-border">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex justify-between items-center h-16">
+                            <div className="flex items-center">
+                                <span className="text-2xl font-bold text-primary">TimeTable</span>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                {!isMobile && (
+                                    <ModeToggle variant="outline" size="default" />
+                                )}
+                                {auth.user ? (
                                     <Link
-                                        href={route("register")}
-                                        className="px-6 py-3 bg-primary text-primary-foreground rounded-full text-lg font-semibold shadow hover:opacity-90 transition"
+                                        href={route("dashboard")}
+                                        className="px-3 md:px-4 py-3 md:py-2 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition"
                                     >
-                                        Get Started
+                                        Dashboard
                                     </Link>
-                                    <Link
-                                        href={route("login")}
-                                        className="px-6 py-3 bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-full text-lg font-semibold shadow transition"
-                                    >
-                                        Log In
-                                    </Link>
-                                </>
-                            )}
+                                ) : (
+                                    <div className="flex gap-3">
+                                        <Link
+                                            href={route("login")}
+                                            className="px-3 md:px-4 py-3 md:py-2 text-foreground hover:text-primary transition"
+                                        >
+                                            Login
+                                        </Link>
+                                        <Link
+                                            href={route("register")}
+                                            className="px-3 md:px-4 py-3 md:py-2 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition"
+                                        >
+                                            Get Started
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </header>
+                    </div>
+                </nav>
 
-                    {/* Features Section */}
-                    <section className="mt-12 w-full max-w-6xl">
-                        <h2 className="text-3xl font-bold text-foreground mb-6">
-                            Why Choose Timetable Generator?
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {/* Feature 1 */}
-                            <div className="flex flex-col items-center p-6 rounded-lg bg-card shadow-lg border border-border">
+                {/* Hero Section */}
+                <section className="pt-32 pb-16 px-4">
+                    <div className="max-w-6xl mx-auto text-center">
+                        <div className="inline-block mb-4 px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                            ✨ Your Time, Optimized
+                        </div>
+                        <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
+                            Transform Your Schedule with
+                            <span className="text-primary"> Smart Planning</span>
+                        </h1>
+                        <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                            Create intelligent timetables that adapt to your needs. Stay organized,
+                            boost productivity, and make the most of every day.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <Link
+                                href={route("register")}
+                                className="px-8 py-4 bg-primary text-primary-foreground rounded-full text-lg font-semibold hover:opacity-90 transition flex items-center justify-center gap-2"
+                            >
+                                Start Free <ArrowRight className="w-5 h-5" />
+                            </Link>
+                            <Link
+                                href="#features"
+                                className="px-8 py-4 bg-secondary text-secondary-foreground rounded-full text-lg font-semibold hover:bg-secondary/80 transition"
+                            >
+                                See Features
+                            </Link>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Stats Section */}
+                <section className="py-16 bg-muted/50">
+                    <div className="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                        <div>
+                            <div className="text-3xl font-bold text-primary mb-2">10k+</div>
+                            <div className="text-muted-foreground">Active Users</div>
+                        </div>
+                        <div>
+                            <div className="text-3xl font-bold text-primary mb-2">98%</div>
+                            <div className="text-muted-foreground">Satisfaction Rate</div>
+                        </div>
+                        <div>
+                            <div className="text-3xl font-bold text-primary mb-2">24/7</div>
+                            <div className="text-muted-foreground">Support</div>
+                        </div>
+                        <div>
+                            <div className="text-3xl font-bold text-primary mb-2">50+</div>
+                            <div className="text-muted-foreground">Features</div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Features Section */}
+                <section id="features" className="py-24 px-4">
+                    <div className="max-w-6xl mx-auto">
+                        <div className="text-center mb-16">
+                            <h2 className="text-3xl font-bold text-foreground mb-4">
+                                Everything You Need for Perfect Scheduling
+                            </h2>
+                            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                                Powerful features designed to make time management effortless
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div className="p-6 rounded-2xl bg-card border border-border hover:border-primary transition-colors">
                                 <Calendar className="h-12 w-12 text-primary mb-4" />
                                 <h3 className="text-xl font-semibold text-foreground mb-2">
-                                    Easy Timetable Creation
+                                    Smart Scheduling
                                 </h3>
-                                <p className="text-foreground/80 text-center">
-                                    Effortlessly generate timetables for your
-                                    week, month, or custom duration with just a
-                                    few clicks.
+                                <p className="text-muted-foreground">
+                                    AI-powered scheduling that learns from your preferences and
+                                    optimizes your daily routine automatically.
                                 </p>
                             </div>
-
-                            {/* Feature 2 */}
-                            <div className="flex flex-col items-center p-6 rounded-lg bg-card shadow-lg border border-border">
-                                <Clock className="h-12 w-12 text-primary mb-4" />
+                            <div className="p-6 rounded-2xl bg-card border border-border hover:border-primary transition-colors">
+                                <Users className="h-12 w-12 text-primary mb-4" />
                                 <h3 className="text-xl font-semibold text-foreground mb-2">
-                                    Real-Time Updates
+                                    Team Collaboration
                                 </h3>
-                                <p className="text-foreground/80 text-center">
-                                    Stay updated with real-time changes and
-                                    notifications, ensuring you never miss a
-                                    task or appointment.
+                                <p className="text-muted-foreground">
+                                    Share schedules, coordinate meetings, and sync with your team
+                                    seamlessly.
                                 </p>
                             </div>
-
-                            {/* Feature 3 */}
-                            <div className="flex flex-col items-center p-6 rounded-lg bg-card shadow-lg border border-border">
-                                <CheckCircle className="h-12 w-12 text-primary mb-4" />
+                            <div className="p-6 rounded-2xl bg-card border border-border hover:border-primary transition-colors">
+                                <Star className="h-12 w-12 text-primary mb-4" />
                                 <h3 className="text-xl font-semibold text-foreground mb-2">
-                                    Highly Customizable
+                                    Custom Templates
                                 </h3>
-                                <p className="text-foreground/80 text-center">
-                                    Customize your timetable according to your
-                                    preferences, with flexible layout options
-                                    and color schemes.
+                                <p className="text-muted-foreground">
+                                    Create and save your favorite schedule templates for quick access
+                                    and reuse.
                                 </p>
                             </div>
                         </div>
-                    </section>
+                    </div>
+                </section>
 
-                    {/* Call to Action Section */}
-                    <section className="mt-16 w-full max-w-4xl text-center">
+                {/* CTA Section */}
+                <section className="py-24 px-4 bg-muted/50">
+                    <div className="max-w-4xl mx-auto text-center">
                         <h2 className="text-3xl font-bold text-foreground mb-6">
-                            Ready to Organize Your Time?
+                            Ready to Transform Your Time Management?
                         </h2>
-                        <p className="text-lg text-foreground/80 mb-8">
-                            Join thousands of users who have streamlined their
-                            productivity using Timetable Generator. It's free to
-                            get started!
+                        <p className="text-lg text-muted-foreground mb-8">
+                            Join thousands of productive professionals who have already optimized
+                            their schedules with our platform.
                         </p>
-
                         <Link
                             href={route("register")}
-                            className="px-8 py-4 bg-primary text-primary-foreground hover:opacity-90 rounded-full text-lg font-semibold shadow transition inline-flex items-center"
+                            className="px-8 py-4 bg-primary text-primary-foreground rounded-full text-lg font-semibold hover:opacity-90 transition inline-flex items-center gap-2"
                         >
-                            <UserPlus className="mr-2 h-6 w-6" /> Sign Up Now
+                            Get Started Free <ArrowRight className="w-5 h-5" />
                         </Link>
-                    </section>
+                    </div>
+                </section>
 
-                    {/* Footer */}
-                    <footer className="mt-24 text-foreground/80 text-sm">
+                {/* Footer */}
+                <footer className="py-8 border-t border-border">
+                    <div className="max-w-6xl mx-auto px-4 text-center text-muted-foreground">
                         <p>© 2024 Timetable Generator. All rights reserved.</p>
-                        <p>
-                            App version: {appVersion} (PHP v{phpVersion})
-                        </p>
-                    </footer>
-                </div>
+                    </div>
+                </footer>
             </div>
         </>
     );
 }
+
+export default LandingPage;

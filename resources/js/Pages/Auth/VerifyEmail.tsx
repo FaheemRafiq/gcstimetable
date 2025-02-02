@@ -1,51 +1,46 @@
-import GuestLayout from "@/Layouts/GuestLayout";
-import { Head, Link, useForm } from "@inertiajs/react";
-import { FormEventHandler } from "react";
-import { Button } from "@/components/ui/button";
+import GuestLayout from '@/Layouts/GuestLayout';
+import { Head, Link } from '@inertiajs/react';
+import { Button } from '@/components/ui/button';
+import { MailCheck, RefreshCw } from 'lucide-react';
 
 export default function VerifyEmail({ status }: { status?: string }) {
-    const { post, processing } = useForm({});
-
-    const submit: FormEventHandler = (e) => {
-        e.preventDefault();
-
-        post(route("verification.send"));
-    };
-
     return (
         <GuestLayout>
-            <Head title="Email Verification" />
-
-            <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-                Thanks for signing up! Before getting started, could you verify
-                your email address by clicking on the link we just emailed to
-                you? If you didn't receive the email, we will gladly send you
-                another.
-            </div>
-
-            {status === "verification-link-sent" && (
-                <div className="mb-4 font-medium text-sm text-green-600 dark:text-green-400">
-                    A new verification link has been sent to the email address
-                    you provided during registration.
+            <Head title="Verify Email" />
+            <div className="w-full md:px-8 py-12 sm:max-w-md mx-auto">
+                <div className="text-center mb-8">
+                    <div className="flex justify-center mb-4">
+                        <MailCheck className="h-12 w-12 text-primary" />
+                    </div>
+                    <h1 className="text-2xl font-bold text-foreground">Verify Your Email</h1>
+                    <p className="text-muted-foreground mt-2">
+                        We've sent a verification link to your email. Please check your inbox and click the link to verify your account.
+                    </p>
                 </div>
-            )}
 
-            <form onSubmit={submit}>
-                <div className="mt-4 flex items-center justify-between">
-                    <Button size={"sm"} disabled={processing}>
-                        Resend Verification Email
-                    </Button>
+                {status === 'verification-link-sent' && (
+                    <div className="mb-4 text-sm text-green-600 text-center">
+                        A new verification link has been sent to your email address.
+                    </div>
+                )}
+
+                <div className="flex flex-col gap-4">
+                    <form method="POST" action={route('verification.send')} className="w-full">
+                        <Button className="w-full" size="lg">
+                            <RefreshCw className="h-4 w-4 mr-2" /> Resend Verification Email
+                        </Button>
+                    </form>
 
                     <Link
-                        href={route("logout")}
+                        href={route('logout')}
                         method="post"
                         as="button"
-                        className="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                        className="text-center text-sm text-primary hover:underline"
                     >
                         Log Out
                     </Link>
                 </div>
-            </form>
+            </div>
         </GuestLayout>
     );
 }

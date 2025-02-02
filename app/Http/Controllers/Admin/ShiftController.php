@@ -19,19 +19,16 @@ class ShiftController extends Controller
      */
     public function index()
     {
-        $admin  = Auth::user();
-        $shifts = [];
-
-        if ($admin->isSuperAdmin()) {
-            $shifts = Shift::all();
-        }
+        $admin      = Auth::user();
+        $shiftQuery = Shift::query();
+        $shifts     = [];
 
         if ($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()) {
-            $shifts = Shift::whereInstitution($admin->institution_id)->get();
+            $shiftQuery->whereInstitution($admin->institution_id);
         }
 
         return inertia()->render('Admin/Shifts/index', [
-            'shifts' => $shifts,
+            'shifts' => $shiftQuery->get(),
         ]);
     }
 

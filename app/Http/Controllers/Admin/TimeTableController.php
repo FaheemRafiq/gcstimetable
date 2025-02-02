@@ -18,21 +18,22 @@ class TimeTableController extends Controller
 
     public function index()
     {
-        $admin  = Auth::user();
-        $tables = [];
+        $admin          = Auth::user();
+        $queryBuilder   = TimeTable::query();
+        $tables         = [];
 
         if ($admin->isInstitutionAdmin()) {
-            $tables = TimeTable::whereHas('institution', function ($query) use ($admin): void {
+            $queryBuilder->whereHas('institution', function ($query) use ($admin): void {
                 $query->where('institutions.id', $admin->institution_id);
-            })->latest()->get();
+            });
         } elseif ($admin->isDepartmentAdmin()) {
-            $tables = TimeTable::whereHas('institution.department', function ($query) use ($admin): void {
+            $$queryBuilder->whereHas('institution.department', function ($query) use ($admin): void {
                 $query->where('departments.id', $admin->department_id);
-            })->latest()->get();
+            });
         }
 
         return Inertia::render('Admin/TimeTables/index', [
-            'timeTables' => $tables,
+            'timeTables' => $queryBuilder->latest()->get(),
         ]);
     }
 
