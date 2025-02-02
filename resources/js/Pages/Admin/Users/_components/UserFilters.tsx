@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { format } from "date-fns";
 import { router } from "@inertiajs/react";
 import { XIcon } from "lucide-react";
-import { FilterManager } from '@/classes/FilterManager';
 import FilterModal from "@/components/filter-modal";
 import InputLabel from "@/Components/InputLabel";
 import DatePicker from "@/components/inputs/date-picker";
@@ -13,98 +12,174 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import SearchInput from "@/components/inputs/search-input";
 
-// Define the filter configuration
-const filterConfig = [
-    { name: 's', defaultValue: '', label: 'Search' },
-    { name: 'start_date', defaultValue: '', label: 'Start Date' },
-    { name: 'end_date', defaultValue: '', label: 'End Date' },
-    { name: 'verified', defaultValue: true, label: 'Verified' },
-    { name: 'unverified', defaultValue: true, label: 'Unverified' }
-];
+// Define initial state and types
+type FilterState = {
+    s: string;
+    start_date: string;
+    end_date: string;
+    verified: boolean;
+    unverified: boolean;
+    sFrom: "" | "url-first" | "search";
+};
+
+const initialState: FilterState = {
+    s: "",
+    start_date: "",
+    end_date: "",
+    verified: true,
+    unverified: true,
+    sFrom: "",
+};
 
 function UserFilters() {
-    // Initialize FilterManager with the route
-    const [filterManager] = useState(() =>
-        new FilterManager(filterConfig, route("users.index"))
-    );
+    // Main filter state
+    const [filters, setFilters] = useState<FilterState>(initialState);
 
-    // Track filter values in React state
-    const [filters, setFilters] = useState(filterManager.getAllFilters());
-
-    // Update filters and UI
-    const updateFilters = (newFilters: typeof filters) => {
-        Object.entries(newFilters).forEach(([key, value]) => {
-            filterManager.setFilter(key, value);
-        });
-        setFilters(filterManager.getAllFilters());
-    };
-
-    // Handle search logic
-    const handleSearch = () => {
-        const queryParams: Record<string, any> = {};
-        Object.entries(filters).forEach(([key, value]) => {
-            if (value !== filterConfig.find(f => f.name === key)?.defaultValue) {
-                queryParams[key] = value;
-            }
-        });
-        router.get(route("users.index"), { ...queryParams, page: 1 });
-    };
-
-    // Handle date changes
-    const handleDateChange = (name: string, date: Date | null) => {
-        updateFilters({
-            ...filters,
-            [name]: date ? format(date, "yyyy-MM-dd") : ""
-        });
-    };
-
-    // Clear all filters
-    const handleClearFilters = () => {
-        filterManager.clearAllFilters();
-        setFilters(filterManager.getAllFilters());
-        router.get(route("users.index"));
-    };
-
-    // Remove a specific filter
-    const removeFilter = (filterName: string) => {
-        filterManager.clearFilter(filterName);
-        setFilters(filterManager.getAllFilters());
-    };
-
-    // Initialize state from URL query parameters
+    // Update state from URL on mount
     useEffect(() => {
-        const searchParams = new URLSearchParams(location.search);
-        const newFilters = {
+        const searchParams = new URLSearchParams(window.location.search);
+        setFilters({
+            s: searchParams.get("s") || "",
             start_date: searchParams.get("start_date") || "",
             end_date: searchParams.get("end_date") || "",
             verified: searchParams.get("verified") === "false" ? false : true,
             unverified: searchParams.get("unverified") === "false" ? false : true,
-        };
-        updateFilters(newFilters);
+            sFrom: "url-first"
+        });
     }, []);
 
-    // Generate active filter badges
-    const activeFilters = filterManager.getActiveFilters();
-    const filterBadges = activeFilters.map(filter => (
-        <Badge
-            variant="secondary"
-            className="!text-sm cursor-pointer hover:bg-secondary/80 transition-colors"
-            key={filter.name}
-            onClick={() => removeFilter(filter.name)}
-        >
-            {filter.label}: {typeof filter.value === 'boolean' ? (filter.value ? 'Yes' : 'No') : filter.value}
-            <XIcon size={12} className="ml-1 inline" />
-        </Badge>
-    ));
+    useEffect(() => {
+        if(filters.sFrom == "search"){
+            handleSearch();
+        }
+    }, [filters.s, filters.sFrom]);
+
+
+    // Handle date changes
+    const handleDateChange = (name: "start_date" | "end_date", date: Date | null) => {
+        setFilters(prev => ({
+            ...prev,
+            [name]: date ? format(date, "yyyy-MM-dd") : ""
+        }));
+    };
+
+    // Handle search submission
+    const handleSearch = () => {
+        const queryParams: Record<string, any> = {};
+
+        // Only add non-default values to query params
+        if (filters.s) queryParams.s = filters.s;
+        if (filters.start_date) queryParams.start_date = filters.start_date;
+        if (filters.end_date) queryParams.end_date = filters.end_date;
+        if (!filters.verified) queryParams.verified = false;
+        if (!filters.unverified) queryParams.unverified = false;
+
+        router.get(route("users.index"), queryParams, { preserveState: true });
+    };
+
+    // Clear all filters
+    const handleClearFilters = () => {
+        setFilters(initialState);
+        router.get(route("users.index"));
+    };
+
+    // Remove individual filter
+    const removeFilter = (filterName: keyof FilterState) => {
+        setFilters(prev => ({
+            ...prev,
+            [filterName]: initialState[filterName]
+        }));
+    };
+
+    // Check if any filter is active
+    const hasActiveFilters = () => {
+        return Object.entries(filters).some(([key, value]) => {
+
+            if (key == 's' || key == 'sFrom') {
+                return false;
+            }
+
+            if (typeof value === 'boolean') {
+                return value !== initialState[key as keyof FilterState];
+            }
+            return value !== '';
+        });
+    };
+
+    // Generate filter badges
+    const getFilterBadges = () => {
+        const badges = [];
+
+        if (filters.start_date) {
+            badges.push(
+                <Badge
+                    key="start_date"
+                    variant="secondary"
+                    className="!text-sm cursor-pointer hover:bg-secondary/80 transition-colors"
+                    onClick={() => removeFilter('start_date')}
+                >
+                    Start Date: {filters.start_date}
+                    <XIcon size={12} className="ml-1 inline" />
+                </Badge>
+            );
+        }
+
+        if (filters.end_date) {
+            badges.push(
+                <Badge
+                    key="end_date"
+                    variant="secondary"
+                    className="!text-sm cursor-pointer hover:bg-secondary/80 transition-colors"
+                    onClick={() => removeFilter('end_date')}
+                >
+                    End Date: {filters.end_date}
+                    <XIcon size={12} className="ml-1 inline" />
+                </Badge>
+            );
+        }
+
+        if (!filters.verified) {
+            badges.push(
+                <Badge
+                    key="verified"
+                    variant="secondary"
+                    className="!text-sm cursor-pointer hover:bg-secondary/80 transition-colors"
+                    onClick={() => removeFilter('verified')}
+                >
+                    Verified: No
+                    <XIcon size={12} className="ml-1 inline" />
+                </Badge>
+            );
+        }
+
+        if (!filters.unverified) {
+            badges.push(
+                <Badge
+                    key="unverified"
+                    variant="secondary"
+                    className="!text-sm cursor-pointer hover:bg-secondary/80 transition-colors"
+                    onClick={() => removeFilter('unverified')}
+                >
+                    Unverified: No
+                    <XIcon size={12} className="ml-1 inline" />
+                </Badge>
+            );
+        }
+
+        return badges;
+    };
 
     return (
         <div className="flex justify-between items-center gap-5">
             <div className="flex-1">
                 <SearchInput
-                    value={filters.s?.toString()}
-                    setValue={(value) => updateFilters({ ...filters, s: value })}
-                    onSearch={handleSearch}
+                    value={filters.s}
+                    setValue={(value) => {
+                        setFilters(prev => ({ ...prev, s: value, sFrom: "search" }));
+                    }}
                     placeholder="Search user by name, email..."
+                    autoSearch={true}
+                    debounceDelay={500}
                 />
             </div>
             <div className="self-end">
@@ -112,15 +187,15 @@ function UserFilters() {
                     title="User Filters"
                     description="Adjust your filters to find the perfect user."
                     onSearch={handleSearch}
-                    hasFiltersApplied={filterManager.hasActiveFilters()}
+                    hasFiltersApplied={hasActiveFilters()}
                 >
                     {/* Active Filters Section */}
-                    {filterManager.hasActiveFilters() && (
+                    {hasActiveFilters() && (
                         <>
                             <div className="space-y-2">
                                 <div className="text-sm font-medium">Active Filters</div>
                                 <div className="flex flex-wrap gap-2">
-                                    {filterBadges}
+                                    {getFilterBadges()}
                                     <Button
                                         variant="ghost"
                                         size="sm"
@@ -144,7 +219,7 @@ function UserFilters() {
                                 <DatePicker
                                     className="w-full"
                                     id="start_date"
-                                    value={filters.start_date ? new Date(filters.start_date.toString()) : null}
+                                    value={filters.start_date ? new Date(filters.start_date) : null}
                                     onChange={(date) => handleDateChange("start_date", date)}
                                 />
                             </div>
@@ -153,7 +228,7 @@ function UserFilters() {
                                 <DatePicker
                                     className="w-full"
                                     id="end_date"
-                                    value={filters.end_date ? new Date(filters.end_date.toString()) : null}
+                                    value={filters.end_date ? new Date(filters.end_date) : null}
                                     onChange={(date) => handleDateChange("end_date", date)}
                                 />
                             </div>
@@ -167,9 +242,9 @@ function UserFilters() {
                             <div className="flex items-center gap-2">
                                 <Checkbox
                                     id="verified"
-                                    checked={Boolean(filters.verified)}
+                                    checked={filters.verified}
                                     onCheckedChange={(checked) =>
-                                        updateFilters({ ...filters, verified: !!checked })
+                                        setFilters(prev => ({ ...prev, verified: !!checked }))
                                     }
                                 />
                                 <Label htmlFor="verified">Verified Users</Label>
@@ -177,9 +252,9 @@ function UserFilters() {
                             <div className="flex items-center gap-2">
                                 <Checkbox
                                     id="unverified"
-                                    checked={Boolean(filters?.unverified)}
+                                    checked={filters.unverified}
                                     onCheckedChange={(checked) =>
-                                        updateFilters({ ...filters, unverified: !!checked })
+                                        setFilters(prev => ({ ...prev, unverified: !!checked }))
                                     }
                                 />
                                 <Label htmlFor="unverified">Unverified Users</Label>

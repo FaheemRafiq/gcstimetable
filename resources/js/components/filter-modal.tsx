@@ -64,9 +64,11 @@ function FilterModal({
                             Cancel
                         </Button>
                     </DialogClose>
-                    <Button type="button" onClick={onSearch}>
-                        Search
-                    </Button>
+                    <DialogClose asChild>
+                        <Button type="button" onClick={onSearch}>
+                            Search
+                        </Button>
+                    </DialogClose>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

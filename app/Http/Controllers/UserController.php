@@ -23,7 +23,8 @@ class UserController extends Controller
         $start_date = $request->query('start_date', null);
         $end_date   = $request->query('end_date', null);
 
-        $users = User::select('id', 'name', 'email', 'email_verified_at', 'created_at')
+        $users = User::query()
+            ->select('id', 'name', 'email', 'email_verified_at', 'created_at')
             ->when($admin->isInstitutionAdmin(), function ($query) use ($admin): void {
                 $query->whereInstitution($admin->institution_id);
             })
@@ -52,7 +53,7 @@ class UserController extends Controller
             ->paginate($request->input('per_page', config('providers.pagination.per_page')));
 
         return Inertia::render('Admin/Users/index', [
-            'users' => UserResource::collection($users),
+            'users' => UserResource::collection($users)->withQuery($request->query()),
         ]);
     }
 
