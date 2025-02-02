@@ -23,18 +23,35 @@ class CourseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $admin        = Auth::user();
-        $queryBuilder = Course::withCount('semesters')->orderByDesc('created_at');
+        $queryBuilder = Course::withCount('semesters');
+        $search       = $request->query('s');
+        $type         = $request->query('type');
 
-        if (! $admin->isSuperAdmin()) {
-            $queryBuilder->whereInstitution($admin->institution_id);
-        }
+        $queryBuilder
+            ->when($search, function ($query, $search) {
+                $query->where(function ($wQuery) use ($search) {
+                    $wQuery->where('name', 'LIKE', "%$search%")
+                    ->orWhere('code', 'LIKE', "%$search%");
+                });
+            })
+            ->when($type, function ($query, $type) {
+                $query->where('type', $type);
+            });
 
-        $courses = $queryBuilder->paginate(config('providers.pagination.per_page'));
+        if (!$admin->isSuperAdmin()) $queryBuilder->whereInstitution($admin->institution_id);
+        
+        $courses = $queryBuilder
+            ->orderByDesc('created_at')
+            ->paginate(config('providers.pagination.per_page'))
+            ->appends($request->query());
 
-        return inertia()->render('Admin/Courses/index', ['courses' => $courses]);
+        return inertia()->render('Admin/Courses/index', [
+            'courses' => $courses,
+            'types'   => Course::TYPES
+        ]);
     }
 
     /**

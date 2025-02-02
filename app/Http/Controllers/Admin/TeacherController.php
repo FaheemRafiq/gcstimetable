@@ -30,6 +30,19 @@ class TeacherController extends Controller
         $ranks          = TeacherRankEnum::toArray();
         $positions      = TeacherPositionEnum::toArray();
         $qualifications = TeacherQualificationEnum::toArray();
+        $search         = $request->query('s');
+        $rank           = $request->query('rank');
+
+        $queyBuilder
+        ->when($search, function ($query) use ($search) {
+            $query->where(function ($wQuery) use ($search) {
+                $wQuery->where('email', 'LIKE', "%$search%")
+                ->orWhere("name", "LIKE", "%$search%");
+            });
+        })
+        ->when($rank, function ($query, $rank) {
+            $query->where('rank', $rank);
+        });
 
         if ($admin->isInstitutionAdmin()) {
             $queyBuilder

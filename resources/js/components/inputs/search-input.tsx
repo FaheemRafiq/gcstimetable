@@ -67,7 +67,7 @@ export default function SearchInput({
                 <div className={cn("relative flex-1", className)}>
                     <Input
                         id={id}
-                        className="peer ps-9"
+                        className="peer ps-9 placeholder:overflow-ellipsis"
                         placeholder={placeholder}
                         type="search"
                         value={search}
