@@ -161,11 +161,6 @@ class CourseController extends Controller
         return back()->withErrors(['message' => $message]);
     }
 
-    // ========================= Custom Methods =======================
-
-    /**
-     * Attach a semester to the course.
-     */
     public function attachSemester(Course $course): JsonResponse
     {
         $admin = Auth::user();
@@ -195,7 +190,7 @@ class CourseController extends Controller
                 });
         }
 
-        return response()->json(compact('semesters'));
+        return response()->json(compact('semesters', 'course'));
     }
 
     /**
@@ -203,6 +198,11 @@ class CourseController extends Controller
      */
     public function attach(Course $course, Request $request): RedirectResponse
     {
+        $request->validate([
+            'semesters'   => 'nullable|array',
+            'semesters.*' => 'nullable|integer|exists:semesters,id',
+        ]);
+
         $response = Gate::inspect('attach', $course);
         $message  = '';
 
@@ -212,7 +212,7 @@ class CourseController extends Controller
                     return back()->withErrors(['message' => 'Semester already attached']);
                 }
 
-                $course->semesters()->attach($request->semester_id);
+                $course->semesters()->sync($request->input('semesters', []));
 
                 return back()->with('success', 'Semester successfully attached');
             } else {

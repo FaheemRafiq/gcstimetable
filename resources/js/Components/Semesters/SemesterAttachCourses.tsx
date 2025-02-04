@@ -3,14 +3,6 @@ import { useForm, usePage } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-import {
     Dialog,
     DialogClose,
     DialogContent,
@@ -139,7 +131,7 @@ export const SemesterAttachForm: React.FC<SemesterAttachFormProps> = ({
                 <form id="SemesterAttachForm" onSubmit={handleSubmit}>
                     {/* Course Selector */}
                     <div className="space-y-2">
-                        <Label htmlFor="semester_id">Semesters</Label>
+                        <Label htmlFor="semester_id">Courses</Label>
                         <MultipleSelector
                             value={
                                 data.courses.map(course => {

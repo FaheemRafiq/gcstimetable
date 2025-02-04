@@ -169,8 +169,8 @@ class SemesterController extends Controller
     public function attach(Semester $semester, Request $request)
     {
         $request->validate([
-            'courses'   => 'required|array',
-            'courses.*' => 'required|integer|exists:courses,id',
+            'courses'   => 'nullable|array',
+            'courses.*' => 'nullable|integer|exists:courses,id',
         ]);
 
         $response = Gate::inspect('attach', $semester);

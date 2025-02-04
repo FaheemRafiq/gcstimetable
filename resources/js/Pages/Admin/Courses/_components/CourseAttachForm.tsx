@@ -3,27 +3,21 @@ import { useForm, usePage } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import InputError from "@/Components/InputError";
-import { ClassType, Course, Institution, Semester } from "@/types/database";
+import { Course } from "@/types/database";
 import { fetchWrapper } from "@/lib/fetchWrapper";
-import { useAbilities } from "@/components/abilities-provider";
-import Modal from "@/Components/Modal";
 import { AutoCompleteSelect } from "@/components/combobox";
 import toast from "react-hot-toast";
+import MultipleSelector from "@/components/ui/multi-select";
 
 interface CourseAttachFormProps {
     open?: boolean | undefined;
@@ -32,8 +26,13 @@ interface CourseAttachFormProps {
 }
 
 interface PageState {
+    course?: Course;
     semesters?: { value: number, label: string }[];
     isFeteched: boolean;
+}
+
+interface FormProps {
+    semesters: { value: number, label: string }[];
 }
 
 export const CourseAttachForm: React.FC<CourseAttachFormProps> = ({
@@ -41,8 +40,6 @@ export const CourseAttachForm: React.FC<CourseAttachFormProps> = ({
     onClose,
     course
 }) => {
-    const { isSuperAdmin } = useAbilities();
-
     // State
     const [open, setOpen] = React.useState(openProp ?? false);
     const [pageState, setPageState] = React.useState<PageState>({
@@ -50,8 +47,8 @@ export const CourseAttachForm: React.FC<CourseAttachFormProps> = ({
         isFeteched: false,
     });
 
-    const { data, setData, post, processing, errors } = useForm({
-        semester_id: ""
+    const { data, setData, post, processing, errors, transform } = useForm<FormProps>({
+        semesters: []
     });
 
     useEffect(() => {
@@ -72,11 +69,18 @@ export const CourseAttachForm: React.FC<CourseAttachFormProps> = ({
             method: "GET",
         })
             .then((response) => {
-                console.log("handleFetchState -> response", response);
                 setPageState({
                     ...response,
                     isFetched: true,
                 });
+
+
+                if (response.course && response.course.semesters) {
+                    setData("semesters", response.course.semesters.map((semester: any) => {
+                        return { value: semester.id, label: semester.name }
+                    })
+                    );
+                }
             })
             .catch((error) => {
                 console.error("handleCreate -> error", error);
@@ -85,6 +89,12 @@ export const CourseAttachForm: React.FC<CourseAttachFormProps> = ({
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        transform((data: FormProps) => {
+            return {
+                semesters: data.semesters.map(semester => semester.value)
+            };
+        });
 
         post(route("courses.attach", { course: course?.id }), {
             preserveScroll: true,
@@ -108,56 +118,46 @@ export const CourseAttachForm: React.FC<CourseAttachFormProps> = ({
     }
 
     return (
-        <Modal show={open} onClose={() => handleOpen(false)}>
-            <Card className="w-full mx-auto bg-transparent shadow-none">
-                <CardHeader>
-                    <CardTitle>Attach Course</CardTitle>
-                    <CardDescription>
+        <Dialog defaultOpen={open} onOpenChange={() => handleOpen(false)}>
+            <DialogContent className="md:min-w-[70%] lg:min-w-[60%] bg-background">
+                <DialogHeader>
+                    <DialogTitle>Attach Course</DialogTitle>
+                    <DialogDescription>
                         Select the semester and attach the course to it.
-                    </CardDescription>
-                </CardHeader>
-                <form id="courseAttachForm" onSubmit={handleSubmit}>
-                    <CardContent className="space-y-6">
-                        {/* Semester Selector */}
-                        <div className="space-y-2">
-                            <Label htmlFor="semester_id">Semesters</Label>
-                            <AutoCompleteSelect
-                                label="Select Semester"
-                                popoverClassName="w-full w-96"
-                                value={
-                                    data.semester_id?.toString() ??
-                                    null
-                                }
-                                setValue={(value: string) => {
-                                    setData(
-                                        "semester_id",
-                                        value
-                                    );
-                                }}
-                                values={
-                                    pageState?.semesters?.map(semester => ({
-                                        value: semester.value.toString(),
-                                        label: semester.label
-                                    })) ?? []
-                                }
-                                isError={Boolean(errors.semester_id)}
-                            />
-                            <InputError message={errors.semester_id} />
-                        </div>
-                    </CardContent>
-                    <CardFooter className="flex justify-end gap-4">
-                        <Button
-                            variant="secondary"
-                            onClick={() => handleOpen(false)}
-                        >
-                            Cancel
-                        </Button>
+                    </DialogDescription>
+                </DialogHeader>
+                <form id="CourseAttachForm" onSubmit={handleSubmit}>
+                    {/* Semester Selector */}
+                    <div className="space-y-2">
+                        <Label htmlFor="semester_id">Semesters</Label>
+                        <MultipleSelector
+                            value={
+                                data.semesters?.map(semesters => {
+                                    return { value: String(semesters.value), label: semesters.label }
+                                })
+                            }
+                            className="w-full z-50"
+                            onChange={(value) => setData("semesters", value.map(v => ({ ...v, value: Number(v.value) })))}
+                            options={pageState.semesters?.map(semester => {
+                                return { value: String(semester.value), label: semester.label }
+                            })}
+                        />
+                        <InputError message={errors.semesters} />
+                    </div>
+                    <DialogFooter className="flex justify-end gap-4 mt-4">
+                        <DialogClose asChild>
+                            <Button
+                                variant="secondary"
+                            >
+                                Cancel
+                            </Button>
+                        </DialogClose>
                         <Button type="submit" variant="default" disabled={processing}>
-                            Attach Course
+                            Attach
                         </Button>
-                    </CardFooter>
+                    </DialogFooter>
                 </form>
-            </Card>
-        </Modal>
+            </DialogContent>
+        </Dialog>
     );
 };
