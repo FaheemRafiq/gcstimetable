@@ -1,4 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
+import React from "react";
 
 interface WithSearchFilter {
     pagination?: boolean;
@@ -24,7 +25,8 @@ export interface DataTableProps<TData, TValue> {
     pageLinks?: PaginationLink[],
     totalCount?: number,
     from?: number,
-    to?: number
+    to?: number,
+    create_button?: React.ReactNode
 }
 
 export interface PaginationLink {

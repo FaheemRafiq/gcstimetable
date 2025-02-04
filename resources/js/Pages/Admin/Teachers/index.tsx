@@ -59,6 +59,8 @@ export default function Teachers({
                         totalItems={teachers.meta.total}
                         pageSize={teachers.meta.per_page}
                         navigationLinks={teachers.links}
+                        from={teachers.meta.from}
+                        to={teachers.meta.to}
                         pageSizeOptions={[15, 30, 50, 100]}
                         onPageSizeChange={(pageSize) => {
                             console.log("pageSize => in Teachers", pageSize);

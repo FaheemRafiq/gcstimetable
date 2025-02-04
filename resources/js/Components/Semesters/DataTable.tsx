@@ -10,6 +10,7 @@ interface DataTableProps {
     filterColumn?: string;
     pagination?: boolean;
     isMainListing?: boolean;
+    create_button?: React.ReactNode;
 }
 
 const DataTable: React.FC<DataTableProps> = ({
@@ -17,7 +18,8 @@ const DataTable: React.FC<DataTableProps> = ({
     columns : columnsProps = undefined,
     searchFilter = false,
     filterColumn = "name",
-    pagination = false
+    pagination = false,
+    create_button
 }) => {
     return (
         <Table
@@ -28,6 +30,7 @@ const DataTable: React.FC<DataTableProps> = ({
                 filterColumn: filterColumn,
                 pagination: pagination,
             }}
+            create_button={create_button}
         />
     );
 };

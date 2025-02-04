@@ -28,7 +28,7 @@ export default function Courses({
             <Head title="Courses" />
             <div className="bg-card text-card-foreground border border-border sm:rounded-lg">
                 <div className="p-6">
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center mb-4">
                         <CourseFilters types={types}  />
                         
                         <div className="self-end">

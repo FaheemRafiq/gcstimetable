@@ -23,6 +23,8 @@ import {
     Book,
     Landmark,
     Hotel,
+    ShieldCheckIcon,
+    KeyIcon,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -162,6 +164,25 @@ export const NavData: NavDataType = [
             },
         ],
     },
+    {
+        label: "Access Control",
+        items: [
+            {
+                title: "Roles",
+                route: "roles.index",
+                url: route("roles.index"),
+                icon: ShieldCheckIcon,
+                isActive: route().current("roles.index"),
+            },
+            {
+                title: "Permissions",
+                route: "permissions.index",
+                url: route("permissions.index"),
+                icon: KeyIcon,
+                isActive: route().current("permissions.index"),
+            },
+        ],
+    },
 ];
 
 export const SecondaryNavData: any = [
@@ -203,7 +224,9 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
     }, []);
 
     const NavigationData = React.useMemo(() => {
-        return NavData.map((section) => ({
+        return NavData
+        .filter(section => isSuperAdmin() || !section.label.includes('Access Control'))
+        .map((section) => ({
             ...section,
             items: section.items
                 .filter((item) => isSuperAdmin() || item.route !== "institutions.index")

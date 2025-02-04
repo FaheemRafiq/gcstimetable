@@ -24,16 +24,16 @@ class RoomController extends Controller
      */
     public function index()
     {
-        $rooms = [];
-        $admin = Auth::user();
+        $admin        = Auth::user();
+        $queryBuilder = Room::query();
 
         if ($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()) {
-            $rooms = new RoomCollection(Room::where('institution_id', $admin->institution_id)->orderByDesc('created_at')->get());
+            $queryBuilder->where('institution_id', $admin->institution_id);
         }
 
         try {
             return Inertia::render('Admin/Rooms/index', [
-                'rooms' => $rooms,
+                'rooms' => new RoomCollection($queryBuilder->orderByDesc('created_at')->get()),
             ]);
         } catch (QueryException $queryException) {
             return back()->with('status', $queryException->getMessage());

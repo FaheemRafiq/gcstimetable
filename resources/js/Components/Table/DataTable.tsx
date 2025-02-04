@@ -41,6 +41,7 @@ export function DataTable<TData, TValue>({
     totalCount,
     from,
     to,
+    create_button,
 }: DataTableProps<TData, TValue>) {
     const [columnFilters, setColumnFilters] =
         React.useState<ColumnFiltersState>([]);
@@ -119,70 +120,52 @@ export function DataTable<TData, TValue>({
 
     return (
         <div>
-            <div className="flex flex-col sm:flex-row items-center justify-between py-4">
-                {finalProps.searchFilter ? (
-                    <div className="relative max-w-md w-full">
-                        <Input
-                            ref={inputRef}
-                            placeholder={`Search by ${finalProps.filterColumn} ...`}
-                            value={
-                                (table
+            {
+                finalProps.searchFilter || create_button ? (
+                    <div className="flex flex-col sm:flex-row items-center justify-between py-4">
+                        {finalProps.searchFilter ? (
+                            <div className="relative max-w-md w-full">
+                                <Input
+                                    ref={inputRef}
+                                    placeholder={`Search by ${finalProps.filterColumn} ...`}
+                                    value={
+                                        (table
+                                            .getColumn(finalProps.filterColumn)
+                                            ?.getFilterValue() as string) ?? ""
+                                    }
+                                    onChange={(event) =>
+                                        finalProps.search === 'server'
+                                            ? finalProps.onSearch?.(event.target.value)
+                                            : table.getColumn(finalProps.filterColumn)
+                                                ?.setFilterValue(event.target.value)
+                                    }
+                                    className="md:shadow-md"
+                                    autoFocus
+                                />
+                                {((table
                                     .getColumn(finalProps.filterColumn)
-                                    ?.getFilterValue() as string) ?? ""
-                            }
-                            onChange={(event) =>
-                                finalProps.search === 'server' 
-                                    ? finalProps.onSearch?.(event.target.value) 
-                                    : table.getColumn(finalProps.filterColumn)
-                                        ?.setFilterValue(event.target.value)
-                            }
-                            className="md:shadow-md"
-                            autoFocus
-                        />
-                        {((table
-                            .getColumn(finalProps.filterColumn)
-                            ?.getFilterValue() as string) ??
-                            "") && (
-                                <button
-                                    className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-                                    aria-label="Clear input"
-                                    onClick={handleClearInput}
-                                >
-                                    <X
-                                        size={18}
-                                        strokeWidth={2}
-                                        aria-hidden="true"
-                                    />
-                                </button>
-                            )}
+                                    ?.getFilterValue() as string) ??
+                                    "") && (
+                                        <button
+                                            className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                                            aria-label="Clear input"
+                                            onClick={handleClearInput}
+                                        >
+                                            <X
+                                                size={18}
+                                                strokeWidth={2}
+                                                aria-hidden="true"
+                                            />
+                                        </button>
+                                    )}
+                            </div>
+                        ) : null}
+                        {
+                            create_button && create_button
+                        }
                     </div>
-                ) : (
-                    <div />
-                )}
-                <div className="mt-3 sm:mt-0 self-end dark:text-foreground text-nowrap">
-                    <TotalRecords
-                        paramTotalCount={
-                            finalProps.pagination
-                                ? table.getRowCount()
-                                : totalCount ?? 0
-                        }
-                        paramFrom={
-                            finalProps.pagination
-                                ? pagination.pageIndex * pagination.pageSize + 1
-                                : from
-                        }
-                        paramTo={
-                            finalProps.pagination
-                                ? Math.min(
-                                    (pagination.pageIndex + 1) *
-                                    pagination.pageSize,
-                                    table.getRowCount()
-                                )
-                                : to
-                        }
-                    />
-                </div>
-            </div>
+                ) : null
+            }
 
             <div className="rounded-md border border-border shadow-md bg-background text-foreground">
                 <Table
@@ -254,30 +237,54 @@ export function DataTable<TData, TValue>({
                 </Table>
             </div>
 
-            {finalProps.pagination && (
-                <div className="flex items-center justify-end space-x-2 py-4">
-                    <Button
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                        size={"sm"}
-                    >
-                        Previous
-                    </Button>
-                    <Button
-                        onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
-                        size={"sm"}
-                    >
-                        Next
-                    </Button>
+            <div className="flex items-center justify-between space-x-2 py-4">
+                <div className="self-start text-nowrap text-sm text-muted-foreground">
+                    <TotalRecords
+                        paramTotalCount={
+                            finalProps.pagination
+                                ? table.getRowCount()
+                                : totalCount ?? 0
+                        }
+                        paramFrom={
+                            finalProps.pagination
+                                ? pagination.pageIndex * pagination.pageSize + 1
+                                : from
+                        }
+                        paramTo={
+                            finalProps.pagination
+                                ? Math.min(
+                                    (pagination.pageIndex + 1) *
+                                    pagination.pageSize,
+                                    table.getRowCount()
+                                )
+                                : to
+                        }
+                    />
                 </div>
-            )}
 
-            {pageLinks && (
-                <div className="flex items-center justify-end space-x-2 py-4">
+                {finalProps.pagination && (
+                    <div className="flex gap-3">
+                        <Button
+                            onClick={() => table.previousPage()}
+                            disabled={!table.getCanPreviousPage()}
+                            size={"sm"}
+                        >
+                            Previous
+                        </Button>
+                        <Button
+                            onClick={() => table.nextPage()}
+                            disabled={!table.getCanNextPage()}
+                            size={"sm"}
+                        >
+                            Next
+                        </Button>
+                    </div>
+                )}
+                {pageLinks && (
                     <TablePagination links={pageLinks} />
-                </div>
-            )}
+                )}
+            </div>
+
         </div>
     );
 }

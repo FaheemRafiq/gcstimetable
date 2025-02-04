@@ -13,7 +13,6 @@ use App\Http\Requests\CourseRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\QueryException;
 
 class CourseController extends Controller
@@ -34,15 +33,17 @@ class CourseController extends Controller
             ->when($search, function ($query, $search) {
                 $query->where(function ($wQuery) use ($search) {
                     $wQuery->where('name', 'LIKE', "%$search%")
-                    ->orWhere('code', 'LIKE', "%$search%");
+                        ->orWhere('code', 'LIKE', "%$search%");
                 });
             })
             ->when($type, function ($query, $type) {
                 $query->where('type', $type);
             });
 
-        if (!$admin->isSuperAdmin()) $queryBuilder->whereInstitution($admin->institution_id);
-        
+        if (! $admin->isSuperAdmin()) {
+            $queryBuilder->whereInstitution($admin->institution_id);
+        }
+
         $courses = $queryBuilder
             ->orderByDesc('created_at')
             ->paginate(config('providers.pagination.per_page'))
@@ -50,7 +51,7 @@ class CourseController extends Controller
 
         return inertia()->render('Admin/Courses/index', [
             'courses' => $courses,
-            'types'   => Course::TYPES
+            'types'   => Course::TYPES,
         ]);
     }
 

@@ -35,32 +35,32 @@ class DashboardController extends Controller
 
         $statistics = (function () use ($institutionId, $departmentId, $admin): array {
             $userQuery = User::query()
-            ->when($institutionId, function ($query, $institutionId): void {
-                $query->whereInstitution($institutionId);
-            })
-            ->when($departmentId, function ($query, $departmentId): void {
-                $query->whereDepartment($departmentId);
-            });
+                ->when($institutionId, function ($query, $institutionId): void {
+                    $query->whereInstitution($institutionId);
+                })
+                ->when($departmentId, function ($query, $departmentId): void {
+                    $query->whereDepartment($departmentId);
+                });
 
             $studentQuery = Student::query()
-            ->when($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin(), function ($query) use ($admin): void {
-                $query->where('institution_id', $admin->institution_id);
-            });
+                ->when($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin(), function ($query) use ($admin): void {
+                    $query->where('institution_id', $admin->institution_id);
+                });
 
             $teacherQuery = Teacher::query()
-            ->when($institutionId, function ($query, $institutionId): void {
-                $query->whereHas('institution', function ($query) use ($institutionId): void {
-                $query->where('institutions.id', $institutionId);
+                ->when($institutionId, function ($query, $institutionId): void {
+                    $query->whereHas('institution', function ($query) use ($institutionId): void {
+                        $query->where('institutions.id', $institutionId);
+                    });
+                })
+                ->when($departmentId, function ($query, $departmentId): void {
+                    $query->where('department_id', $departmentId);
                 });
-            })
-            ->when($departmentId, function ($query, $departmentId): void {
-                $query->where('department_id', $departmentId);
-            });
 
             return [
-            'users'    => $userQuery->count(),
-            'students' => $studentQuery->count(),
-            'teachers' => $teacherQuery->count(),
+                'users'    => $userQuery->count(),
+                'students' => $studentQuery->count(),
+                'teachers' => $teacherQuery->count(),
             ];
         })();
 

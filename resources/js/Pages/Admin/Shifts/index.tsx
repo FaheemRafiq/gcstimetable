@@ -23,10 +23,7 @@ export default function Rooms({
         <AuthenticatedLayout user={auth.user}>
             <Head title="Shifts" />
             <div className="bg-card text-card-foreground border border-border sm:rounded-lg">
-                <div className="p-6">
-                    <div className="flex justify-end">
-                        <ShiftForm />
-                    </div>
+                <div className="p-6">=
                     <DataTable
                         data={shifts}
                         columns={columns}
@@ -35,6 +32,11 @@ export default function Rooms({
                             filterColumn: "name",
                             pagination: true,
                         }}
+                        create_button={
+                            <div className="flex justify-end">
+                                <ShiftForm />
+                            </div>
+                        }
                     />
                 </div>
             </div>

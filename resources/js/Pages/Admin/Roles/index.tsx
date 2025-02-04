@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Head, router } from "@inertiajs/react";
 
 // Types
-import { PageProps } from "@/types";
-import { Program } from "@/types/database";
+import { PageProps, Role } from "@/types";
 
 // Components
 import { DataTable } from "@/Components/Table/DataTable";
@@ -11,12 +10,12 @@ import columns from "./_components/columns";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useBreadcrumb } from "@/components/providers/breadcrum-provider";
 import { Button } from "@/components/ui/button";
-import { ProgramForm } from "./_components/ProgramForm";
+import { RoleForm } from "./_components/RoleForm";
 
 export default function Rooms({
     auth,
-    programs,
-}: PageProps<{ programs: Program[] }>) {
+    roles,
+}: PageProps<{ roles: Role[] }>) {
     // state
     const [openCreate, setOpenCreate] = useState(false);
 
@@ -25,17 +24,18 @@ export default function Rooms({
 
     useEffect(() => {
         setBreadcrumb({
-            title: "Programs",
+            title: "Roles",
         });
     }, [setBreadcrumb]);
 
     return (
         <AuthenticatedLayout user={auth.user}>
-            <Head title="Programs" />
+            <Head title="Roles" />
             <div className="bg-card text-card-foreground border border-border sm:rounded-lg">
                 <div className="p-6">
+
                     <DataTable
-                        data={programs}
+                        data={roles}
                         columns={columns}
                         inputProps={{
                             searchFilter: true,
@@ -45,7 +45,7 @@ export default function Rooms({
                         create_button={
                             <h2 className="flex justify-end">
                                 <Button size={"sm"} onClick={() => setOpenCreate(true)}>
-                                    Create Program
+                                    Create Role
                                 </Button>
                             </h2>
                         }
@@ -53,7 +53,7 @@ export default function Rooms({
                 </div>
             </div>
 
-            <ProgramForm
+            <RoleForm
                 open={openCreate}
                 onClose={() => setOpenCreate(false)}
             />

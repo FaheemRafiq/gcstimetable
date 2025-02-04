@@ -22,9 +22,6 @@ export default function Rooms({ auth, rooms }: PageProps<{ rooms: Room[] }>) {
             <Head title="Rooms" />
             <div className="bg-card text-card-foreground border border-border sm:rounded-lg">
                 <div className="p-6">
-                    <div className="flex justify-end">
-                        <RoomForm />
-                    </div>
                     <DataTable
                         data={rooms}
                         columns={columns}
@@ -33,6 +30,11 @@ export default function Rooms({ auth, rooms }: PageProps<{ rooms: Room[] }>) {
                             filterColumn: "code",
                             pagination: true,
                         }}
+                        create_button={
+                            <div className="flex justify-end">
+                                <RoomForm />
+                            </div>
+                        }
                     />
                 </div>
             </div>

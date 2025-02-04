@@ -59,6 +59,8 @@ export interface ServerSidePaginationProps {
   currentPage: number;
   totalItems: number;
   pageSize: number;
+  from: number;
+  to: number;
   navigationLinks: {
     first: string;
     last: string;
@@ -95,6 +97,8 @@ export function DataTable<TData, TValue>({
   currentPage = 1,
   totalItems = 0,
   pageSize = 10,
+  from = 0,
+  to = 0,
   navigationLinks = { first: '', last: '', prev: null, next: null },
   pageSizeOptions = [10, 20, 30, 40, 50],
   onPageSizeChange,
@@ -228,8 +232,14 @@ export function DataTable<TData, TValue>({
       </div>
       <div className="flex items-center justify-between px-2">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {/* {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} row(s) selected. */}
+
+          {/* Now I'm goind to show the total number of rows */}
+          Total<strong className="pl-1">{totalItems}</strong>{" "}
+          <span className="text-xs">
+            {from && to && `(${from} to ${to})`}
+          </span>
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
 

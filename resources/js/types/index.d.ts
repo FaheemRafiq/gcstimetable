@@ -5,12 +5,18 @@ export type IsActive = "active" | "inactive";
 
 interface Role {
     id: number;
+    guard_name: string;
     name: string;
+
+    permissions?: Permission[];
+    permissions_count?: number;
 }
 
 interface Permission {
     id: number;
     name: string;
+
+    roles_count?: number;
 }
 
 export interface User {

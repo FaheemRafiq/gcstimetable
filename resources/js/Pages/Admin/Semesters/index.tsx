@@ -33,17 +33,19 @@ export default function IndexPage({
             <Head title="Semesters" />
             <div className="bg-card text-card-foreground border border-border sm:rounded-lg">
                 <div className="p-6">
-                    <h2 className="flex justify-end">
-                        <Button size={"sm"} onClick={() => setOpenCreate(true)}>
-                            Create Semester
-                        </Button>
-                    </h2>
                     <DataTable
                         semesters={semesters}
                         columns={columns}
                         searchFilter
                         pagination
                         isMainListing
+                        create_button={
+                            <h2 className="flex justify-end">
+                                <Button size={"sm"} onClick={() => setOpenCreate(true)}>
+                                    Create Semester
+                                </Button>
+                            </h2>
+                        }
                     />
                 </div>
             </div>

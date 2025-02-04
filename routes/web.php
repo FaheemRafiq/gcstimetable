@@ -7,7 +7,7 @@ use App\Http\Controllers\ProfileController;
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin'       => Route::has('login'),
-        'canRegister'    => Route::has('register')
+        'canRegister'    => Route::has('register'),
     ]);
 });
 
@@ -19,3 +19,4 @@ Route::middleware('auth')->group(function (): void {
 
 require __DIR__.'/admin.php';
 require __DIR__.'/auth.php';
+require __DIR__.'/permission.php';

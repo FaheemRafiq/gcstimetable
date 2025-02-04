@@ -34,11 +34,6 @@ export default function Rooms({
             <Head title="Departments" />
             <div className="bg-card text-card-foreground border border-border sm:rounded-lg">
                 <div className="p-6">
-                    <h2 className="flex justify-end">
-                        <Button size={"sm"} onClick={() => setOpenCreate(true)}>
-                            Create Department
-                        </Button>
-                    </h2>
                     <DataTable
                         data={departments}
                         columns={columns}
@@ -47,6 +42,13 @@ export default function Rooms({
                             filterColumn: "name",
                             pagination: true,
                         }}
+                        create_button={
+                            <h2 className="flex justify-end">
+                                <Button size={"sm"} onClick={() => setOpenCreate(true)}>
+                                    Create Department
+                                </Button>
+                            </h2>
+                        }
                     />
                 </div>
             </div>

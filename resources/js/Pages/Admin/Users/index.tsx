@@ -27,7 +27,9 @@ export default function Users({
             <div className="bg-card border border-border text-foreground sm:rounded-lg">
                 <div className="p-6">
 
-                    <UserFilters />
+                    <div className="mb-4">
+                        <UserFilters />
+                    </div>
 
                     <DataTable
                         data={users.data}

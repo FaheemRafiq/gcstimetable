@@ -34,15 +34,15 @@ class TeacherController extends Controller
         $rank           = $request->query('rank');
 
         $queyBuilder
-        ->when($search, function ($query) use ($search) {
-            $query->where(function ($wQuery) use ($search) {
-                $wQuery->where('email', 'LIKE', "%$search%")
-                ->orWhere("name", "LIKE", "%$search%");
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($wQuery) use ($search) {
+                    $wQuery->where('email', 'LIKE', "%$search%")
+                        ->orWhere('name', 'LIKE', "%$search%");
+                });
+            })
+            ->when($rank, function ($query, $rank) {
+                $query->where('rank', $rank);
             });
-        })
-        ->when($rank, function ($query, $rank) {
-            $query->where('rank', $rank);
-        });
 
         if ($admin->isInstitutionAdmin()) {
             $queyBuilder
@@ -55,7 +55,7 @@ class TeacherController extends Controller
                 ->with('department.institution');
         }
 
-        $teachers = $queyBuilder->paginate($request->input('perPage', config('providers.pagination.per_page')));
+        $teachers = $queyBuilder->with('department.institution:id,name')->paginate($request->input('perPage', config('providers.pagination.per_page')));
 
         return Inertia::render('Admin/Teachers/index', [
             'teachers'       => TeacherResource::collection($teachers)->withQuery($request->query()),
