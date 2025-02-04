@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useForm, usePage } from "@inertiajs/react";
+import { useForm } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -15,7 +15,6 @@ import {
 import InputError from "@/Components/InputError";
 import { Course } from "@/types/database";
 import { fetchWrapper } from "@/lib/fetchWrapper";
-import { AutoCompleteSelect } from "@/components/combobox";
 import toast from "react-hot-toast";
 import MultipleSelector from "@/components/ui/multi-select";
 

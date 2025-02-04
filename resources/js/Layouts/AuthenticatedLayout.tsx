@@ -37,6 +37,7 @@ export default function Authenticated({
                         className={cn(
                             "flex flex-1 flex-col p-4 pt-0 overflow-y-auto"
                         )}
+                        scroll-region="true"
                     >
                         {children}
                     </div>

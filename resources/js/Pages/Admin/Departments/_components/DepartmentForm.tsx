@@ -110,6 +110,10 @@ export const DepartmentForm: React.FC<DepartmentFormProps> = ({
                     ...response,
                     isFetched: true,
                 });
+
+                if(response.institutions && response.institutions.length > 0) {
+                    setData('institution_id', response.institutions[0].id);
+                }
             })
             .catch((error) => {
                 console.error(error);
