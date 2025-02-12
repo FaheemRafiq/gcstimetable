@@ -13,7 +13,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(PermissionEnum::VIEW_USERS);
     }
 
     /**
@@ -35,9 +35,11 @@ class UserPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, User $model): bool
+    public function update(User $user, User $model): Response
     {
-        return $user->can(PermissionEnum::EDIT_USER->value) || $user->id === $model->id;
+        return $user->can(PermissionEnum::EDIT_USER->value) || $user->id === $model->id
+            ? Response::allow()
+            : Response::deny(config('providers.permission.action.error'));
     }
 
     /**
@@ -53,16 +55,10 @@ class UserPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, User $model): bool
+    public function manage_roles(User $user): Response
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, User $model): bool
-    {
-        return false;
+        return $user->can(PermissionEnum::MANAGE_USER_ROLES)
+            ? Response::allow()
+            : Response::deny('You do not have permission to manage user roles.');
     }
 }

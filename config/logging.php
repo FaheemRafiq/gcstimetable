@@ -190,6 +190,20 @@ return [
             'level'  => 'debug',
             'days'   => 30,
         ],
+
+        'roles' => [
+            'driver' => 'single',
+            'path'   => storage_path('logs/'.now()->toDateString().'/roles.log'),
+            'level'  => 'debug',
+            'days'   => 30,
+        ],
+
+        'users' => [
+            'driver' => 'single',
+            'path'   => storage_path('logs/'.now()->toDateString().'/users.log'),
+            'level'  => 'debug',
+            'days'   => 30,
+        ],
     ],
 
 ];

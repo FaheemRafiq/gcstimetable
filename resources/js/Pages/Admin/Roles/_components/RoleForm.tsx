@@ -1,177 +1,122 @@
-import React, { Fragment, useEffect } from "react";
-import { FormSheet } from "@/Components/FormSheet";
-import { useForm } from "@inertiajs/react";
-import toast from "react-hot-toast";
-import { Department, Program, Room } from "@/types/database";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { router, useForm } from '@inertiajs/react'
+import { Role, Permission } from '@/types'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import InputError from '@/Components/InputError'
+import toast from 'react-hot-toast'
+import { useAbilities } from '@/components/abilities-provider'
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import InputError from "@/Components/InputError";
-import { Role, Shift } from "@/types";
-import { fetchWrapper } from "@/lib/fetchWrapper";
-import { AutoCompleteSelect } from "@/components/combobox";
-
-interface FormProps {
-    name: string;
-    guard_name: string;
-}
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { PermissionCheckboxList } from '@/Components/PermissionList'
+import { cn } from '@/lib/utils'
 
 interface RoleFormProps {
-    role?: Role;
-    open?: boolean | undefined;
-    onClose?: () => void;
+  role?: Role
+  permissions: Permission[]
+  institutions?: { key: number; value: string }[]
 }
 
-export const RoleForm: React.FC<RoleFormProps> = ({
-    role,
-    open: openProp = undefined,
-    onClose,
-}) => {
-    // Constants
-    const isEditForm = role !== undefined;
+function RoleForm({ role, permissions, institutions }: RoleFormProps) {
+  const { isSuperAdmin } = useAbilities()
+  const isEditForm = !!role
 
-    // State
-    const [open, setOpen] = React.useState(false);
+  const { data, setData, post, put, errors, processing, reset } = useForm({
+    name: role?.name || '',
+    guard_name: 'web',
+    institution_id: role?.institution_id || null,
+    permissions: role?.permissions?.map(p => p.id) || [],
+  })
 
-    const { data, post, put, errors, processing, reset, setData, setError } =
-        useForm<FormProps>({
-            name: "",
-            guard_name: "web",
-        });
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const routePath = isEditForm ? route('roles.update', role!.id) : route('roles.store')
+    const method = isEditForm ? put : post
 
-    useEffect(() => {
-        if (openProp !== undefined) {
-            setOpen(openProp);
-        }
-    }, [openProp]);
+    method(routePath, {
+      preserveState: true,
+      onSuccess: () => {
+        reset()
+      },
+      onError: error => {
+        if (error.message) toast.error(error.message)
+      },
+    })
+  }
 
-    useEffect(() => {
-        if (isEditForm && role) {
-            setData((data) => ({
-                ...data,
-                name: role.name,
-                code: role.guard_name
-            }));
-        }
-    }, [role]);
-
-    // Clear errors when data changes
-    useEffect(() => {
-        if (errors && data) {
-            Object.keys(errors).forEach((key) => {
-                if (key === "duration") {
-                    return;
-                }
-
-                if (
-                    errors[key as keyof FormProps] &&
-                    data[key as keyof FormProps]
-                ) {
-                    setError(key as keyof FormProps, "");
-                }
-            });
-        }
-    }, [data]);
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        const fullRoute = isEditForm
-            ? route("roles.update", role.id)
-            : route("roles.store");
-        const method = isEditForm ? put : post;
-
-        method(fullRoute, {
-            preserveState: true,
-            onSuccess: () => {
-                reset();
-                setOpen(false);
-                onClose?.();
-            },
-            onError: (error) => {
-                if (error.message) {
-                    toast.error(error.message);
-                }
-            },
-        });
-    };
-
-    function handleOpen(value: boolean) {
-        setOpen(value);
-
-        if (value === false) {
-            onClose?.();
-        }
-    }
-
-    return (
-        <Fragment>
-            {openProp === undefined && (
-                <Button onClick={() => setOpen(true)} size="sm">
-                    {isEditForm ? "Edit" : "Create"} Role
-                </Button>
-            )}
-
-            <FormSheet
-                open={open}
-                setOpen={handleOpen}
-                title={
-                    isEditForm
-                        ? `Edit Role: ${role?.name}`
-                        : "Create Role"
-                }
-                description={`Fill the required fields to ${
-                    isEditForm ? "update the role." : "create a new role."
-                }`}
-                footerActions={
-                    <Button
-                        disabled={processing}
-                        size="sm"
-                        type="submit"
-                        form="roleForm" // Attach button to form
-                    >
-                        Save
-                    </Button>
-                }
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <Card className="w-full bg-white rounded-lg dark:bg-background">
+        <CardHeader>
+          <CardTitle>{isEditForm ? 'Edit Role' : 'Create Role'}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div
+              className={cn('col-span-2', {
+                'col-span-2 md:col-span-1': isSuperAdmin(),
+              })}
             >
-                <form
-                    id="roleForm"
-                    onSubmit={handleSubmit}
-                    className="flex flex-col gap-4"
-                >
-                    {/* Name Field */}
-                    <div>
-                        <Label htmlFor="name">Name</Label>
-                        <Input
-                            id="name"
-                            value={data.name}
-                            placeholder="Enter role name"
-                            onChange={(e) => setData("name", e.target.value)}
-                        />
-                        <InputError message={errors.name} />
-                    </div>
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                value={data.name}
+                placeholder="Enter role name"
+                onChange={e => setData('name', e.target.value)}
+              />
+              <InputError message={errors.name} />
+            </div>
 
-                    {/* Guard Name */}
-                    <div>
-                        <Label htmlFor="name">Guard Name</Label>
-                        <Input
-                            id="guard_name"
-                            value={data.guard_name}
-                            placeholder="Enter guard name"
-                            onChange={(e) => setData("guard_name", e.target.value)}
-                            disabled
-                        />
-                        <InputError message={errors.guard_name} />
-                    </div>
-                </form>
-            </FormSheet>
-        </Fragment>
-    );
-};
+            {isSuperAdmin() ? (
+              <div className="col-span-2 md:col-span-1">
+                <Label className="text-sm font-medium">Select Type</Label>
+                <Select
+                  value={data.institution_id?.toString() ?? 'null'}
+                  onValueChange={value => setData('institution_id', Number(value))}
+                >
+                  <SelectTrigger id="type">
+                    <SelectValue placeholder="Select Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={'null'}>All</SelectItem>
+
+                    {institutions?.map(({ key, value }) => (
+                      <SelectItem key={key} value={key.toString()}>
+                        {value}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : null}
+
+            <div className="col-span-2">
+              <Label className="text-sm font-medium">Assign Permissions</Label>
+              <PermissionCheckboxList
+                permissions={permissions}
+                selectedPermissions={data.permissions}
+                onToggle={ids => setData('permissions', ids)}
+              />
+            </div>
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-end gap-3">
+          <Button variant="outline" type="button" onClick={() => router.get(route('roles.index'))}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={processing}>
+            {isEditForm ? 'Update' : 'Save'}
+          </Button>
+        </CardFooter>
+      </Card>
+    </form>
+  )
+}
+
+export default RoleForm

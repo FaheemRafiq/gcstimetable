@@ -26,7 +26,8 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
                    $entry->isFailedRequest()       ||
                    $entry->isFailedJob()           ||
                    $entry->isScheduledTask()       ||
-                   $entry->hasMonitoredTag();
+                   $entry->hasMonitoredTag()       ||
+                   ($entry->isRequest() && str_contains($entry->content['uri'], 'manifest'));
         });
     }
 

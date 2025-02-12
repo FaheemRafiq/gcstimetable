@@ -3,12 +3,18 @@
 namespace App\Http\Controllers;
 
 use Inertia\Inertia;
+use App\Enums\RoleEnum;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller
 {
     public const ONLY = ['index', 'store', 'update', 'destroy'];
+
+    public function __construct()
+    {
+        $this->middleware('role:'.RoleEnum::SUPER_ADMIN->value);
+    }
 
     /**
      * Display a listing of the resource.

@@ -62,6 +62,16 @@ class ProgramSeeder extends Seeder
         ];
 
         // Create records for programs using the array
+
+        // First For Institute 1
+        $this->createPrograms($programs, 1);
+
+        // Second For Institute 2
+        $this->createPrograms($programs, 2);
+    }
+
+    protected function createPrograms($programs, $institution_id)
+    {
         foreach ($programs as $programData) {
             $pcode = $programData['pcode'];
             $pname = $programData['name'];
@@ -75,7 +85,7 @@ class ProgramSeeder extends Seeder
             Program::create([
                 'name'          => $pname,
                 'code'          => $pcode,
-                'department_id' => Department::where('code', $programData['dcode'])->first()->id,
+                'department_id' => Department::where(['code' => $programData['dcode'], 'institution_id' => $institution_id])->first()->id,
                 'type'          => $pType,
                 'shift_id'      => $programData['shift_id'],
             ]);

@@ -1,5 +1,5 @@
-import DataTable from "./DataTable";
-import { SemesterForm } from "./SemesterForm";
-import { SemesterAttachForm } from "./SemesterAttachCourses";
+import DataTable from './DataTable'
+import { SemesterForm } from './SemesterForm'
+import { SemesterAttachForm } from './SemesterAttachCourses'
 
-export { DataTable, SemesterForm, SemesterAttachForm };
+export { DataTable, SemesterForm, SemesterAttachForm }

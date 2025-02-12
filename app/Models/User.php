@@ -8,10 +8,12 @@ use App\Traits\RoleTrait;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\PermissionRegistrar;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -58,6 +60,44 @@ class User extends Authenticatable implements MustVerifyEmail
             if (is_null($user->institution_id) && $user->email != 'sadmin@gmail.com') {
                 throw new Exception('User must belongs to an instituion.');
             }
+        });
+    }
+
+    /**
+     * A model may have multiple roles.
+     */
+    public function roles(): BelongsToMany
+    {
+        $relation = $this->morphToMany(
+            config('permission.models.role'),
+            'model',
+            config('permission.table_names.model_has_roles'),
+            config('permission.column_names.model_morph_key'),
+            app(PermissionRegistrar::class)->pivotRole
+        );
+
+        // If teams are not enabled, simply return the relation.
+        if (! app(PermissionRegistrar::class)->teams) {
+            return $relation;
+        }
+
+        $teamsKey = app(PermissionRegistrar::class)->teamsKey;
+        // Ensure the pivot data contains the team key.
+        $relation->withPivot($teamsKey);
+
+        $teamField = config('permission.table_names.roles').'.'.$teamsKey;
+
+        // When no team is set, return only global roles.
+        if (is_null(getPermissionsTeamId())) {
+            return $relation->wherePivot($teamField, null);
+        }
+
+        // Otherwise, return both:
+        // - Global roles (pivot team_id is null), and
+        // - Roles assigned to the current team.
+        return $relation->where(function ($query) use ($teamField) {
+            $query->whereNull($teamField)
+                ->orWhere($teamField, getPermissionsTeamId());
         });
     }
 

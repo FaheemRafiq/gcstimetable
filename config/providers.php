@@ -24,5 +24,10 @@ return [
                 'You do not have permission to view this resource.',
             ],
         ],
+        'view_any' => [
+            'error' => [
+                'You do not have permission to view any resources.',
+            ],
+        ],
     ],
 ];

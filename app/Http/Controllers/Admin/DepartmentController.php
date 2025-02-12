@@ -9,9 +9,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Request;
 use App\Http\Requests\DepartmentRequest;
 use App\Http\Resources\DepartmentResource;
-use Illuminate\Support\Facades\Request;
 
 class DepartmentController extends Controller
 {
@@ -21,12 +21,12 @@ class DepartmentController extends Controller
     {
         $admin = Auth::user();
         try {
-            $departments = [];
+            $departments  = [];
             $queryBuilder = Department::query()->with('institution:id,name');
-            $per_page = Request::input('per_page', config('providers.pagination.per_page'));
-            $search = Request::input('s');
+            $per_page     = Request::input('per_page', config('providers.pagination.per_page'));
+            $search       = Request::input('s');
 
-            if (!$admin->isSuperAdmin()) {
+            if (! $admin->isSuperAdmin()) {
                 $queryBuilder->where('institution_id', $admin->institution_id);
             }
 
@@ -55,8 +55,8 @@ class DepartmentController extends Controller
 
     public function create()
     {
-        $response    = Gate::inspect('create', Department::class);
-        $message     = '';
+        $response     = Gate::inspect('create', Department::class);
+        $message      = '';
         $institutions = Institution::all();
 
         if ($response->allowed()) {

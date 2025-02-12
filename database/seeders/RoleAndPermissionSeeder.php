@@ -19,8 +19,8 @@ class RoleAndPermissionSeeder extends Seeder
         $superadmin_role       = Role::create(['name' => RoleEnum::SUPER_ADMIN->value]);
         $institute_admin_role  = Role::create(['name' => RoleEnum::INSTITUTION_ADMIN->value]);
         $department_admin_role = Role::create(['name' => RoleEnum::DEPARTMENT_ADMIN->value]);
-        $student_role          = Role::create(['name' => RoleEnum::STUDENT->value]);
-        $teacher_role          = Role::create(['name' => RoleEnum::TEACHER->value]);
+        // $student_role          = Role::create(['name' => RoleEnum::STUDENT->value]);
+        // $teacher_role          = Role::create(['name' => RoleEnum::TEACHER->value]);
 
         // Create Permissions for Modules
 
@@ -41,8 +41,8 @@ class RoleAndPermissionSeeder extends Seeder
 
         $superadmin_role->givePermissionTo(Permission::all()->pluck('name')->toArray());
 
-        $institute_admin_role->givePermissionTo(Permission::whereNotLike('name', 'institute')->pluck('name')->toArray());
+        $institute_admin_role->givePermissionTo(Permission::whereNotLike('name', '%institute%')->whereNotLike('name', '%permission%')->pluck('name')->toArray());
 
-        $department_admin_role->givePermissionTo(Permission::whereLike('name', 'teacher')->orWhereLike('name', 'student')->pluck('name')->toArray());
+        $department_admin_role->givePermissionTo(Permission::whereNotLike('name', '%institute%')->whereNotLike('name', '%department%')->whereNotLike('name', '%role%')->whereNotLike('name', '%permission%')->pluck('name')->toArray());
     }
 }

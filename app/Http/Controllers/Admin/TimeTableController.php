@@ -22,13 +22,9 @@ class TimeTableController extends Controller
         $queryBuilder   = TimeTable::query();
         $tables         = [];
 
-        if ($admin->isInstitutionAdmin()) {
-            $queryBuilder->whereHas('institution', function ($query) use ($admin): void {
+        if ($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()) {
+            $queryBuilder->whereHas('institution', function ($query) use ($admin) {
                 $query->where('institutions.id', $admin->institution_id);
-            });
-        } elseif ($admin->isDepartmentAdmin()) {
-            $$queryBuilder->whereHas('institution.department', function ($query) use ($admin): void {
-                $query->where('departments.id', $admin->department_id);
             });
         }
 

@@ -14,12 +14,17 @@ class CourseSemesterSeeder extends Seeder
     public function run(): void
     {
         // Retrieve all courses and semesters
-        $semesters = Semester::all();
+        $semesters = Semester::with('program.department')->get();
         $courses   = Course::all();
 
         $semesters->each(function ($semester) use ($courses) {
             // Ensure we get a fresh collection for random selection
-            $randomCourses = $courses->shuffle()->take(rand(5, 6));
+            $randomCourses = $courses
+                ->filter(function ($course) use ($semester) {
+                    return $course->institution_id == $semester->program->department->institution_id;
+                })
+                ->shuffle()
+                ->take(rand(5, 7));
 
             // Attach the selected random courses to the semester
             $semester->courses()->syncWithoutDetaching($randomCourses->pluck('id'));

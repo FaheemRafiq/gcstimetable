@@ -1,36 +1,30 @@
-import { Pie, PieChart } from "recharts";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Pie, PieChart } from 'recharts'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart";
+} from '@/components/ui/chart'
 
 // Define the shape of the chart data
 interface ChartData {
-  name: string;
-  value: number;
-  fill: string;
+  name: string
+  value: number
+  fill: string
 }
 
 // Define the chart configuration type
 interface ChartConfigType extends ChartConfig {
   [key: string]: {
-    label: string;
-    color?: string;
-  };
+    label: string
+    color?: string
+  }
 }
 
 // Props for the component
 interface PieChartCardProps {
-  courseTypes: { [key: string]: number }; // Pass courseTypes from the backend
+  courseTypes: { [key: string]: number } // Pass courseTypes from the backend
 }
 
 export function PieChartCard({ courseTypes }: PieChartCardProps) {
@@ -39,19 +33,16 @@ export function PieChartCard({ courseTypes }: PieChartCardProps) {
     name: key,
     value: courseTypes[key],
     fill: `hsl(var(--chart-${index + 1}))`, // Dynamic fill colors
-  }));
+  }))
 
   // Chart configuration
-  const chartConfig: ChartConfigType = Object.keys(courseTypes).reduce(
-    (config, key, index) => {
-      config[key] = {
-        label: key,
-        color: `hsl(var(--chart-${index + 1}))`,
-      };
-      return config;
-    },
-    {} as ChartConfigType
-  );
+  const chartConfig: ChartConfigType = Object.keys(courseTypes).reduce((config, key, index) => {
+    config[key] = {
+      label: key,
+      color: `hsl(var(--chart-${index + 1}))`,
+    }
+    return config
+  }, {} as ChartConfigType)
 
   return (
     <Card className="flex flex-col">
@@ -60,15 +51,9 @@ export function PieChartCard({ courseTypes }: PieChartCardProps) {
         <CardDescription>Distribution of Course Types</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
-        >
+        <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
           <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
             <Pie
               data={chartData}
               dataKey="value"
@@ -83,5 +68,5 @@ export function PieChartCard({ courseTypes }: PieChartCardProps) {
         </ChartContainer>
       </CardContent>
     </Card>
-  );
+  )
 }

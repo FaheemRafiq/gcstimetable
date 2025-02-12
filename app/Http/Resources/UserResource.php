@@ -22,6 +22,7 @@ class UserResource extends JsonResource
             'verifiedAt' => $this->email_verified_at?->format(config('providers.date.readable')),
 
             'profilePhotoUrl' => $this->profile_photo_url,
+            'department_id'   => $this->department_id,
             'label'           => $this->label,
             'roles'           => RoleResource::collection($this->roles),
             'permissions'     => PermissionResource::collection($this->getAllPermissions()),

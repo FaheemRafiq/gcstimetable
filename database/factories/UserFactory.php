@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\User;
-use App\Enums\RoleEnum;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -40,7 +39,10 @@ class UserFactory extends Factory
     public function configure(): static
     {
         return $this->afterCreating(function (User $user) {
-            $user->assignRole(rand(0, 1) ? RoleEnum::STUDENT : RoleEnum::TEACHER);
+            if ($user->roles()->exists() || !is_null($user->institution_id) || $user->email === 'sadmin@gmail.com') {
+                return;
+            }
+
             $user->institution_id = rand(1, 2);
 
             $user->save();

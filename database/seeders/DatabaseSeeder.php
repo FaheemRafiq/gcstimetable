@@ -14,9 +14,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(RoleAndPermissionSeeder::class);
 
-        $superadmin_role       = Role::where('name', RoleEnum::SUPER_ADMIN)->first();
-        $institute_admin_role  = Role::where('name', RoleEnum::INSTITUTION_ADMIN)->first();
-        $department_admin_role = Role::where('name', RoleEnum::DEPARTMENT_ADMIN)->first();
+        $superadmin_role       = Role::where('name', RoleEnum::SUPER_ADMIN->value)->first();
+        $institute_admin_role  = Role::where('name', RoleEnum::INSTITUTION_ADMIN->value)->first();
+        $department_admin_role = Role::where('name', RoleEnum::DEPARTMENT_ADMIN->value)->first();
 
         // Institutions
         $this->call(InstitutionSeeder::class);
@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
                 'name'     => 'superadmin',
                 'email'    => 'sadmin@gmail.com',
                 'password' => 'asdf1234',
+                'institution_id' => null,
             ]);
 
         $superAdmin->assignRole($superadmin_role);
