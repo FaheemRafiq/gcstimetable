@@ -34,7 +34,7 @@ class ProgramSeeder extends Seeder
 
             ['name' => 'Msc Mathematics', 'pcode' => 'Msc-MATH', 'dcode' => 'MATH'],
             ['name' => 'Msc Physics', 'pcode' => 'Msc-PHY', 'dcode' => 'PHY'],
-            ['name' => 'Msc Chemistry', 'pcode' => 'Msc-CHEM', 'dcode' => 'Chem'],
+            ['name' => 'Msc Chemistry', 'pcode' => 'Msc-CHEM', 'dcode' => 'CHEM'],
 
             // BS Evening Shift = 3
             ['name' => 'BS BSCS', 'pcode' => 'BS-BSCS', 'dcode' => 'BSCS'],
@@ -58,7 +58,7 @@ class ProgramSeeder extends Seeder
 
             ['name' => 'Msc Mathematics', 'pcode' => 'Msc-MATH', 'dcode' => 'MATH',   'type' => 'ADP'],
             ['name' => 'Msc Physics', 'pcode' => 'Msc-PHY', 'dcode' => 'PHY',   'type' => 'ADP'],
-            ['name' => 'Msc Chemistry', 'pcode' => 'Msc-CHEM', 'dcode' => 'Chem',   'type' => 'ADP'],
+            ['name' => 'Msc Chemistry', 'pcode' => 'Msc-CHEM', 'dcode' => 'CHEM',   'type' => 'ADP'],
         ];
 
         // First For Institute 1
@@ -78,7 +78,7 @@ class ProgramSeeder extends Seeder
             $pType = $programData['type'] ?? 'BS';
             // get a random shift
             $shift      = $institution->shifts->random();
-            $department = $institution->departments->where(['code' => $programData['dcode'], 'institution_id' => $institution_id])->first();
+            $department = $institution->departments->where('institution_id', $institution_id)->whereIn('code', [$programData['dcode']])->first();
 
             if (str_contains($pcode, 'Inter')) {
                 $pType = 'INTER';
