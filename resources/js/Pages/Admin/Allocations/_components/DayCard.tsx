@@ -2,34 +2,36 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 import { Day } from '@/types/database'
 import {
-  dayCardClasses,
-  getBackgroundColor,
-  getBorderColor,
-  getShadowColor,
+  getBackgroundColor
 } from '@/utils/dayHelper'
+import { Badge } from '@/components/ui/badge'
 
-interface DayCardProps extends React.HTMLAttributes<HTMLDivElement> {
+type DayCardProps = {
   day: Day
   selected: boolean
   children: React.ReactNode
+  onClick: () => void
 }
 
-const DayCard: React.FC<DayCardProps> = ({ day, selected, children, className, ...props }) => {
+const DayCard = ({ day, selected, children, onClick }: DayCardProps) => {
   return (
     <div
-      key={day.id}
-      {...props}
+      onClick={onClick}
       className={cn(
-        `relative text-center min-h-[120px] h-full overflow-hidden border rounded-lg transition-all duration-300`,
-        className,
-        getBorderColor(day.name),
-        selected && `scale-110 shadow-md ${getShadowColor(day.name)}`
+        "relative h-full min-h-[150px] rounded-lg border transition-all duration-200",
+        "hover:shadow-md hover:border-primary/50",
+        selected ? "border-primary bg-primary/5" : "border-border bg-background"
       )}
     >
-      <div className={cn('text-center font-semibold', getBackgroundColor(day.name))}>
-        {day.name}
+      <div className="absolute top-2 left-2">
+        <Badge
+          variant="outline"
+          className={cn("font-semibold", getBackgroundColor(day.name))}
+        >
+          {day.name}
+        </Badge>
       </div>
-      <div className={cn('flex items-start justify-center h-full cursor-pointer')}>{children}</div>
+      {children}
     </div>
   )
 }

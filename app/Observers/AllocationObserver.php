@@ -26,7 +26,6 @@ class AllocationObserver
 
     public function validateAllocation(Allocation $allocation, string $action): void
     {
-        auth()->user()->institution_id;
         /**
          * Required in Request Validation
          * 1. Time Table
@@ -34,8 +33,9 @@ class AllocationObserver
          * 3. Section
          */
         $excludeId = $action === 'update' ? $allocation->id : null;
-        $allocation->load('slot');
-        $currentSlot = $allocation->slot;
+        $allocation->load('slot', 'timetable.shift');
+        $currentSlot   = $allocation->slot;
+        $institutionId = $allocation->timetable->shift->institution_id;
 
         if (! $allocation->hasDay()) {
             throw new AllocationException('Allocation must have a day.');
@@ -58,7 +58,7 @@ class AllocationObserver
             $roomConflict = Allocation::where('room_id', $allocation->room_id)
                 ->conflictForDayAndTime($allocation->day_id, $currentSlot->start_time, $currentSlot->end_time)
                 ->excludeById($excludeId)
-                // ->whereInstitutionId($institutionId)
+                ->whereInstitutionId($institutionId)
                 ->exists();
 
             if ($roomConflict) {
@@ -71,7 +71,7 @@ class AllocationObserver
             $teacherConflict = Allocation::where('teacher_id', $allocation->teacher_id)
                 ->conflictForDayAndTime($allocation->day_id, $currentSlot->start_time, $currentSlot->end_time)
                 ->excludeById($excludeId)
-                // ->whereInstitutionId($institutionId)
+                ->whereInstitutionId($institutionId)
                 ->exists();
 
             if ($teacherConflict) {
@@ -84,7 +84,7 @@ class AllocationObserver
             $sectionConflict = Allocation::whereSection($allocation->section_id)
                 ->conflictForDayAndTime($allocation->day_id, $currentSlot->start_time, $currentSlot->end_time)
                 ->excludeById($excludeId)
-                // ->whereInstitutionId($institutionId)
+                ->whereInstitutionId($institutionId)
                 ->exists();
 
             if ($sectionConflict) {
@@ -97,7 +97,7 @@ class AllocationObserver
             $sectionTimeTableConflict = Allocation::whereSection($allocation->section_id)
                 ->where('time_table_id', '!=', $allocation->time_table_id)
                 ->excludeById($excludeId)
-                // ->whereInstitutionId($institutionId)
+                ->whereInstitutionId($institutionId)
                 ->exists();
 
             if ($sectionTimeTableConflict) {
@@ -109,7 +109,7 @@ class AllocationObserver
         if ($allocation->shouldCheckDuplicate()) {
             $duplicate = $allocation->duplicate()
                 ->excludeById($excludeId)
-                // ->whereInstitutionId($institutionId)
+                ->whereInstitutionId($institutionId)
                 ->exists();
 
             if ($duplicate) {

@@ -21,7 +21,7 @@ export default function Rooms({ auth, shifts }: PageProps<{ shifts: Shift[] }>) 
       <Head title="Shifts" />
       <div className="bg-card text-card-foreground border border-border sm:rounded-lg">
         <div className="p-6">
-          =
+          
           <DataTable
             data={shifts}
             columns={columns}

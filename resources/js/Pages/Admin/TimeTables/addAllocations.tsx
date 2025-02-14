@@ -1,31 +1,64 @@
-import { useState, useEffect } from 'react'
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
+import { useState, useEffect, useMemo } from 'react'
 import { Head } from '@inertiajs/react'
-import { PageProps, Shift, TimeStamp, TimeTable } from '@/types'
-import { router, useForm, Link } from '@inertiajs/react'
-import { ArrowUpRight, Plus } from 'lucide-react'
-import Tooltip from '@/components/ui/tooltip'
+import { router, Link } from '@inertiajs/react'
+import { ArrowUpRight, Calendar, Plus } from 'lucide-react'
 import { getRomanNumber } from '@/utils/helper'
-import { Allocation, Section, Slot } from '@/types/database'
-import { AllocationCell } from './Partials/AllocationCell'
+import { PageProps, TimeTable } from '@/types'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Button } from '@/components/ui/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
+import { AllocationCell, GroupAllocationCell } from './_components/AllocationCell'
+import { Allocation, Section } from '@/types/database'
+import {
+  Column,
+  ColumnPinningState,
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
 import { useBreadcrumb } from '@/components/providers/breadcrum-provider'
+import { random } from 'lodash'
+import { cn } from '@/lib/utils'
+import { useIsMobile } from '@/hooks/use-mobile'
 
-export default function AddAllocationsTimeTable({
+export default function TimeTableView({
   auth,
   timetable,
   sections,
 }: PageProps<{ timetable: TimeTable; sections: Section[] }>) {
   const { setBreadcrumb } = useBreadcrumb()
+  const isMobile = useIsMobile();
 
   // state
   const [allocations, setAllocations] = useState<Allocation[]>([])
+  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({
+    left: [],
+    right: [],
+  })
 
   useEffect(() => {
-    if (timetable?.allocations?.length) {
-      setAllocations(timetable.allocations)
+    if (isMobile) {
+      setColumnPinning({
+        left: [],
+        right: [],
+      })
+    } else {
+      setColumnPinning({
+        left: ['section'],
+        right: [],
+      })
     }
+  }, [isMobile]);
 
+  useEffect(() => {
     setBreadcrumb({
       title: timetable?.title ?? 'Add Allocations',
       backItems: [
@@ -37,164 +70,272 @@ export default function AddAllocationsTimeTable({
     })
   }, [timetable])
 
-  function getAllocations(slotId: number, sectionId: number) {
-    let arrayOfAllocations = allocations.filter(
-      allocation => allocation.slot_id === slotId && allocation.section_id === sectionId
-    )
-
-    if (arrayOfAllocations.length > 0) {
-      arrayOfAllocations.sort((acc, curr) => Number(acc.day?.number) - Number(curr.day?.number))
+  useEffect(() => {
+    if (timetable?.allocations?.length) {
+      setAllocations(timetable.allocations)
     }
+  }, [timetable])
 
-    return arrayOfAllocations
+  const getAllocations = (slotId: number, sectionId: number) => {
+    let filteredAllocations = allocations
+      .filter(
+        allocation => allocation.slot_id === slotId && allocation.section_id === sectionId
+      )
+      .sort((a, b) => Number(a.day?.number) - Number(b.day?.number));
+
+    return groupAllocations(filteredAllocations);
   }
 
-  function handleCreateAllocation(slot_id: number, section_id = null as any) {
-    let params: any = {
+  const groupAllocations = (allocations: Allocation[]) => {
+    const groupedMap = allocations.reduce<Record<string, any>>((acc, allocation) => {
+      // Create a unique key based on teacher_id, course_id, and room_id
+      const key = `${allocation.teacher_id}-${allocation.course_id}-${allocation.room_id}`;
+
+      // If the key doesn't exist in the map, initialize it with an empty array
+      if (!acc[key]) {
+        acc[key] = {
+          ...allocation,
+          days: [],
+        };
+      }
+
+      // Add the day to the group
+      acc[key].days.push(allocation.day);
+
+      return acc;
+    }, {});
+
+    // Convert the map into an array of groups
+    return Object.values(groupedMap);
+  };
+
+  const handleCreateAllocation = (slot_id: number, section_id?: number) => {
+    const params: any = {
       time_table_id: timetable.id,
-      slot_id: slot_id,
+      slot_id,
+      ...(section_id && { section_id }),
     }
-
-    if (section_id) {
-      params['section_id'] = section_id
-    }
-
     router.get(route('allocations.create', params))
   }
 
-  function editTimeTableCell(slot_id: number, section_id: number) {
-    router.get(
-      route('allocations.create', {
-        time_table_id: timetable.id,
-        slot_id,
-        section_id,
-      })
-    )
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    })
   }
+
+  const columnHelper = createColumnHelper<any>()
+
+  const columns = useMemo(() => {
+    const baseColumns = [
+      columnHelper.accessor('section', {
+        header: 'Section',
+        size: 200,
+
+        cell: ({ row }) => (
+          <div className="p-4 font-medium text-center">
+            {row.original?.semester?.name} ({row.original?.name})
+          </div>
+        ),
+      }),
+    ]
+
+    // Add slot columns dynamically
+    const slotColumns = timetable.shift?.slots?.map((slot, index) =>
+      columnHelper.accessor(`slot_${slot.id}`, {
+        header: () => (
+          <div className="space-y-2">
+            <div className="font-medium text-center">{getRomanNumber(index + 1)}</div>
+            <div className="text-sm text-muted-foreground text-center">{slot.name}</div>
+          </div>
+        ),
+        size: 250,
+
+        cell: ({ row }) => {
+          const allocs = getAllocations(slot.id, row.original?.id)
+          return (
+            <div className="min-h-[120px] hover:bg-accent/50 transition-colors p-2">
+              {allocs.length > 0 ? (
+                <div
+                  className="h-full w-full cursor-pointer"
+                  onClick={() => handleCreateAllocation(slot.id, row.original?.id)}
+                >
+                  {allocs.map(alloc => {
+                    if (alloc.days.length > 1) {
+                      return (
+                        <GroupAllocationCell key={alloc.id} allocation={alloc} />
+                      )
+                    }
+
+                    return (
+                      <AllocationCell key={alloc.id} allocation={alloc} />
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="h-full w-full flex items-center justify-center">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleCreateAllocation(slot.id, row.original?.id)}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Add Allocation</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              )}
+            </div>
+          )
+        },
+      })
+    ) || []
+
+    return [...baseColumns, ...slotColumns]
+  }, [timetable.shift?.slots, random(1, 1000)])
+
+  const getCommonPinningClasses = (column: Column<any>): object => {
+    const isPinned = column.getIsPinned()
+    const isLastLeftPinnedColumn = isPinned === 'left' && column.getIsLastColumn('left')
+    const isFirstRightPinnedColumn = isPinned === 'right' && column.getIsFirstColumn('right')
+
+    return {
+      'sticky left-0 z-10 opacity-95': isPinned === 'left',
+      'sticky right-0 z-10 opacity-95': isPinned === 'right',
+      'shadow-[inset_-4px_0_4px_-4px_gray] border-r border-border': isLastLeftPinnedColumn,
+      'shadow-[inset_4px_0_4px_-4px_gray] border-l border-border': isFirstRightPinnedColumn,
+      'bg-background': isPinned,
+    }
+  }
+
+  const table = useReactTable({
+    data: sections,
+    columns,
+    state: {
+      columnPinning,
+    },
+    enablePinning: true,
+    enableRowPinning: true,
+    getCoreRowModel: getCoreRowModel(),
+    onColumnPinningChange: setColumnPinning,
+  })
 
   return (
     <AuthenticatedLayout user={auth.user}>
-      <Head title="Add Allocations" />
+      <Head title="Timetable View" />
 
-      <div className="bg-card text-card-foreground border border-border sm:rounded-lg">
-        <div className="p-6 pb-10 flex flex-col">
-          {/* Timetable Information */}
-          <div className="w-full text-center relative">
-            <div className="flex gap-4 justify-center items-center">
-              <h2 className="text-lg font-bold">{timetable.title}</h2>
-              <Tooltip title="Shift" className="cursor-default">
-                <span className="text-sm self-end">{timetable.shift?.name}</span>
-              </Tooltip>
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <div className="text-center flex-1">
+              <div className="flex gap-4 justify-center items-center">
+                <h2 className="text-2xl font-bold">{timetable.title}</h2>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Badge variant="secondary">{timetable.shift?.name}</Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>Shift</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">
+                {timetable.description} 
+                <div className="mt-1 text-xs font-medium">{formatDate(timetable.start_date)} - {formatDate(timetable.end_date)}</div>
+              </p>
             </div>
-            <p className="text-sm mt-2">{timetable.description}</p>
-            <Link
-              href={route('timetables.edit', timetable.id)}
-              className="absolute top-0 right-0 p-2"
-            >
-              <Tooltip title="Edit Time Table">
-                <ArrowUpRight className="text-gray-700 dark:text-foreground" size={20} />
-              </Tooltip>
+            <Link href={route('timetables.edit', timetable.id)}>
+              <Button variant="ghost" size="icon">
+                <ArrowUpRight className="h-4 w-4" />
+              </Button>
             </Link>
           </div>
 
-          <div className="my-4" />
-
-          {/* Timetable Grid */}
-          <div className="overflow-x-auto overflow-y-auto bg-background text-foreground rounded-lg p-3 shadow-md">
-            <div className="grid grid-cols-12 gap-2">
-              {/* Shift Slots Header */}
-              <div className="col-span-12 flex h-10">
-                <p className="flex-1 font-bold text-card-foreground dark:text-foreground text-center h-[50px] w-[150px] min-w-[200px] flex items-center justify-center border-l border-t">
-                  Period
-                </p>
-                {timetable.shift?.slots?.map((slot, index) => (
-                  <p
-                    key={`period-${index}`}
-                    className="flex-1 font-bold text-card-foreground dark:text-foreground text-center h-[50px] w-[150px] min-w-[300px] flex items-center justify-center border-l border-t"
-                  >
-                    {getRomanNumber(index + 1)}
-                  </p>
-                ))}
-              </div>
-
-              {/* Time Header */}
-              <div className="col-span-12 flex h-10">
-                <p className="flex-1 font-bold text-card-foreground dark:text-foreground text-center h-[50px] w-[150px] min-w-[200px] flex items-center justify-center border-l">
-                  Time
-                </p>
-                {timetable.shift?.slots?.map(slot => (
-                  <p
-                    key={slot.id}
-                    className="flex-1 font-bold text-card-foreground dark:text-foreground text-center h-[50px] w-[150px] min-w-[300px] flex items-center justify-center border-l"
-                  >
-                    {slot.name}
-                  </p>
-                ))}
-              </div>
-            </div>
-
-            {/* Action Rows */}
-            <div className="grid grid-cols-12 gap-2">
-              {/* Allocations With Sections */}
-              {sections.length > 0 &&
-                sections.map(section => (
-                  <div key={section.id} className="col-span-12 flex text-center">
-                    <p className="text-sm flex-1 text-center h-auto min-h-[100px] w-[150px] min-w-[200px] flex justify-center items-center border-l">
-                      {section?.semester?.name} ({section.name})
-                    </p>
-
-                    {timetable.shift?.slots?.map(slot => {
-                      let allocs = getAllocations(slot.id, section.id)
-
-                      return allocs.length > 0 ? (
-                        <p
-                          key={slot.id}
-                          className="flex-1 text-center h-auto min-h-[100px] w-[150px] min-w-[300px] flex flex-col items-center justify-center border-l py-5 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-                          onClick={() => editTimeTableCell(slot.id, section.id)}
+          <div className="rounded-md border">
+            <div className={cn("overflow-x-auto", { "max-h-[75vh]": !isMobile })}>
+              <table className="w-full border-collapse">
+                <thead className="sticky top-0 z-10 bg-background border-b">
+                  {table.getHeaderGroups().map(headerGroup => (
+                    <tr key={headerGroup.id}>
+                      {headerGroup.headers.map(header => (
+                        <th
+                          key={header.id}
+                          className={cn("border-r p-4", getCommonPinningClasses(header.column))}
+                          style={{
+                            width: header.getSize(),
+                            minWidth: header.getSize(),
+                          }}
                         >
-                          {allocs.map(alloc => (
-                            <AllocationCell key={alloc.id} allocation={alloc} />
-                          ))}
-                        </p>
-                      ) : (
-                        <p
-                          key={slot.id}
-                          className="flex-1 text-center h-auto min-h-[100px] w-[150px] min-w-[300px] flex items-center justify-center border-l"
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                        </th>
+                      ))}
+                    </tr>
+                  ))}
+                </thead>
+                <tbody>
+                  {table.getRowModel().rows.map(row => (
+                    <tr key={row.id} className="border-b">
+                      {row.getVisibleCells().map(cell => (
+                        <td
+                          key={cell.id}
+                          className={cn("border-r", getCommonPinningClasses(cell.column))}
+                          style={{
+                            width: cell.column.getSize(),
+                            minWidth: cell.column.getSize(),
+                          }}
                         >
-                          <Tooltip title="Add Allocation">
-                            <Button
-                              variant={'ghost'}
-                              onClick={() => handleCreateAllocation(slot.id, section.id)}
-                            >
-                              <Plus size={16} />
-                            </Button>
-                          </Tooltip>
-                        </p>
-                      )
-                    })}
-                  </div>
-                ))}
-
-              {/* Empty Section */}
-              <div className="col-span-12 flex text-center">
-                <p className="flex-1 text-center h-auto min-h-[100px] w-[150px] min-w-[200px]"></p>
-                {timetable.shift?.slots?.map(slot => (
-                  <p
-                    key={slot.id}
-                    className="flex-1 text-center h-auto min-h-[100px] w-[150px] min-w-[300px] flex items-center justify-center border-l"
-                  >
-                    <Tooltip title="Add Allocation">
-                      <Button variant={'ghost'} onClick={() => handleCreateAllocation(slot.id)}>
-                        <Plus size={16} />
-                      </Button>
-                    </Tooltip>
-                  </p>
-                ))}
-              </div>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                  {/* Empty Row for Additional Allocations */}
+                  <tr className="border-b">
+                    <td className="border-r p-4"></td>
+                    {timetable.shift?.slots?.map(slot => (
+                      <td
+                        key={slot.id}
+                        className="border-r"
+                        style={{ width: 250, minWidth: 250 }}
+                      >
+                        <div className="min-h-[120px] flex items-center justify-center">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleCreateAllocation(slot.id)}
+                                >
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Add Allocation</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </AuthenticatedLayout>
   )
 }

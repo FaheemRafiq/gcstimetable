@@ -20,7 +20,6 @@ class TimeTableController extends Controller
     {
         $admin          = Auth::user();
         $queryBuilder   = TimeTable::query();
-        $tables         = [];
 
         if ($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()) {
             $queryBuilder->whereHas('institution', function ($query) use ($admin) {
@@ -29,7 +28,7 @@ class TimeTableController extends Controller
         }
 
         return Inertia::render('Admin/TimeTables/index', [
-            'timeTables' => $queryBuilder->latest()->get(),
+            'timeTables' => $queryBuilder->with('shift')->latest()->get(),
         ]);
     }
 

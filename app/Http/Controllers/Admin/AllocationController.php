@@ -50,13 +50,16 @@ class AllocationController extends Controller
                 'shift.institution.teachers' => function ($query): void {
                     $query->select('teachers.id', 'teachers.name', 'teachers.email', 'teachers.department_id');
                 },
+                'shift.institution.courses' => function ($query): void {
+                    $query->with('semesters:id,name');
+                },
                 'allocations' => fn ($query) => $query->select('section_id', 'time_table_id'),
             ]);
             $removeSections = $timetable->allocations?->groupBy('section_id')->keys()->toArray();
 
             $slot     = Slot::find($request->slot_id);
             $sections = $this->sectionRepository->getAllByShiftId($timetable?->shift_id, $request->input('section_id'));
-            $courses  = $timetable?->shift?->institution?->courses()->with('semesters:id')->get();
+            $courses  = $timetable?->shift?->institution?->courses;
 
             $allocations = [];
 
@@ -70,7 +73,7 @@ class AllocationController extends Controller
             // Remove the semesters relationship from the timetable object
             $timetable?->shift?->setRelation('semesters', collect());
 
-            return Inertia::render('Admin/Allocations/create', [
+            return Inertia::render('Admin/Allocations/create_claude', [
                 'props' => [
                     'timetable'   => $timetable,
                     'slot'        => $slot,

@@ -39,7 +39,7 @@ class UserFactory extends Factory
     public function configure(): static
     {
         return $this->afterCreating(function (User $user) {
-            if ($user->roles()->exists() || !is_null($user->institution_id) || $user->email === 'sadmin@gmail.com') {
+            if ($user->roles()->exists() || ! is_null($user->institution_id) || $user->email === 'sadmin@gmail.com') {
                 return;
             }
 

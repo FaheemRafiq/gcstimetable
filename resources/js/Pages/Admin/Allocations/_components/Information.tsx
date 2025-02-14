@@ -1,23 +1,24 @@
 import { Icon } from '@/components/app-sidebar'
 import React from 'react'
 
-interface InformationProps {
+type InformationProps = {
   icon: Icon
   title: string
   value: string
   jsxValue?: JSX.Element
 }
 
-const Information: React.FC<InformationProps> = ({ icon: Icon, title, value, jsxValue }) => {
+const Information = ({ icon: Icon, title, value, jsxValue }: InformationProps) => {
   return (
-    <div className="mb-4 flex flex-col sm:flex-row">
-      <span className="font-bold sm:w-4/12 lg:w-2/12 flex items-center">
-        <Icon size={18} className="mr-1" />
-        {title}:{' '}
-      </span>
-      <span className="ps-5 sm:ps-0 flex-1">{jsxValue ? jsxValue : value}</span>
+    <div className="flex items-start space-x-3 mb-4">
+      <div className="p-2 rounded-lg bg-primary/10">
+        <Icon className="w-4 h-4 text-primary" />
+      </div>
+      <div>
+        <p className="text-sm text-muted-foreground">{title}</p>
+        {jsxValue || <p className="font-medium">{value}</p>}
+      </div>
     </div>
   )
 }
-
 export default Information

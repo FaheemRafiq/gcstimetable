@@ -117,9 +117,11 @@ class Allocation extends Model
     public function scopeWhereInstitutionId(Builder $query, $institutionId): void
     {
         $query->whereHas('timetable', function (Builder $query) use ($institutionId): void {
-            $query->whereHas('shift', function (Builder $query) use ($institutionId): void {
-                $query->where('institution_id', $institutionId);
-            });
+            $query
+                ->isValidForToday()
+                ->whereHas('shift', function (Builder $query) use ($institutionId): void {
+                    $query->where('institution_id', $institutionId);
+                });
         });
     }
 

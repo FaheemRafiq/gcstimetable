@@ -55,4 +55,9 @@ class Institution extends Model
     {
         return $this->hasMany(Slot::class);
     }
+
+    public function shifts(): HasMany
+    {
+        return $this->hasMany(Shift::class);
+    }
 }

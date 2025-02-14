@@ -276,7 +276,6 @@ class UserController extends Controller
             $user->save();
 
             if ($roles->count() > 0) {
-
                 if ($admin->isSuperAdmin()) {
                     setPermissionsTeamId($user->institution_id);
                 }

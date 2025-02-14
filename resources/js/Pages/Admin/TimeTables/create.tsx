@@ -1,49 +1,17 @@
-import React, { useEffect } from 'react'
-import { FormEventHandler } from 'react'
+import { useEffect } from 'react'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Head } from '@inertiajs/react'
-import { PageProps, Shift, TimeStamp } from '@/types'
-import { router, useForm, Link } from '@inertiajs/react'
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from '@/components/ui/card'
-import TextInput from '@/Components/TextInput'
-import InputLabel from '@/Components/InputLabel'
-import InputError from '@/Components/InputError'
-import toast from 'react-hot-toast'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
+import { PageProps, Shift } from '@/types'
 import { useBreadcrumb } from '@/components/providers/breadcrum-provider'
-
-interface FormProps {
-  title: string
-  description: string
-  shift_id: number | null
-}
+import TimeTableForm from './_components/TimeTableForm'
 
 export default function CreateTimeTable({ auth, shifts }: PageProps<{ shifts: Shift[] }>) {
-  const { data, setData, post, errors, processing, reset } = useForm<FormProps>({
-    title: '',
-    description: '',
-    shift_id: null,
-  })
 
   const { setBreadcrumb } = useBreadcrumb()
 
   useEffect(() => {
     setBreadcrumb({
-      title: 'Create',
+      title: 'Create Time Table',
       backItems: [
         {
           title: 'Time Tables',
@@ -53,84 +21,22 @@ export default function CreateTimeTable({ auth, shifts }: PageProps<{ shifts: Sh
     })
   }, [setBreadcrumb])
 
-  const submit: FormEventHandler = e => {
-    e.preventDefault()
-
-    post(route('timetables.store'), {
-      onSuccess: response => {
-        reset('title', 'description')
-      },
-    })
-  }
-
-  function handleClose() {
-    router.get(route('timetables.index'))
-  }
-
   return (
     <AuthenticatedLayout user={auth.user}>
-      <Head title="Create | Time Table" />
-      <div className="bg-card border border-border text-foreground sm:rounded-lg">
-        <div className="p-6 flex justify-end">
-          <Card className="w-full bg-white shadow-md rounded-lg dark:bg-background">
-            <CardHeader className="flex items-center space-x-4">
-              <CardTitle>Create Time Table</CardTitle>
-            </CardHeader>
-
-            <CardContent className="mt-4">
-              <div className="mb-4">
-                <InputLabel htmlFor="title" value="Title" aria-required />
-                <TextInput
-                  autoFocus
-                  className={'w-full'}
-                  id="title"
-                  value={data.title}
-                  onChange={e => setData('title', e.target.value)}
-                  required
-                />
-                <InputError message={errors.title} />
-              </div>
-              <div className="mb-4">
-                <InputLabel htmlFor="description" value="Description" aria-required />
-                <TextInput
-                  className={'w-full'}
-                  id="description"
-                  value={data.description}
-                  onChange={e => setData('description', e.target.value)}
-                  required
-                />
-                <InputError message={errors.description} />
-              </div>
-
-              <div className="mb-4">
-                <InputLabel htmlFor="shift" value="Shift" aria-required />
-                <Select name="shift" onValueChange={value => setData('shift_id', Number(value))}>
-                  <SelectTrigger className="dark:bg-gray-900 dark:border dark:border-gray-700">
-                    <SelectValue placeholder="Select a shift" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {shifts?.length > 0 &&
-                      shifts.map(shift => (
-                        <SelectItem key={shift.id} value={shift.id.toString()}>
-                          {shift.name} - {shift.program_type}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-                <InputError message={errors.shift_id} />
-              </div>
-            </CardContent>
-
-            <CardFooter className="mt-4 flex justify-end gap-3">
-              <Button variant={'outline'} onClick={handleClose}>
-                Cancel
-              </Button>
-              <Button onClick={submit} disabled={processing}>
-                Save
-              </Button>
-            </CardFooter>
-          </Card>
+      <Head title="Create Time Table" />
+      
+      <div className="px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-foreground">Create Time Table</h1>
+          <p className="text-muted-foreground mt-1">
+            Create a new time table for scheduling and organization
+          </p>
         </div>
+
+        <TimeTableForm
+          shifts={shifts}
+        />
+
       </div>
     </AuthenticatedLayout>
   )

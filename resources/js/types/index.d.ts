@@ -72,6 +72,8 @@ export type TimeTable = {
   id: number
   title: string
   description: string
+  start_date: string
+  end_date: string
   shift_id: number
   shift?: Shift
   allocations?: Allocation[]

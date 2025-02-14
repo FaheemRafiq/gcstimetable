@@ -17,8 +17,8 @@ class TeamsPermission
     public function handle(Request $request, Closure $next): Response
     {
         $user = Auth::user();
-        
-        if ($user && !$user->isSuperAdmin()) {
+
+        if ($user && ! $user->isSuperAdmin()) {
             setPermissionsTeamId($user->institution_id);
         }
 
