@@ -8,7 +8,7 @@ import InputError from '@/Components/InputError'
 import InputLabel from '@/Components/InputLabel'
 import { AutoCompleteSelect } from '@/components/combobox'
 import { Department, Institution } from '@/types/database'
-import toast from 'react-hot-toast'
+import { toast } from 'react-toastify';
 import { Role, User, UserType } from '@/types'
 import AdminWrapper, { RolesWrapper } from '@/Components/AdminWrapper'
 import { RoleEnum } from '@/lib/enums'

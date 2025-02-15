@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import toast from 'react-hot-toast'
+import { toast } from 'react-toastify';
 
 interface FormSection {
   title: string

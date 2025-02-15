@@ -39,10 +39,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-import { DataTablePagination } from './data-table-pagination'
 import { DataTableToolbar as DefaultTableToolbar } from './data-table-toolbar'
 import { cn } from '@/lib/utils'
-import { Pagination } from '@/components/ui/pagination'
 import { Link } from '@inertiajs/react'
 
 interface TablePinningState {
@@ -50,7 +48,20 @@ interface TablePinningState {
   right: string[]
 }
 
-export interface ServerSidePaginationProps {
+interface BaseDataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[]
+  data: TData[]
+  pinnedColumns?: Partial<TablePinningState>
+  DataTableToolbar?: React.FC<{ table: Table<TData> }>
+  pageSizeOptions?: number[]
+}
+
+interface ClientSideDataTableProps<TData, TValue> extends BaseDataTableProps<TData, TValue> {
+  pagination: 'client'
+}
+
+interface ServerSideDataTableProps<TData, TValue> extends BaseDataTableProps<TData, TValue> {
+  pagination: 'server'
   currentPage: number
   totalItems: number
   pageSize: number
@@ -62,25 +73,7 @@ export interface ServerSidePaginationProps {
     prev: string | null
     next: string | null
   }
-  pageSizeOptions?: number[]
   onPageSizeChange?: (pageSize: number) => void
-}
-
-interface BaseDataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  pinnedColumns?: Partial<TablePinningState>
-  DataTableToolbar?: React.FC<{ table: Table<TData> }>
-}
-
-interface ClientSideDataTableProps<TData, TValue> extends BaseDataTableProps<TData, TValue> {
-  pagination?: 'client'
-}
-
-interface ServerSideDataTableProps<TData, TValue>
-  extends BaseDataTableProps<TData, TValue>,
-    ServerSidePaginationProps {
-  pagination: 'server'
 }
 
 type DataTableProps<TData, TValue> =
@@ -92,25 +85,19 @@ export function DataTable<TData, TValue>({
   data,
   pinnedColumns,
   DataTableToolbar = DefaultTableToolbar,
-  pagination = 'client',
-  currentPage = 1,
-  totalItems = 0,
-  pageSize = 10,
-  from = 0,
-  to = 0,
-  navigationLinks = { first: '', last: '', prev: null, next: null },
-  pageSizeOptions = [10, 20, 30, 40, 50],
-  onPageSizeChange,
+  pagination,
+  ...props
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnPinning, setColumnPinning] = React.useState<ColumnPinningState>({
     left: pinnedColumns?.left ?? [],
     right: pinnedColumns?.right ?? [],
   })
+
+  const pageSizeOptions = props.pageSizeOptions ?? [10, 20, 30, 40, 50]
 
   const getCommonPinningClasses = (column: Column<TData>): object => {
     const isPinned = column.getIsPinned()
@@ -150,6 +137,9 @@ export function DataTable<TData, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
     onColumnPinningChange: setColumnPinning,
   })
+
+  const isServerSide = pagination === 'server'
+  const serverProps = isServerSide ? (props as ServerSideDataTableProps<TData, TValue>) : null
 
   return (
     <div className="space-y-4">
@@ -208,30 +198,36 @@ export function DataTable<TData, TValue>({
       </div>
       <div className="flex items-center justify-between px-2">
         <div className="flex-1 text-sm text-muted-foreground">
-          {/* {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected. */}
-          {/* Now I'm goind to show the total number of rows */}
-          Total<strong className="pl-1">{totalItems}</strong>{' '}
-          <span className="text-xs">{from && to && `(${from} to ${to})`}</span>
+          Total<strong className="pl-1">
+            {isServerSide ? serverProps?.totalItems : table.getFilteredRowModel().rows.length}
+          </strong>{' '}
+          {isServerSide && serverProps?.from && serverProps?.to && (
+            <span className="text-xs">({serverProps.from} to {serverProps.to})</span>
+          )}
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
             <p className="text-sm font-medium">Rows per page</p>
             <Select
-              value={`${pagination == 'client' ? table.getState().pagination.pageSize : pageSize}`}
+              value={`${isServerSide ? serverProps?.pageSize : table.getState().pagination.pageSize}`}
               onValueChange={value => {
-                pagination == 'client'
-                  ? table.setPageSize(Number(value))
-                  : onPageSizeChange?.(Number(value))
+                const newSize = Number(value)
+                if (isServerSide) {
+                  serverProps?.onPageSizeChange?.(newSize)
+                } else {
+                  table.setPageSize(newSize)
+                }
               }}
             >
               <SelectTrigger className="h-8 w-[70px]">
-                <SelectValue placeholder={table.getState().pagination.pageSize} />
+                <SelectValue 
+                  placeholder={isServerSide ? serverProps?.pageSize : table.getState().pagination.pageSize} 
+                />
               </SelectTrigger>
               <SelectContent side="top">
-                {pageSizeOptions.map((pageSize: number) => (
-                  <SelectItem key={pageSize} value={`${pageSize}`}>
-                    {pageSize}
+                {pageSizeOptions.map(size => (
+                  <SelectItem key={size} value={`${size}`}>
+                    {size}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -239,18 +235,62 @@ export function DataTable<TData, TValue>({
           </div>
 
           <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            {pagination == 'client' ? (
+            {isServerSide ? (
               <>
-                Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                Page {serverProps?.currentPage} of{' '}
+                {Math.ceil((serverProps?.totalItems ?? 0) / (serverProps?.pageSize ?? 1))}
               </>
             ) : (
               <>
-                Page {currentPage} of {Math.ceil(totalItems / pageSize)}
+                Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
               </>
             )}
           </div>
           <div className="flex items-center space-x-2">
-            {pagination == 'client' ? (
+            {isServerSide ? (
+              <>
+                <Link href={serverProps?.navigationLinks.first ?? '#'}>
+                  <Button
+                    variant="outline"
+                    className="hidden h-8 w-8 p-0 lg:flex"
+                    disabled={!serverProps?.navigationLinks.prev}
+                  >
+                    <span className="sr-only">Go to first page</span>
+                    <ChevronsLeft />
+                  </Button>
+                </Link>
+                <Link href={serverProps?.navigationLinks.prev ?? '#'}>
+                  <Button
+                    variant="outline"
+                    className="h-8 w-8 p-0"
+                    disabled={!serverProps?.navigationLinks.prev}
+                  >
+                    <span className="sr-only">Go to previous page</span>
+                    <ChevronLeft />
+                  </Button>
+                </Link>
+                <Link href={serverProps?.navigationLinks.next ?? '#'}>
+                  <Button
+                    variant="outline"
+                    className="h-8 w-8 p-0"
+                    disabled={!serverProps?.navigationLinks.next}
+                  >
+                    <span className="sr-only">Go to next page</span>
+                    <ChevronRight />
+                  </Button>
+                </Link>
+                <Link href={serverProps?.navigationLinks.last ?? '#'}>
+                  <Button
+                    variant="outline"
+                    className="hidden h-8 w-8 p-0 lg:flex"
+                    disabled={!serverProps?.navigationLinks.next}
+                  >
+                    <span className="sr-only">Go to last page</span>
+                    <ChevronsRight />
+                  </Button>
+                </Link>
+              </>
+            ) : (
               <>
                 <Button
                   variant="outline"
@@ -288,45 +328,6 @@ export function DataTable<TData, TValue>({
                   <span className="sr-only">Go to last page</span>
                   <ChevronsRight />
                 </Button>
-              </>
-            ) : (
-              <>
-                {/* First Page */}
-                <Link href={navigationLinks.first}>
-                  <Button variant="outline" className="hidden h-8 w-8 p-0 lg:flex">
-                    <span className="sr-only">Go to first page</span>
-                    <ChevronsLeft />
-                  </Button>
-                </Link>
-                {/* Previous Page */}
-                <Link href={navigationLinks.prev} disabled={!navigationLinks.prev}>
-                  <Button
-                    variant="outline"
-                    className="h-8 w-8 p-0"
-                    disabled={!navigationLinks.prev}
-                  >
-                    <span className="sr-only">Go to previous page</span>
-                    <ChevronLeft />
-                  </Button>
-                </Link>
-                {/* Next Page */}
-                <Link href={navigationLinks.next} disabled={!navigationLinks.next}>
-                  <Button
-                    variant="outline"
-                    className="h-8 w-8 p-0"
-                    disabled={!navigationLinks.next}
-                  >
-                    <span className="sr-only">Go to next page</span>
-                    <ChevronRight />
-                  </Button>
-                </Link>
-                {/* Last Page */}
-                <Link href={navigationLinks.last}>
-                  <Button variant="outline" className="hidden h-8 w-8 p-0 lg:flex">
-                    <span className="sr-only">Go to last page</span>
-                    <ChevronsRight />
-                  </Button>
-                </Link>
               </>
             )}
           </div>

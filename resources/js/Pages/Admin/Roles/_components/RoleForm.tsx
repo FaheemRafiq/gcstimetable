@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import InputError from '@/Components/InputError'
-import toast from 'react-hot-toast'
+import { toast } from 'react-toastify';
 import { useAbilities } from '@/components/abilities-provider'
 import {
   Select,

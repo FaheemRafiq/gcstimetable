@@ -15,7 +15,7 @@ import {
 import InputError from '@/Components/InputError'
 import { Course } from '@/types/database'
 import { fetchWrapper } from '@/lib/fetchWrapper'
-import toast from 'react-hot-toast'
+import { toast } from 'react-toastify';
 import MultipleSelector from '@/components/ui/multi-select'
 
 interface CourseAttachFormProps {

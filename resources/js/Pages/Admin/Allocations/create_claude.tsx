@@ -46,7 +46,7 @@ import {
 import { formatTime, getNumberWithOrdinal } from '@/utils/helper'
 import { getBackgroundColor } from '@/utils/dayHelper'
 import { cn } from '@/lib/utils'
-import toast from 'react-hot-toast'
+import { toast } from 'react-toastify';
 import { Allocation, Course, Day, Institution, Room, Semester, Slot, Teacher } from '@/types/database'
 import { useBreadcrumb } from '@/components/providers/breadcrum-provider'
 import DeleteAllocationDialog from './_components/DeleteAllocationDialog'

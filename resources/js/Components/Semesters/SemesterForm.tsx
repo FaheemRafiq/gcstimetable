@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useForm } from '@inertiajs/react'
 import InputError from '@/Components/InputError'
-import toast from 'react-hot-toast'
+import { toast } from 'react-toastify';
 import { Program, Semester, Slot } from '@/types/database'
 import { Switch } from '@/components/ui/switch'
 import { FormSheet } from '@/Components/FormSheet'

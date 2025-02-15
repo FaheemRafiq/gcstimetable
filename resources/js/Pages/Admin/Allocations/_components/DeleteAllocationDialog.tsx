@@ -1,6 +1,6 @@
 import React from 'react'
 import { router } from '@inertiajs/react'
-import toast from 'react-hot-toast'
+import { toast } from 'react-toastify';
 import DeleteConfirmationDialog from '@/Components/Dialog/DeleteConfirmationDialog'
 
 interface DeleteAllocationDialogProps {

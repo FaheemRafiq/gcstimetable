@@ -9,7 +9,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ServerSidePaginationProps } from './data-table'
+// import { ServerSidePaginationProps } from './data-table'
+
+interface ServerSidePaginationProps {
+  currentPage: number
+  totalItems: number
+  pageSize: number
+  from: number
+  to: number
+  navigationLinks: {
+    first: string
+    last: string
+    prev: string | null
+    next: string | null
+  }
+  pageSizeOptions?: number[]
+  onPageSizeChange?: (pageSize: number) => void
+}
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>

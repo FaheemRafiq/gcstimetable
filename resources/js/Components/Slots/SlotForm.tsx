@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useForm } from '@inertiajs/react'
 import InputError from '@/Components/InputError'
-import toast from 'react-hot-toast'
+import { toast } from 'react-toastify';
 import { TimePickerDemo } from '@/components/time-picker/time-picker-input'
 import { format } from 'date-fns'
 import { Slot } from '@/types/database'

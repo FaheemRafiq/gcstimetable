@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Fragment } from 'react/jsx-runtime'
 import { Link, router, useForm } from '@inertiajs/react'
-import toast from 'react-hot-toast'
+import { toast } from 'react-toastify';
 import { Room } from '@/types/database'
 import DeleteConfirmationDialog from '@/Components/Dialog/DeleteConfirmationDialog'
 import { RoomForm } from './RoomForm'

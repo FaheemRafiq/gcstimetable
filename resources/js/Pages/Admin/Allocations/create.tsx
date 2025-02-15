@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/card'
 import InputLabel from '@/Components/InputLabel'
 import InputError from '@/Components/InputError'
-import toast from 'react-hot-toast'
+import { toast } from 'react-toastify';
 import {
   DropdownMenu,
   DropdownMenuContent,

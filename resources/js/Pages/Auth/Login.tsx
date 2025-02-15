@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import GuestLayout from '@/Layouts/GuestLayout'
 import InputError from '@/Components/InputError'
 import { error } from 'console'
-import toast from 'react-hot-toast'
+import { toast } from 'react-toastify';
 
 export default function Login({
   status,
