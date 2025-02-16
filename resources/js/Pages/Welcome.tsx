@@ -71,7 +71,7 @@ function LandingPage({ auth }: PageProps) {
               ✨ Your Time, Optimized
             </div>
             <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-              Transform Your Schedule with
+              Transform Your Schedule with Faheem's 
               <span className="text-primary"> Smart Planning</span>
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
