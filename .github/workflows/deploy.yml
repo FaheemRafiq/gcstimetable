@@ -3,7 +3,7 @@ name: Deploy to Production
 on:
   push:
     branches:
-      - main
+      - without_filament_institution
 
 jobs:
   deploy:
