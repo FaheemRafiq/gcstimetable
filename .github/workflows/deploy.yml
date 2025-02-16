@@ -24,12 +24,12 @@ jobs:
 
       - name: Install PHP Dependencies
         run: |
-          cd /var/www/gcstimetable
+          cd gcstimetable
           composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
           
       - name: Install Node Dependencies and Build
         run: |
-          cd /var/www/gcstimetable
+          cd gcstimetable
           npm ci
           npm run build
           
