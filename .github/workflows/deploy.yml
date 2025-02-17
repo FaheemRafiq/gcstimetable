@@ -30,7 +30,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ${{ secrets.REMOTE_DIR }}
-            git pull origin without_filament_institution
+            sudo git pull origin without_filament_institution
             sudo -u www-data composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
             sudo -u www-data npm ci
             sudo -u www-data npm run build
