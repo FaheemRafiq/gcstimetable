@@ -30,16 +30,15 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ${{ secrets.REMOTE_DIR }}
-            git pull origin main
-            composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
-            npm ci
-            npm run build
-            php artisan migrate
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-            php artisan optimize:clear
-            php artisan optimize
+            git pull origin without_filament_institution
+            sudo -u www-data composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+            sudo -u www-data npm ci
+            sudo -u www-data npm run build
+            sudo -u www-data php artisan config:cache
+            sudo -u www-data php artisan route:cache
+            sudo -u www-data php artisan view:cache
+            sudo -u www-data php artisan optimize:clear
+            sudo -u www-data php artisan optimize
             sudo chown -R www-data:www-data storage bootstrap/cache
             sudo chmod -R 775 storage bootstrap/cache
             sudo systemctl restart apache2
