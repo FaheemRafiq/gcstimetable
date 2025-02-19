@@ -12,8 +12,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-      - run: npm ci
+          node-version: '20'
           
       # Deploy using SSH key-based authentication
       - name: Deploy to server
@@ -24,34 +23,14 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ${{ secrets.REMOTE_DIR }}
-            
-            # Check if Node.js is installed, if not, install it
-            if ! command -v node &> /dev/null
-            then
-                curl -sL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-                sudo apt-get install -y nodejs
-            fi
-            
-            # Verify npm installation
-            if ! command -v npm &> /dev/null
-            then
-                echo "npm not found after Node.js installation. Installation might have failed."
-                exit 1
-            fi
-
-            # Reset and pull the latest code
             sudo chown -R $USER:$USER ${{ secrets.REMOTE_DIR }}
             git reset --hard --quiet
             git pull --rebase origin without_filament_institution
-
-            # Install Node dependencies
+            curl https://get.volta.sh | bash
+            volta install node@20
             npm ci
-
-            # Set Node memory limit for build process
             export NODE_OPTIONS=--max-old-space=2024
             npm run build
-
-            # Run Laravel commands
             composer dump-autoload
             php artisan migrate
             php artisan config:cache
@@ -59,11 +38,7 @@ jobs:
             php artisan view:cache
             php artisan optimize:clear
             php artisan optimize
-
-            # Set correct permissions
             sudo chown -R www-data:www-data ${{ secrets.REMOTE_DIR }}
             sudo chmod -R 775 ${{ secrets.REMOTE_DIR }}
             sudo chmod -R 664 ${{ secrets.REMOTE_DIR }}/storage/logs
-
-            # Restart Apache
             sudo systemctl restart apache2
