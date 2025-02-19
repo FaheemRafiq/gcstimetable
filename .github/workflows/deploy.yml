@@ -34,5 +34,5 @@ jobs:
             sudo php artisan optimize
             sudo chown -R www-data:www-data ${{ secrets.REMOTE_DIR }}
             sudo chmod -R 664 ${{ secrets.REMOTE_DIR }}/storage/logs
-            sudo chmod -R 775 ${{ secrets.REMOTE_DIR }} ${{ secrets.REMOTE_DIR }}/storage ${{ secrets.REMOTE_DIR }}/bootstrap/cache
+            sudo chmod -R 775 ${{ secrets.REMOTE_DIR }}
             sudo systemctl restart apache2
