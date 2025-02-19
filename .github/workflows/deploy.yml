@@ -9,6 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
           
       # Deploy using SSH key-based authentication
       - name: Deploy to server
@@ -19,20 +24,20 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ${{ secrets.REMOTE_DIR }}
-            sudo git reset --hard --quiet
-            sudo git pull --rebase origin without_filament_institution
-            sudo chown -R ${{ secrets.EC2_USERNAME }}:${{ secrets.EC2_USERNAME }} ${{ secrets.REMOTE_DIR }}
-            volta run npm ci
+            sudo chown -R $USER:$USER ${{ secrets.REMOTE_DIR }}
+            git reset --hard --quiet
+            git pull --rebase origin without_filament_institution
+            npm ci
             export NODE_OPTIONS=--max-old-space=2024
-            volta run npm run build
-            sudo php artisan migrate
-            sudo composer dump-autoload
-            sudo php artisan config:cache
-            sudo php artisan route:cache
-            sudo php artisan view:cache
-            sudo php artisan optimize:clear
-            sudo php artisan optimize
+            npm run build
+            composer dump-autoload
+            php artisan migrate
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan optimize:clear
+            php artisan optimize
             sudo chown -R www-data:www-data ${{ secrets.REMOTE_DIR }}
-            sudo chmod -R 664 ${{ secrets.REMOTE_DIR }}/storage/logs
             sudo chmod -R 775 ${{ secrets.REMOTE_DIR }}
+            sudo chmod -R 664 ${{ secrets.REMOTE_DIR }}/storage/logs
             sudo systemctl restart apache2
