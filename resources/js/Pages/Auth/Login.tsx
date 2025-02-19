@@ -126,12 +126,12 @@ export default function Login({
             Sign In
           </Button>
 
-          <div className="text-center text-sm text-muted-foreground">
+          {/* <div className="text-center text-sm text-muted-foreground">
             Don't have an account?{' '}
             <Link href={route('register')} className="text-primary hover:underline">
               Create one
             </Link>
-          </div>
+          </div> */}
         </form>
       </div>
     </GuestLayout>

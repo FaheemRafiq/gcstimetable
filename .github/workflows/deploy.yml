@@ -22,16 +22,16 @@ jobs:
             sudo git reset --hard --quiet
             sudo git pull --rebase origin without_filament_institution
             sudo chown -R ${{ secrets.EC2_USERNAME }}:${{ secrets.EC2_USERNAME }} ${{ secrets.REMOTE_DIR }}
-            npm ci
+            volta run npm ci
             export NODE_OPTIONS=--max-old-space=2024
-            npm run build
+            volta run npm run build
             sudo php artisan migrate
             sudo composer dump-autoload
             sudo php artisan config:cache
             sudo php artisan route:cache
             sudo php artisan view:cache
             sudo php artisan optimize:clear
-            sudo php artisan optimzie
+            sudo php artisan optimize
             sudo chown -R www-data:www-data ${{ secrets.REMOTE_DIR }}
             sudo chmod -R 664 ${{ secrets.REMOTE_DIR }}/storage/logs
             sudo chmod -R 775 ${{ secrets.REMOTE_DIR }} ${{ secrets.REMOTE_DIR }}/storage ${{ secrets.REMOTE_DIR }}/bootstrap/cache
