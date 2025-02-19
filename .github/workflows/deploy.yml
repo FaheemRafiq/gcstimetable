@@ -9,24 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-         
-      # Setup environments
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql, bcmath, zip
-          
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22'
-          
-      - name: Install Dependencies
-        run: npm install
-        
-      - name: Build
-        run: npm run build
           
       # Deploy using SSH key-based authentication
       - name: Deploy to server
@@ -37,40 +19,20 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ${{ secrets.REMOTE_DIR }}
-            git reset --hard --quiet
-            git pull
+            sudo git reset --hard --quiet
+            sudo git pull --rebase origin without_filament_institution
+            sudo chown -R ${{ secrets.EC2_USERNAME }}:${{ secrets.EC2_USERNAME }} ${{ secrets.REMOTE_DIR }}
+            npm ci
+            export NODE_OPTIONS=--max-old-space=2024
+            npm run build
+            sudo php artisan migrate
+            sudo composer dump-autoload
+            sudo php artisan config:cache
+            sudo php artisan route:cache
+            sudo php artisan view:cache
+            sudo php artisan optimize:clear
+            sudo php artisan optimzie
             sudo chown -R www-data:www-data ${{ secrets.REMOTE_DIR }}
-            sudo chmod -R 755 ${{ secrets.REMOTE_DIR }}
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-            php artisan optimize:clear
-            sudo chown -R www-data:www-data ${{ secrets.REMOTE_DIR }}/storage ${{ secrets.REMOTE_DIR }}/bootstrap/cache
-            sudo chmod -R 775 ${{ secrets.REMOTE_DIR }}/storage ${{ secrets.REMOTE_DIR }}/bootstrap/cache
-            sudo systemctl restart apache2 # If you're using Apache, adjust accordingly if using another server
-
-      # Copy files to Linode using SSH key-based authentication
-      - name: copy to Linode
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: ".,!node_modules,!tests,!.git,!storage,!bootstrap"
-          target: "${{ secrets.REMOTE_DIR }}"
-         
-      # Execute post-deploy commands
-      - name: CLEAR CACHE
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd ${{ secrets.REMOTE_DIR }}
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-            php artisan optimize:clear
-            sudo chown -R www-data:www-data ${{ secrets.REMOTE_DIR }}/storage ${{ secrets.REMOTE_DIR }}/bootstrap/cache
-            sudo chmod -R 775 ${{ secrets.REMOTE_DIR }}/storage ${{ secrets.REMOTE_DIR }}/bootstrap/cache
+            sudo chmod -R 664 ${{ secrets.REMOTE_DIR }}/storage/logs
+            sudo chmod -R 775 ${{ secrets.REMOTE_DIR }} ${{ secrets.REMOTE_DIR }}/storage ${{ secrets.REMOTE_DIR }}/bootstrap/cache
+            sudo systemctl restart apache2
