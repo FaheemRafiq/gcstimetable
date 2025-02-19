@@ -29,8 +29,7 @@ jobs:
             curl https://get.volta.sh | bash
             volta install node@20
             npm ci
-            export NODE_OPTIONS=--max-old-space=2024
-            npm run build
+            NODE_OPTIONS="--max-old-space-size=2024" npm run build
             composer dump-autoload
             php artisan migrate
             php artisan config:cache
