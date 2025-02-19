@@ -19,11 +19,7 @@ return new class extends Migration
             $table->string('name');
             // day code
             $table->string('code');
-
-            $institution_id = 1;
-            // belongs to some institution
-            $table->foreignId('institution_id')->default($institution_id)->constrained()->onDelete('cascade');
-
+            
             $table->timestamps();
         });
     }

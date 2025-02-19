@@ -1,3 +1,5 @@
+import axios from "axios"
+
 type FetchMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 
 interface FetchOptions<T> {
@@ -40,4 +42,21 @@ async function fetchWrapper<TBody = unknown>({
   }
 }
 
-export { fetchWrapper }
+async function AxiosWrapper<TBody = unknown>({
+  url,
+  method = 'GET',
+  body,
+  headers = {},
+}: FetchOptions<TBody>) {
+  return axios({
+    url,
+    method,
+    headers: {
+      ...headers,
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+    },
+    data: body,
+  })
+}
+
+export { fetchWrapper, AxiosWrapper }

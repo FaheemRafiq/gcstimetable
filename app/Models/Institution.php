@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Institution extends Model
@@ -45,9 +46,14 @@ class Institution extends Model
     }
 
     // Institution has many days
-    public function days(): HasMany
+    public function days(): BelongsToMany
     {
-        return $this->hasMany(Day::class);
+        return $this->belongsToMany(Day::class)->withPivot('is_active');
+    }
+
+    public function activeDays(): BelongsToMany
+    {
+        return $this->days()->wherePivot('is_active', Day::ACTIVE);
     }
 
     // Institution has many slots

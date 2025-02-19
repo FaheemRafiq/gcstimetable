@@ -6,9 +6,11 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart'
+import { router } from '@inertiajs/react'
 
 // Define the shape of the chart data
 interface TeacherWorkload {
+  id: number
   teacher: string
   allocations: number
 }
@@ -35,6 +37,10 @@ export function TeacherWorkloadChart({ teacherWorkload }: BarChartCardProps) {
     },
   }
 
+  function handleShowTeacherWorkLoad(teacherWorkload: TeacherWorkload) {
+    router.get(route('teachers.workload', teacherWorkload.id))
+  }
+
   return (
     <Card className="col-span-3">
       <CardHeader>
@@ -50,6 +56,7 @@ export function TeacherWorkloadChart({ teacherWorkload }: BarChartCardProps) {
               data={teacherWorkload}
               layout="vertical" // Horizontal bar chart
               margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
+              // onClick={() => handleShowTeacherWorkLoad(teacherWorkload)}
             >
               <CartesianGrid horizontal={false} stroke="hsl(var(--border))" />
               <XAxis
@@ -70,6 +77,11 @@ export function TeacherWorkloadChart({ teacherWorkload }: BarChartCardProps) {
                 dataKey="allocations"
                 fill="hsl(var(--chart-1))" // Blue color
                 radius={8} // Rounded corners
+                onClick={(e) => {
+                  const { payload } = e;
+                  
+                  handleShowTeacherWorkLoad(payload);
+                }}
               />
             </BarChart>
           </ResponsiveContainer>

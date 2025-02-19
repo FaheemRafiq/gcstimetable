@@ -46,6 +46,10 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
     router.get(route('teachers.edit', row.id))
   }
 
+  function handleWorkload(row: Teacher) {
+    router.get(route('teachers.workload', row.id))
+  }
+
   return (
     <Fragment>
       <DropdownMenu>
@@ -57,10 +61,12 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
           <DropdownMenuItem onSelect={() => handleEdit(row)}>Edit</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => handleWorkload(row)}>View Workload</DropdownMenuItem>
           <DropdownMenuItem onSelect={() => setOpenDelete(true)}>
             Delete
             {/* <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut> */}
           </DropdownMenuItem>
+
         </DropdownMenuContent>
       </DropdownMenu>
 

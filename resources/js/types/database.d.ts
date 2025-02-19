@@ -69,7 +69,12 @@ export type Day = {
   number: number
   name: string
   code: string
-  institution?: Institution
+
+  pivot: {
+    institution_id: number
+    day_id: number
+    is_active?: IsActive
+  }
 }
 
 export type Allocation = {

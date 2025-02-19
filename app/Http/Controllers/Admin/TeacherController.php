@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Day;
 use Inertia\Inertia;
 use App\Models\Teacher;
 use App\Models\Department;
@@ -180,5 +181,27 @@ class TeacherController extends Controller
         }
 
         return back()->withErrors(['message' => $message]);
+    }
+
+    public function showWorkload(Teacher $teacher)
+    {
+        $admin = Auth::user();
+
+        if (!$admin->isSuperAdmin()) {
+            $days = $admin->institution->days()->get();
+        } else {
+            $days = Day::all();
+        }
+
+        $allocations = $teacher->allocations()
+            ->with(['day', 'slot', 'course', 'room', 'section.semester:id,name'])
+            ->get();
+
+        // 3. Return data to Inertia
+        return Inertia::render('Admin/Teachers/workload', [
+            'teacher'     => $teacher,
+            'days'        => $days,
+            'allocations' => $allocations,
+        ]);
     }
 }

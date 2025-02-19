@@ -14,7 +14,9 @@ export default {
     theme: {
     	extend: {
     		fontFamily: {
-    			sans: [...defaultTheme.fontFamily.sans]
+    			sans: [
+                    ...defaultTheme.fontFamily.sans
+                ]
     		},
     		borderRadius: {
     			lg: 'var(--radius)',
@@ -32,34 +34,34 @@ export default {
     			card: {
     				DEFAULT: 'hsl(var(--card))',
     				foreground: 'hsl(var(--card-foreground))',
-					primary: {
-						DEFAULT: 'hsl(var(--card-primary))',
-						foreground: 'hsl(var(--card-primary-foreground))'
-					},
-					monday: {
-						DEFAULT: 'hsl(var(--card-monday))',
-						foreground: 'hsl(var(--card-monday-foreground))'
-					},
-					tuesday: {
-						DEFAULT: 'hsl(var(--card-tuesday))',
-						foreground: 'hsl(var(--card-tuesday-foreground))'
-					},
-					wednesday: {
-						DEFAULT: 'hsl(var(--card-wednesday))',
-						foreground: 'hsl(var(--card-wednesday-foreground))'
-					},
-					thursday: {
-						DEFAULT: 'hsl(var(--card-thursday))',
-						foreground: 'hsl(var(--card-thursday-foreground))'
-					},	
-					friday: {
-						DEFAULT: 'hsl(var(--card-friday))',
-						foreground: 'hsl(var(--card-friday-foreground))'
-					},
-					saturday: {
-						DEFAULT: 'hsl(var(--card-saturday))',
-						foreground: 'hsl(var(--card-saturday-foreground))'
-					}
+    				primary: {
+    					DEFAULT: 'hsl(var(--card-primary))',
+    					foreground: 'hsl(var(--card-primary-foreground))'
+    				},
+    				monday: {
+    					DEFAULT: 'hsl(var(--card-monday))',
+    					foreground: 'hsl(var(--card-monday-foreground))'
+    				},
+    				tuesday: {
+    					DEFAULT: 'hsl(var(--card-tuesday))',
+    					foreground: 'hsl(var(--card-tuesday-foreground))'
+    				},
+    				wednesday: {
+    					DEFAULT: 'hsl(var(--card-wednesday))',
+    					foreground: 'hsl(var(--card-wednesday-foreground))'
+    				},
+    				thursday: {
+    					DEFAULT: 'hsl(var(--card-thursday))',
+    					foreground: 'hsl(var(--card-thursday-foreground))'
+    				},
+    				friday: {
+    					DEFAULT: 'hsl(var(--card-friday))',
+    					foreground: 'hsl(var(--card-friday-foreground))'
+    				},
+    				saturday: {
+    					DEFAULT: 'hsl(var(--card-saturday))',
+    					foreground: 'hsl(var(--card-saturday-foreground))'
+    				}
     			},
     			popover: {
     				DEFAULT: 'hsl(var(--popover))',
@@ -105,6 +107,28 @@ export default {
     				border: 'hsl(var(--sidebar-border))',
     				ring: 'hsl(var(--sidebar-ring))'
     			}
+    		},
+    		keyframes: {
+    			'accordion-down': {
+    				from: {
+    					height: '0'
+    				},
+    				to: {
+    					height: 'var(--radix-accordion-content-height)'
+    				}
+    			},
+    			'accordion-up': {
+    				from: {
+    					height: 'var(--radix-accordion-content-height)'
+    				},
+    				to: {
+    					height: '0'
+    				}
+    			}
+    		},
+    		animation: {
+    			'accordion-down': 'accordion-down 0.2s ease-out',
+    			'accordion-up': 'accordion-up 0.2s ease-out'
     		}
     	}
     },

@@ -24,6 +24,7 @@ interface ShiftCoverage {
 }
 
 interface TeacherWorkload {
+  id: number
   teacher: string
   allocations: number
 }

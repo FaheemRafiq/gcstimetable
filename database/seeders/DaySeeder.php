@@ -12,7 +12,6 @@ class DaySeeder extends Seeder
      */
     public function run(): void
     {
-        // Define an array of day data
         $days = [
             ['name' => 'Monday', 'code' => 'MON', 'number' => 1],
             ['name' => 'Tuesday', 'code' => 'TUE', 'number' => 2],
@@ -22,19 +21,7 @@ class DaySeeder extends Seeder
             ['name' => 'Saturday', 'code' => 'SAT', 'number' => 6],
         ];
 
-        $insitution_id = 1;
-
-        // Create records for days using the array
         foreach ($days as $dayData) {
-            $dayData['institution_id'] = $insitution_id;
-            Day::create($dayData);
-        }
-
-        $insitution_id = 2;
-
-        // Create records for days using the array
-        foreach ($days as $dayData) {
-            $dayData['institution_id'] = $insitution_id;
             Day::create($dayData);
         }
     }

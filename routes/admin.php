@@ -46,6 +46,7 @@ Route::prefix('admin')
 
         // Teachers 🧑‍🏫
         Route::resource('teachers', TeacherController::class)->only(TeacherController::ONLY);
+        Route::get('/teachers/{teacher}/workload', [TeacherController::class, 'showWorkload'])->name('teachers.workload');
 
         // Time Table Resource 📆
         Route::resource('timetables', TimeTableController::class)->only(TimeTableController::ONLY);
@@ -53,6 +54,8 @@ Route::prefix('admin')
 
         // Allocations 🔹
         Route::resource('allocations', AllocationController::class)->only(AllocationController::ONLY);
+        Route::post('allocations/bulk/store', [AllocationController::class, 'bulkStore'])->name('allocations.bulk.store');
+        Route::delete('allocations/bulk/destroy', [AllocationController::class, 'bulkDestroy'])->name('allocations.bulk.destroy');
 
         // Institutions 🏢
         Route::resource('institutions', InstitutionController::class)->only(InstitutionController::ONLY);

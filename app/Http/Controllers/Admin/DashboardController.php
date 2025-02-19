@@ -101,6 +101,7 @@ class DashboardController extends Controller
             ->limit(10)
             ->get()
             ->map(fn ($teacher): array => [
+                'id'          => $teacher->id,
                 'teacher'     => $teacher->name,
                 'allocations' => $teacher->allocations_count,
             ]);

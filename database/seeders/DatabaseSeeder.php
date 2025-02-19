@@ -88,6 +88,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call(DaySeeder::class);
 
+        $this->call(DayInstitutionSeeder::class);
+
         $this->call(ProgramSeeder::class);
 
         $this->call(TeacherSeeder::class);

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Day;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
@@ -24,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
         JsonResource::withoutWrapping();
 
         Blueprint::macro('is_active', function (): void {
-            $this->enum('is_active', ['active', 'inactive'])->default('active');
+            $this->enum('is_active', [Day::ACTIVE, Day::INACTIVE])->default(Day::ACTIVE);
         });
     }
 }
