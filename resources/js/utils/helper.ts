@@ -51,26 +51,26 @@ export function sortByDays(a: string, b: string) {
  * "1-3, 5-7".
  */
 export function formatNumberRange(numbers: number[]): string {
-  if (numbers.length === 0) return '';
+  if (numbers.length === 0) return ''
 
-  let result: string[] = [];
-  let start = numbers[0];
-  let end = start;
+  let result: string[] = []
+  let start = numbers[0]
+  let end = start
 
   for (let i = 1; i <= numbers.length; i++) {
     if (i < numbers.length && numbers[i] === end + 1) {
-      end = numbers[i]; // Extend the range
+      end = numbers[i] // Extend the range
     } else {
       // Add the current range or single number to result
-      result.push(start === end ? `${start}` : `${start}-${end}`);
+      result.push(start === end ? `${start}` : `${start}-${end}`)
 
       // If we haven't reached the end of the array, start a new range
       if (i < numbers.length) {
-        start = numbers[i];
-        end = start;
+        start = numbers[i]
+        end = start
       }
     }
   }
 
-  return result.join(',');
+  return result.join(',')
 }

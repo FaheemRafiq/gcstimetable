@@ -7,7 +7,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/s
 import { AppSidebar } from '@/components/app-sidebar'
 import { cn } from '@/lib/utils'
 import { AbilitiesProvider } from '@/components/abilities-provider'
-import { toast } from 'react-toastify';
+import { toast } from 'react-toastify'
 
 export default function Authenticated({ user, children }: PropsWithChildren<{ user: User }>) {
   const { flash } = usePage<PageProps>().props

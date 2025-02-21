@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect } from 'react'
 import { FormSheet } from '@/Components/FormSheet'
 import { useForm } from '@inertiajs/react'
-import { toast } from 'react-toastify';
+import { toast } from 'react-toastify'
 import { Department, Program, Room } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,6 +25,7 @@ interface FormProps {
   type: string
   shift_id: number | null
   department_id: number | null
+  [key: string]: any
 }
 
 interface RoomFormProps {

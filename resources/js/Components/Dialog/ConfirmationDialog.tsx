@@ -49,7 +49,12 @@ function ConfirmationDialog({
           </Button>
 
           {/* Confirm Button with dynamic variant */}
-          <Button variant={confirmButtonVariant} className="ms-3" type="submit" disabled={processing}>
+          <Button
+            variant={confirmButtonVariant}
+            className="ms-3"
+            type="submit"
+            disabled={processing}
+          >
             {confirmButtonLabel}
           </Button>
         </div>

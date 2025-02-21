@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { FormSheet } from '@/Components/FormSheet'
 import { useForm, usePage } from '@inertiajs/react'
-import { toast } from 'react-toastify';
+import { toast } from 'react-toastify'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -30,6 +30,8 @@ interface PageState {
   isFeteched: boolean
 }
 
+type UpdatedCourse = Course & { [key: string]: any }
+
 export const CourseForm: React.FC<CourseFormProps> = ({
   course,
   open: openProp = undefined,
@@ -49,7 +51,7 @@ export const CourseForm: React.FC<CourseFormProps> = ({
   })
 
   const { data, post, put, errors, processing, reset, setData } = useForm<
-    Omit<Course, 'id' | 'created_at' | 'updated_at'>
+    Omit<UpdatedCourse, 'id' | 'created_at' | 'updated_at'>
   >({
     name: course?.name ?? '',
     code: course?.code ?? '',

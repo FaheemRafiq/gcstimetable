@@ -198,11 +198,14 @@ export function DataTable<TData, TValue>({
       </div>
       <div className="flex items-center justify-between px-2">
         <div className="flex-1 text-sm text-muted-foreground">
-          Total<strong className="pl-1">
+          Total
+          <strong className="pl-1">
             {isServerSide ? serverProps?.totalItems : table.getFilteredRowModel().rows.length}
           </strong>{' '}
           {isServerSide && serverProps?.from && serverProps?.to && (
-            <span className="text-xs">({serverProps.from} to {serverProps.to})</span>
+            <span className="text-xs">
+              ({serverProps.from} to {serverProps.to})
+            </span>
           )}
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
@@ -220,8 +223,10 @@ export function DataTable<TData, TValue>({
               }}
             >
               <SelectTrigger className="h-8 w-[70px]">
-                <SelectValue 
-                  placeholder={isServerSide ? serverProps?.pageSize : table.getState().pagination.pageSize} 
+                <SelectValue
+                  placeholder={
+                    isServerSide ? serverProps?.pageSize : table.getState().pagination.pageSize
+                  }
                 />
               </SelectTrigger>
               <SelectContent side="top">

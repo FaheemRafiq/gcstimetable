@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/card'
 import InputLabel from '@/Components/InputLabel'
 import InputError from '@/Components/InputError'
-import { toast } from 'react-toastify';
+import { toast } from 'react-toastify'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -72,6 +72,7 @@ interface FormProps {
   teacher_id: number | null
   course_id: number | null
   allocation_id: number | null
+  [key: string]: any
 }
 
 type ModifiedSection = {

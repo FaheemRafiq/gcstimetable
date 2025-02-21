@@ -3,15 +3,19 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Head } from '@inertiajs/react'
 import { PageProps, Shift, TimeTable } from '@/types'
 import { getNumberWithOrdinal } from '@/utils/helper'
-import { Allocation, Course, Day, Institution, Room, Semester, Slot, Teacher } from '@/types/database'
+import {
+  Allocation,
+  Course,
+  Day,
+  Institution,
+  Room,
+  Semester,
+  Slot,
+  Teacher,
+} from '@/types/database'
 import { useBreadcrumb } from '@/components/providers/breadcrum-provider'
 import SingleCreateForm from './_components/SingleCreateForm'
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import MultipleCreateForm from './_components/MultipleCreateForm'
 import useLocalStorage from '@/hooks/useLocalStorage'
 
@@ -45,13 +49,14 @@ export interface CreateAllocationProps {
 }
 
 export function getSectionLabel(section: ModifiedSection) {
-  return `${section?.SemesterName ?? ''} - (${section?.name ?? ''})`;
+  return `${section?.SemesterName ?? ''} - (${section?.name ?? ''})`
 }
 
-
 function CreateAllocation({ auth, props }: PageProps & CreateAllocationProps) {
-
-  const [selectedTab, setSelectedTab] = useLocalStorage('create_allocation_tab', 'single_allocation');
+  const [selectedTab, setSelectedTab] = useLocalStorage(
+    'create_allocation_tab',
+    'single_allocation'
+  )
   const BACK_ROUTE = route('timetables.add.allocations', props.timetable.id)
   const { setBreadcrumb } = useBreadcrumb()
 
@@ -82,18 +87,14 @@ function CreateAllocation({ auth, props }: PageProps & CreateAllocationProps) {
           <TabsTrigger value="bulk_allocation">Bulk Allocation</TabsTrigger>
         </TabsList>
         <TabsContent value="single_allocation">
-          <SingleCreateForm
-            props={props}
-          />
+          <SingleCreateForm props={props} />
         </TabsContent>
         <TabsContent value="bulk_allocation">
-          <MultipleCreateForm
-            props={props}
-          />
+          <MultipleCreateForm props={props} />
         </TabsContent>
       </Tabs>
     </AuthenticatedLayout>
   )
 }
 
-export default CreateAllocation;
+export default CreateAllocation

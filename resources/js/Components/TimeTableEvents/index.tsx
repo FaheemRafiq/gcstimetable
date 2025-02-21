@@ -17,7 +17,7 @@ const TimeTableEvents = ({ events }: { events: Events }) => {
   const [currentDayIndex, setCurrentDayIndex] = useState(0)
 
   // Media query for responsive design
-  const isDesktop = !useIsMobile();
+  const isDesktop = !useIsMobile()
 
   // Constants
   const rowHeight = isDesktop ? 3 : 4 // Larger touch targets on mobile
@@ -43,11 +43,11 @@ const TimeTableEvents = ({ events }: { events: Events }) => {
 
   // Mobile navigation handlers
   const nextDay = () => {
-    setCurrentDayIndex((prev) => (prev + 1) % days.length)
+    setCurrentDayIndex(prev => (prev + 1) % days.length)
   }
 
   const previousDay = () => {
-    setCurrentDayIndex((prev) => (prev - 1 + days.length) % days.length)
+    setCurrentDayIndex(prev => (prev - 1 + days.length) % days.length)
   }
 
   // Mobile view component
@@ -83,15 +83,11 @@ const TimeTableEvents = ({ events }: { events: Events }) => {
         <div className="flex-1 relative">
           {/* Time Slots Background */}
           {timeSlots.map(slot => (
-            <div 
-              key={slot.minutes} 
-              style={{ height: `${rowHeight}rem` }}
-              className="border-b"
-            />
+            <div key={slot.minutes} style={{ height: `${rowHeight}rem` }} className="border-b" />
           ))}
 
           {/* Events */}
-          {events[days[currentDayIndex]]?.map((event) => {
+          {events[days[currentDayIndex]]?.map(event => {
             const startMinutes =
               ensureDate(event.startTime).getHours() * OneHoursInMinutes +
               ensureDate(event.startTime).getMinutes()
@@ -142,10 +138,7 @@ const TimeTableEvents = ({ events }: { events: Events }) => {
       <div className="flex sticky top-0 bg-background z-10 border-b">
         <div className="w-16 text-center self-center">Time</div>
         {days.map(day => (
-          <div
-            key={day}
-            className="flex-1 text-center py-2 font-medium capitalize"
-          >
+          <div key={day} className="flex-1 text-center py-2 font-medium capitalize">
             {day}
           </div>
         ))}
@@ -170,14 +163,10 @@ const TimeTableEvents = ({ events }: { events: Events }) => {
         {days.map(day => (
           <div key={day} className="flex-1 border-r relative">
             {timeSlots.map(slot => (
-              <div 
-                key={slot.minutes} 
-                style={{ height: `${rowHeight}rem` }}
-                className="border-b"
-              />
+              <div key={slot.minutes} style={{ height: `${rowHeight}rem` }} className="border-b" />
             ))}
 
-            {events[day]?.map((event) => {
+            {events[day]?.map(event => {
               const startMinutes =
                 ensureDate(event.startTime).getHours() * OneHoursInMinutes +
                 ensureDate(event.startTime).getMinutes()

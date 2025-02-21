@@ -40,7 +40,8 @@ export const PermissionCheckboxList: React.FC<PermissionCheckboxListProps> = ({
   )
 
   const allPermissionIds = permissions.map(p => p.id)
-  const isAllSelected = allPermissionIds.length > 0 && allPermissionIds.every(id => selectedPermissions.includes(id))
+  const isAllSelected =
+    allPermissionIds.length > 0 && allPermissionIds.every(id => selectedPermissions.includes(id))
 
   const handleSelectAll = () => {
     if (isAllSelected) {
@@ -71,10 +72,10 @@ export const PermissionCheckboxList: React.FC<PermissionCheckboxListProps> = ({
     <div className="space-y-6">
       <div className="flex justify-end">
         <Button
-          variant={isAllSelected ? "destructive" : "default"}
+          variant={isAllSelected ? 'destructive' : 'default'}
           onClick={handleSelectAll}
           className="mb-4"
-          type='button'
+          type="button"
         >
           {isAllSelected ? 'Deselect All' : 'Select All'}
         </Button>

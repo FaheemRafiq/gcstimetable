@@ -51,12 +51,12 @@ class AllocationController extends Controller
 
         // Get departments with allocations in the time window
         $departments = Department::with([
-                'programs.semesters.sections',
-                'programs.semesters.sections.allocations' => function ($query) use ($selectedDay, $startTime, $endTime, $admin, $shift_id) {
-                    $query->whereHas('day', function ($q) use ($selectedDay) {
-                        $q->where('number', $selectedDay);
-                    })->whereHas('slot', function ($q) use ($startTime, $endTime, $admin, $shift_id) {
-                        $q->timeOverlaps($startTime, $endTime)
+            'programs.semesters.sections',
+            'programs.semesters.sections.allocations' => function ($query) use ($selectedDay, $startTime, $endTime, $admin, $shift_id) {
+                $query->whereHas('day', function ($q) use ($selectedDay) {
+                    $q->where('number', $selectedDay);
+                })->whereHas('slot', function ($q) use ($startTime, $endTime, $admin, $shift_id) {
+                    $q->timeOverlaps($startTime, $endTime)
                         ->when(! $admin->isSuperAdmin(), function ($wQuery) use ($admin) {
                             $wQuery->whereHas('institution', function ($query) use ($admin) {
                                 $query->where('institutions.id', $admin->institution_id);
@@ -65,30 +65,30 @@ class AllocationController extends Controller
                         ->when($shift_id, function ($query, $shift_id) {
                             $query->where('shift_id', $shift_id);
                         });
-                    })
+                })
                     ->whereHas('timetable', function ($q) {
                         $q->isValidForToday();
                     })
                     ->with(['course', 'teacher', 'room', 'slot']);
-                },
-            ])
+            },
+        ])
             ->whereHas('programs.semesters.sections.allocations', function ($query) use ($selectedDay, $startTime, $endTime, $admin, $shift_id) {
                 $query->whereHas('day', function ($q) use ($selectedDay) {
                     $q->where('number', $selectedDay);
                 })->whereHas('slot', function ($q) use ($startTime, $endTime, $admin, $shift_id) {
                     $q->timeOverlaps($startTime, $endTime)
-                    ->when(! $admin->isSuperAdmin(), function ($wQuery) use ($admin) {
-                        $wQuery->whereHas('institution', function ($query) use ($admin) {
-                            $query->where('institutions.id', $admin->institution_id);
+                        ->when(! $admin->isSuperAdmin(), function ($wQuery) use ($admin) {
+                            $wQuery->whereHas('institution', function ($query) use ($admin) {
+                                $query->where('institutions.id', $admin->institution_id);
+                            });
+                        })
+                        ->when($shift_id, function ($query, $shift_id) {
+                            $query->where('shift_id', $shift_id);
                         });
-                    })
-                    ->when($shift_id, function ($query, $shift_id) {
-                        $query->where('shift_id', $shift_id);
-                    });
                 })
-                ->whereHas('timetable', function ($q) {
-                    $q->isValidForToday();
-                });
+                    ->whereHas('timetable', function ($q) {
+                        $q->isValidForToday();
+                    });
             })
             ->when($admin->isInstitutionAdmin(), function ($query) use ($admin) {
                 $query->where('institution_id', $admin->institution_id);

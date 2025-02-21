@@ -8,7 +8,7 @@ import InputError from '@/Components/InputError'
 import InputLabel from '@/Components/InputLabel'
 import { AutoCompleteSelect } from '@/components/combobox'
 import { Department, Institution } from '@/types/database'
-import { toast } from 'react-toastify';
+import { toast } from 'react-toastify'
 import { Role, User, UserType } from '@/types'
 import AdminWrapper, { RolesWrapper } from '@/Components/AdminWrapper'
 import { RoleEnum } from '@/lib/enums'
@@ -33,6 +33,7 @@ interface UserFormInterface {
   department_id: number | null
   institution_id: number | null
   roles: ValueAndLable[]
+  [key: string]: any
 }
 
 export function UserForm({ user, roles, departments, institutions }: UserFormProps) {

@@ -77,10 +77,10 @@ export function TeacherWorkloadChart({ teacherWorkload }: BarChartCardProps) {
                 dataKey="allocations"
                 fill="hsl(var(--chart-1))" // Blue color
                 radius={8} // Rounded corners
-                onClick={(e) => {
-                  const { payload } = e;
-                  
-                  handleShowTeacherWorkLoad(payload);
+                onClick={e => {
+                  const { payload } = e
+
+                  handleShowTeacherWorkLoad(payload)
                 }}
               />
             </BarChart>

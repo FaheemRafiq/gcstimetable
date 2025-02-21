@@ -38,12 +38,12 @@ import {
   Table,
   TimerIcon,
   Trash,
-  User
+  User,
 } from 'lucide-react'
 import { formatTime, getNumberWithOrdinal } from '@/utils/helper'
 import { getBackgroundColor } from '@/utils/dayHelper'
 import { cn } from '@/lib/utils'
-import { toast } from 'react-toastify';
+import { toast } from 'react-toastify'
 import DeleteAllocationDialog from './DeleteAllocationDialog'
 import DayCard from './DayCard'
 import Information from './Information'
@@ -58,13 +58,12 @@ interface FormProps {
   teacher_id: number | null
   course_id: number | null
   allocation_id: number | null
+  [key: string]: any
 }
 
 interface SingleCreateForm extends CreateAllocationProps {}
 
-
 function SingleCreateForm({ props }: SingleCreateForm) {
-
   const BACK_ROUTE = route('timetables.add.allocations', props.timetable.id)
   const [deleteAllocation, setDeleteAllocation] = useState<number | null>(null)
 
@@ -80,8 +79,8 @@ function SingleCreateForm({ props }: SingleCreateForm) {
   })
 
   useEffect(() => {
-    setDefaultValues();
-  }, []);
+    setDefaultValues()
+  }, [])
 
   const filteredCourse = useMemo(() => {
     if (!data.section_id) return []
@@ -119,9 +118,7 @@ function SingleCreateForm({ props }: SingleCreateForm) {
         allocation_id: allocation.id,
       }))
     } else {
-      const monday = props?.timetable?.shift?.institution?.days?.find(
-        day => day.name === 'Monday'
-      )
+      const monday = props?.timetable?.shift?.institution?.days?.find(day => day.name === 'Monday')
       setData('day_id', monday?.id ?? null)
     }
   }
@@ -157,16 +154,15 @@ function SingleCreateForm({ props }: SingleCreateForm) {
                   {formatTime(props?.slot?.start_time)} - {formatTime(props?.slot?.end_time)}
                 </Badge>
               </div>
-              <CardDescription>
-                Select a day to manage its allocation
-              </CardDescription>
+              <CardDescription>Select a day to manage its allocation</CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[calc(100vh-20rem)]">
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 p-1">
                   {props?.timetable?.shift?.institution?.days?.map(day => {
                     const allocation = getDayAllocation(day.id)
-                    const isSelected = data.day_id === day.id &&
+                    const isSelected =
+                      data.day_id === day.id &&
                       data.allocation_id === (allocation ? allocation.id : null)
 
                     return (
@@ -197,15 +193,11 @@ function SingleCreateForm({ props }: SingleCreateForm) {
                               </div>
                               <div className="flex items-center gap-2">
                                 <User className="w-4 h-4 text-primary" />
-                                <span className="text-sm">
-                                  {allocation.teacher?.name}
-                                </span>
+                                <span className="text-sm">{allocation.teacher?.name}</span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <MapPin className="w-4 h-4 text-primary" />
-                                <span className="text-sm">
-                                  {allocation.room?.name}
-                                </span>
+                                <span className="text-sm">{allocation.room?.name}</span>
                               </div>
                             </div>
                           ) : (data.course_id || data.teacher_id || data.room_id) &&
@@ -214,7 +206,7 @@ function SingleCreateForm({ props }: SingleCreateForm) {
                               {data.course_id && (
                                 <div className="flex items-center gap-2">
                                   <Book className="w-4 h-4 text-primary" />
-                                  <span className='text-sm'>
+                                  <span className="text-sm">
                                     {
                                       props?.courses.find(course => course.id === data.course_id)
                                         ?.display_code
@@ -225,7 +217,7 @@ function SingleCreateForm({ props }: SingleCreateForm) {
                               {data.teacher_id && (
                                 <div className="flex items-center gap-2">
                                   <User className="w-4 h-4 text-primary" />
-                                  <span className='text-sm'>
+                                  <span className="text-sm">
                                     {
                                       props?.timetable?.shift?.institution?.teachers?.find(
                                         teacher => teacher.id === data.teacher_id
@@ -237,7 +229,7 @@ function SingleCreateForm({ props }: SingleCreateForm) {
                               {data.room_id && (
                                 <div className="flex items-center gap-2">
                                   <MapPin className="w-4 h-4 text-primary" />
-                                  <span className='text-sm'>
+                                  <span className="text-sm">
                                     {
                                       props?.timetable?.shift?.institution?.rooms?.find(
                                         room => room.id === data.room_id
@@ -275,7 +267,10 @@ function SingleCreateForm({ props }: SingleCreateForm) {
                         value={selectedDay.name}
                         jsxValue={
                           <Badge
-                            className={cn('pointer-events-none', getBackgroundColor(selectedDay.name))}
+                            className={cn(
+                              'pointer-events-none',
+                              getBackgroundColor(selectedDay.name)
+                            )}
                           >
                             {selectedDay.name}
                           </Badge>
@@ -304,9 +299,7 @@ function SingleCreateForm({ props }: SingleCreateForm) {
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                       <DropdownMenuSub>
-                        <DropdownMenuSubTrigger
-                          disabled={allocatedDays.length === 0}
-                        >
+                        <DropdownMenuSubTrigger disabled={allocatedDays.length === 0}>
                           <ArrowLeftRight className="mr-2 h-4 w-4" />
                           <span>Copy From</span>
                         </DropdownMenuSubTrigger>
@@ -353,7 +346,7 @@ function SingleCreateForm({ props }: SingleCreateForm) {
                       <AutoCompleteSelect
                         label="Select Section"
                         value={data.section_id?.toString() ?? ''}
-                        setValue={(value) => setData('section_id', Number(value))}
+                        setValue={value => setData('section_id', Number(value))}
                         values={props?.sections.map(section => ({
                           value: section.id.toString(),
                           label: getSectionLabel(section),
@@ -369,7 +362,7 @@ function SingleCreateForm({ props }: SingleCreateForm) {
                     <AutoCompleteSelect
                       label="Select Room"
                       value={data.room_id?.toString() ?? ''}
-                      setValue={(value) => setData('room_id', Number(value))}
+                      setValue={value => setData('room_id', Number(value))}
                       values={filteredRooms.map(room => ({
                         value: room.id.toString(),
                         label: room.name,
@@ -384,11 +377,13 @@ function SingleCreateForm({ props }: SingleCreateForm) {
                     <AutoCompleteSelect
                       label="Select Teacher"
                       value={data.teacher_id?.toString() ?? ''}
-                      setValue={(value) => setData('teacher_id', Number(value))}
-                      values={props?.timetable?.shift?.institution?.teachers?.map(teacher => ({
-                        value: teacher.id.toString(),
-                        label: teacher.name,
-                      })) ?? []}
+                      setValue={value => setData('teacher_id', Number(value))}
+                      values={
+                        props?.timetable?.shift?.institution?.teachers?.map(teacher => ({
+                          value: teacher.id.toString(),
+                          label: teacher.name,
+                        })) ?? []
+                      }
                       isError={Boolean(errors.teacher_id)}
                     />
                     <InputError message={errors.teacher_id} />
@@ -399,7 +394,7 @@ function SingleCreateForm({ props }: SingleCreateForm) {
                     <AutoCompleteSelect
                       label="Select Course"
                       value={data.course_id?.toString() ?? ''}
-                      setValue={(value) => setData('course_id', Number(value))}
+                      setValue={value => setData('course_id', Number(value))}
                       values={filteredCourse.map(course => ({
                         value: course.id.toString(),
                         label: course.code,
@@ -412,16 +407,10 @@ function SingleCreateForm({ props }: SingleCreateForm) {
               </CardContent>
 
               <CardFooter className="flex justify-between">
-                <Button
-                  variant="outline"
-                  onClick={() => router.get(BACK_ROUTE)}
-                >
+                <Button variant="outline" onClick={() => router.get(BACK_ROUTE)}>
                   Cancel
                 </Button>
-                <Button
-                  onClick={submit}
-                  disabled={processing}
-                >
+                <Button onClick={submit} disabled={processing}>
                   {data.allocation_id ? 'Update' : 'Create'}
                 </Button>
               </CardFooter>
@@ -441,4 +430,4 @@ function SingleCreateForm({ props }: SingleCreateForm) {
   )
 }
 
-export default SingleCreateForm;
+export default SingleCreateForm

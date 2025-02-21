@@ -15,7 +15,7 @@ import {
 import InputError from '@/Components/InputError'
 import { Course, Semester } from '@/types/database'
 import { fetchWrapper } from '@/lib/fetchWrapper'
-import { toast } from 'react-toastify';
+import { toast } from 'react-toastify'
 import MultipleSelector from '@/components/ui/multi-select'
 
 interface SemesterAttachFormProps {
@@ -32,6 +32,7 @@ interface PageState {
 
 interface FormProps {
   courses: { value: number; label: string }[]
+  [key: string]: any
 }
 
 export const SemesterAttachForm: React.FC<SemesterAttachFormProps> = ({

@@ -63,8 +63,9 @@ export default function Teachers({
             to={teachers.meta.to}
             pageSizeOptions={[15, 30, 50, 100]}
             onPageSizeChange={pageSize => {
-              console.log('pageSize => in Teachers', pageSize)
-              router.replace(route('teachers.index', { page: 1, perPage: pageSize }))
+              router.replace({
+                url: route('teachers.index', { page: 1, perPage: pageSize })
+              })
             }}
           />
         </div>

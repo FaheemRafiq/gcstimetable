@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect } from 'react'
 import { FormSheet } from '@/Components/FormSheet'
 import { useForm } from '@inertiajs/react'
-import { toast } from 'react-toastify';
+import { toast } from 'react-toastify'
 import { Room } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -23,6 +23,7 @@ interface FormProps {
   capacity: number
   type: string
   isavailable: boolean
+  [key: string]: any
 }
 
 interface RoomFormProps {

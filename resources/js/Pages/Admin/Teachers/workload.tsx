@@ -7,14 +7,19 @@ import { Allocation, Day, Teacher } from '@/types/database'
 import { Calendar, Clock, Book, MapPin, User, GraduationCap, Users } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 
 interface TeachersWorkloadProps extends Record<string, unknown> {
-  teacher: Teacher;
-  days: Day[];
-  allocations: Allocation[];
+  teacher: Teacher
+  days: Day[]
+  allocations: Allocation[]
 }
 
 export default function TeachersWorkload({
@@ -33,12 +38,12 @@ export default function TeachersWorkload({
   }, [setBreadcrumb])
 
   const getAllocationsByDay = (dayId: number) => {
-    return allocations.filter((a) => a.day_id === dayId);
-  };
+    return allocations.filter(a => a.day_id === dayId)
+  }
 
   const sortByStartTime = (a: Allocation, b: Allocation) => {
-    return a.slot?.start_time.localeCompare(b.slot?.start_time || '') || 0;
-  };
+    return a.slot?.start_time.localeCompare(b.slot?.start_time || '') || 0
+  }
 
   return (
     <AuthenticatedLayout user={auth.user}>
@@ -67,10 +72,10 @@ export default function TeachersWorkload({
 
         <ScrollArea className="h-[calc(100vh-300px)]">
           <Accordion type="multiple" className="space-y-4">
-            {days.map((day) => {
-              const dayAllocations = getAllocationsByDay(day.id).sort(sortByStartTime);
-              const totalClasses = dayAllocations.length;
-              
+            {days.map(day => {
+              const dayAllocations = getAllocationsByDay(day.id).sort(sortByStartTime)
+              const totalClasses = dayAllocations.length
+
               return (
                 <Card key={day.id}>
                   <AccordionItem value={day.id.toString()} className="border-none">
@@ -79,13 +84,13 @@ export default function TeachersWorkload({
                         <Calendar className="h-5 w-5 text-primary" />
                         <div className="flex items-center gap-4">
                           <span className="font-semibold">{day.name}</span>
-                          <Badge variant={totalClasses ? "default" : "secondary"}>
+                          <Badge variant={totalClasses ? 'default' : 'secondary'}>
                             {totalClasses} {totalClasses === 1 ? 'class' : 'classes'}
                           </Badge>
                         </div>
                       </div>
                     </AccordionTrigger>
-                    
+
                     <AccordionContent>
                       <CardContent>
                         {dayAllocations.length === 0 ? (
@@ -102,28 +107,33 @@ export default function TeachersWorkload({
                                   {allocation.room && (
                                     <div className="flex items-center gap-2 min-w-[150px]">
                                       <MapPin className="h-4 w-4 text-primary shrink-0" />
-                                      <span className="text-sm font-medium">{allocation.room.name}</span>
+                                      <span className="text-sm font-medium">
+                                        {allocation.room.name}
+                                      </span>
                                     </div>
                                   )}
-                                  
+
                                   {/* Section/Semester */}
                                   {allocation.section && (
                                     <div className="flex items-center gap-2 min-w-[150px]">
                                       <Users className="h-4 w-4 text-primary shrink-0" />
                                       <span className="text-sm font-medium">
-                                        {allocation.section?.semester?.name} - ({allocation.section?.name})
+                                        {allocation.section?.semester?.name} - (
+                                        {allocation.section?.name})
                                       </span>
                                     </div>
                                   )}
-                                  
+
                                   {/* Course */}
                                   {allocation.course && (
                                     <div className="flex items-center gap-2 min-w-[200px]">
                                       <Book className="h-4 w-4 text-primary shrink-0" />
-                                      <span className="text-sm font-medium">{allocation.course.code}</span>
+                                      <span className="text-sm font-medium">
+                                        {allocation.course.code}
+                                      </span>
                                     </div>
                                   )}
-                                  
+
                                   {/* Time */}
                                   <div className="flex items-center gap-2 ml-auto">
                                     <Clock className="h-4 w-4 text-primary shrink-0" />
@@ -140,7 +150,7 @@ export default function TeachersWorkload({
                     </AccordionContent>
                   </AccordionItem>
                 </Card>
-              );
+              )
             })}
           </Accordion>
         </ScrollArea>

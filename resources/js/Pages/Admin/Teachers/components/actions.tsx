@@ -25,7 +25,6 @@ interface DataTableRowActionsProps {
 }
 
 export function DataTableRowActions({ row }: DataTableRowActionsProps) {
-  
   // Delete state
   const [openDelete, setOpenDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -58,7 +57,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   function handleToggleStatus(row: Teacher) {
     router.patch(route('teachers.change.status', row.id), {
       preserveScroll: true,
-      preserveState: true
+      preserveState: true,
     })
   }
 
@@ -74,13 +73,10 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         <DropdownMenuContent align="end" className="w-[160px]">
           <DropdownMenuItem onSelect={() => handleEdit(row)}>Edit</DropdownMenuItem>
           <DropdownMenuItem onSelect={() => handleWorkload(row)}>View Workload</DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setOpenDelete(true)}>
-            Delete
-          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setOpenDelete(true)}>Delete</DropdownMenuItem>
           <DropdownMenuItem onSelect={() => setOpenStatusChange(true)}>
             {row.is_active === 'active' ? 'Deactivate' : 'Activate'}
           </DropdownMenuItem>
-
         </DropdownMenuContent>
       </DropdownMenu>
 

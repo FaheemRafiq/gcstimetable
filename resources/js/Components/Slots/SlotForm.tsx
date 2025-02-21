@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useForm } from '@inertiajs/react'
 import InputError from '@/Components/InputError'
-import { toast } from 'react-toastify';
+import { toast } from 'react-toastify'
 import { TimePickerDemo } from '@/components/time-picker/time-picker-input'
 import { format } from 'date-fns'
 import { Slot } from '@/types/database'
@@ -17,7 +17,7 @@ interface FormProps {
   end_time: string
   is_practical: string
   shift_id: number
-  [key: string] : any
+  [key: string]: any
 }
 
 interface SlotFormProps {

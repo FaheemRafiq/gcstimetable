@@ -6,12 +6,7 @@ import { getRomanNumber } from '@/utils/helper'
 import { PageProps, TimeTable } from '@/types'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Button } from '@/components/ui/button'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { AllocationCell, GroupAllocationCell } from './_components/AllocationCell'
@@ -35,7 +30,7 @@ export default function TimeTableView({
   sections,
 }: PageProps<{ timetable: TimeTable; sections: Section[] }>) {
   const { setBreadcrumb } = useBreadcrumb()
-  const isMobile = useIsMobile();
+  const isMobile = useIsMobile()
 
   // state
   const [allocations, setAllocations] = useState<Allocation[]>([])
@@ -56,7 +51,7 @@ export default function TimeTableView({
         right: [],
       })
     }
-  }, [isMobile]);
+  }, [isMobile])
 
   useEffect(() => {
     setBreadcrumb({
@@ -78,36 +73,34 @@ export default function TimeTableView({
 
   const getAllocations = (slotId: number, sectionId: number) => {
     let filteredAllocations = allocations
-      .filter(
-        allocation => allocation.slot_id === slotId && allocation.section_id === sectionId
-      )
-      .sort((a, b) => Number(a.day?.number) - Number(b.day?.number));
+      .filter(allocation => allocation.slot_id === slotId && allocation.section_id === sectionId)
+      .sort((a, b) => Number(a.day?.number) - Number(b.day?.number))
 
-    return groupAllocations(filteredAllocations);
+    return groupAllocations(filteredAllocations)
   }
 
   const groupAllocations = (allocations: Allocation[]) => {
     const groupedMap = allocations.reduce<Record<string, any>>((acc, allocation) => {
       // Create a unique key based on teacher_id, course_id, and room_id
-      const key = `${allocation.teacher_id}-${allocation.course_id}-${allocation.room_id}`;
+      const key = `${allocation.teacher_id}-${allocation.course_id}-${allocation.room_id}`
 
       // If the key doesn't exist in the map, initialize it with an empty array
       if (!acc[key]) {
         acc[key] = {
           ...allocation,
           days: [],
-        };
+        }
       }
 
       // Add the day to the group
-      acc[key].days.push(allocation.day);
+      acc[key].days.push(allocation.day)
 
-      return acc;
-    }, {});
+      return acc
+    }, {})
 
     // Convert the map into an array of groups
-    return Object.values(groupedMap);
-  };
+    return Object.values(groupedMap)
+  }
 
   const handleCreateAllocation = (slot_id: number, section_id?: number) => {
     const params: any = {
@@ -122,7 +115,7 @@ export default function TimeTableView({
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
-      year: 'numeric'
+      year: 'numeric',
     })
   }
 
@@ -143,54 +136,53 @@ export default function TimeTableView({
     ]
 
     // Add slot columns dynamically
-    const slotColumns = timetable.shift?.slots?.map((slot, index) =>
-      columnHelper.accessor(`slot_${slot.id}`, {
-        header: () => (
-          <div className="space-y-2">
-            <div className="font-medium text-center">{getRomanNumber(index + 1)}</div>
-            <div className="text-sm text-muted-foreground text-center">{slot.name}</div>
-          </div>
-        ),
-        size: 250,
-
-        cell: ({ row }) => {
-          const allocs = getAllocations(slot.id, row.original?.id)
-          return (
-            <div className="min-h-[120px] hover:bg-accent/50 transition-colors p-2">
-              {allocs.length > 0 ? (
-                <div
-                  className="h-full w-full cursor-pointer"
-                  onClick={() => handleCreateAllocation(slot.id, row.original?.id)}
-                >
-                  {allocs.map(alloc => {
-                      return (
-                        <GroupAllocationCell key={alloc.id} allocation={alloc} />
-                      )
-                  })}
-                </div>
-              ) : (
-                <div className="h-full w-full flex items-center justify-center">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleCreateAllocation(slot.id, row.original?.id)}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Add Allocation</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              )}
+    const slotColumns =
+      timetable.shift?.slots?.map((slot, index) =>
+        columnHelper.accessor(`slot_${slot.id}`, {
+          header: () => (
+            <div className="space-y-2">
+              <div className="font-medium text-center">{getRomanNumber(index + 1)}</div>
+              <div className="text-sm text-muted-foreground text-center">{slot.name}</div>
             </div>
-          )
-        },
-      })
-    ) || []
+          ),
+          size: 250,
+
+          cell: ({ row }) => {
+            const allocs = getAllocations(slot.id, row.original?.id)
+            return (
+              <div className="min-h-[120px] hover:bg-accent/50 transition-colors p-2">
+                {allocs.length > 0 ? (
+                  <div
+                    className="h-full w-full cursor-pointer"
+                    onClick={() => handleCreateAllocation(slot.id, row.original?.id)}
+                  >
+                    {allocs.map(alloc => {
+                      return <GroupAllocationCell key={alloc.id} allocation={alloc} />
+                    })}
+                  </div>
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleCreateAllocation(slot.id, row.original?.id)}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Add Allocation</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                )}
+              </div>
+            )
+          },
+        })
+      ) || []
 
     return [...baseColumns, ...slotColumns]
   }, [timetable.shift?.slots, random(1, 1000)])
@@ -241,8 +233,10 @@ export default function TimeTableView({
                 </TooltipProvider>
               </div>
               <p className="text-sm text-muted-foreground mt-2">
-                {timetable.description} 
-                <div className="mt-1 text-xs font-medium">{formatDate(timetable.start_date)} - {formatDate(timetable.end_date)}</div>
+                {timetable.description}
+                <div className="mt-1 text-xs font-medium">
+                  {formatDate(timetable.start_date)} - {formatDate(timetable.end_date)}
+                </div>
               </p>
             </div>
             <Link href={route('timetables.edit', timetable.id)}>
@@ -253,7 +247,7 @@ export default function TimeTableView({
           </div>
 
           <div className="rounded-md border">
-            <div className={cn("overflow-x-auto", { "max-h-[75vh]": !isMobile })}>
+            <div className={cn('overflow-x-auto', { 'max-h-[75vh]': !isMobile })}>
               <table className="w-full border-collapse">
                 <thead className="sticky top-0 z-10 bg-background border-b">
                   {table.getHeaderGroups().map(headerGroup => (
@@ -261,16 +255,13 @@ export default function TimeTableView({
                       {headerGroup.headers.map(header => (
                         <th
                           key={header.id}
-                          className={cn("border-r p-4", getCommonPinningClasses(header.column))}
+                          className={cn('border-r p-4', getCommonPinningClasses(header.column))}
                           style={{
                             width: header.getSize(),
                             minWidth: header.getSize(),
                           }}
                         >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          {flexRender(header.column.columnDef.header, header.getContext())}
                         </th>
                       ))}
                     </tr>
@@ -282,16 +273,13 @@ export default function TimeTableView({
                       {row.getVisibleCells().map(cell => (
                         <td
                           key={cell.id}
-                          className={cn("border-r", getCommonPinningClasses(cell.column))}
+                          className={cn('border-r', getCommonPinningClasses(cell.column))}
                           style={{
                             width: cell.column.getSize(),
                             minWidth: cell.column.getSize(),
                           }}
                         >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </td>
                       ))}
                     </tr>
@@ -300,11 +288,7 @@ export default function TimeTableView({
                   <tr className="border-b">
                     <td className="border-r p-4"></td>
                     {timetable.shift?.slots?.map(slot => (
-                      <td
-                        key={slot.id}
-                        className="border-r"
-                        style={{ width: 250, minWidth: 250 }}
-                      >
+                      <td key={slot.id} className="border-r" style={{ width: 250, minWidth: 250 }}>
                         <div className="min-h-[120px] flex items-center justify-center">
                           <TooltipProvider>
                             <Tooltip>

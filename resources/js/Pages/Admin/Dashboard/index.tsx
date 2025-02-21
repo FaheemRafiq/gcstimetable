@@ -22,7 +22,7 @@ interface DashboardProps {
 export default function Dashboard({
   auth,
   statistics,
-  teacherWorkload
+  teacherWorkload,
 }: PageProps<DashboardProps>) {
   const { setBreadcrumb } = useBreadcrumb()
 

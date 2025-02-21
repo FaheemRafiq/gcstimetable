@@ -4,7 +4,6 @@ import { Allocation, Day } from '@/types/database'
 import { getBackgroundColor } from '@/utils/dayHelper'
 import { formatNumberRange } from '@/utils/helper'
 
-
 export const AllocationCell = ({ allocation }: { allocation: Allocation }) => {
   return (
     <div className="flex flex-col gap-1 p-1 w-full">
@@ -26,9 +25,11 @@ export const AllocationCell = ({ allocation }: { allocation: Allocation }) => {
   )
 }
 
-
-
-export const GroupAllocationCell = ({ allocation }: { allocation: Allocation & { days: Day[] } }) => {
+export const GroupAllocationCell = ({
+  allocation,
+}: {
+  allocation: Allocation & { days: Day[] }
+}) => {
   return (
     <div className="flex flex-col gap-1 p-1 w-full">
       <div className="flex items-center gap-2 justify-center flex-wrap">
@@ -43,8 +44,8 @@ export const GroupAllocationCell = ({ allocation }: { allocation: Allocation & {
         {allocation?.room?.name && (
           <span className="text-sm text-muted-foreground">{allocation?.room?.name}</span>
         )}
-        ({formatNumberRange(allocation.days?.map((day) => day.number))})
+        ({formatNumberRange(allocation.days?.map(day => day.number))})
       </div>
     </div>
-  );
-};
+  )
+}

@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect } from 'react'
 import { FormSheet } from '@/Components/FormSheet'
 import { useForm } from '@inertiajs/react'
-import { toast } from 'react-toastify';
+import { toast } from 'react-toastify'
 import { Section, Semester } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,6 +16,7 @@ interface FormProps {
   name: string
   semester_id: number | null
   is_active: IsActive
+  [key: string]: any
 }
 
 interface SectionFormProps {

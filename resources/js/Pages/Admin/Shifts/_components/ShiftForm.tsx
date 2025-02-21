@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { FormSheet } from '@/Components/FormSheet'
 import { useForm } from '@inertiajs/react'
-import { toast } from 'react-toastify';
+import { toast } from 'react-toastify'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -25,6 +25,7 @@ interface FormProps {
   type: string
   is_active: IsActive
   program_type: string
+  [key: string]: any
 }
 
 interface ShiftFormProps {
