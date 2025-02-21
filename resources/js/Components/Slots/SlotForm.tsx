@@ -17,6 +17,7 @@ interface FormProps {
   end_time: string
   is_practical: string
   shift_id: number
+  [key: string] : any
 }
 
 interface SlotFormProps {

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 /*
 *   Allocation Observer
@@ -52,8 +53,15 @@ class Slot extends Model
     }
 
     // Slot belongs to an Institution
-    public function institution(): BelongsTo
+    public function institution(): HasOneThrough
     {
-        return $this->belongsTo(Institution::class);
+        return $this->hasOneThrough(
+            Institution::class,  // Target model (distant)
+            Shift::class,        // Intermediate model
+            'id',               // Foreign key on the slots table (parent) linking to shifts
+            'id',               // Foreign key on the shifts table linking to institutions
+            'shift_id',                // Local key on the slots table (parent)
+            'institution_id'                 // Local key on the shifts table (intermediate)
+        );
     }
 }

@@ -22,7 +22,7 @@ class TeacherRequest extends FormRequest
         return [
             'name'                              => ['required', 'string', 'max:255'],
             'personnel_number'                  => ['required', 'string', 'max:255', Rule::unique('teachers', 'personnel_number')->ignore($this->route('teacher'))],
-            'email'                             => ['required', 'email:rfc,dns', 'max:255', Rule::unique('teachers', 'email')->ignore($this->route('teacher'))],
+            'email'                             => ['required', 'email', 'max:255', Rule::unique('teachers', 'email')->ignore($this->route('teacher'))],
             'cnic'                              => ['nullable', 'string', 'max:255', Rule::unique('teachers', 'cnic')->ignore($this->route('teacher'))],
             'phone_number'                      => ['nullable', 'string', 'max:255', Rule::unique('teachers', 'phone_number')->ignore($this->route('teacher'))],
             'bank_iban'                         => ['nullable', 'string', 'max:255', Rule::unique('teachers', 'bank_iban')->ignore($this->route('teacher'))],

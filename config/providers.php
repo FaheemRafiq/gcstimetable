@@ -15,19 +15,13 @@ return [
 
     'permission' => [
         'action' => [
-            'error' => [
-                'You do not have permission to perform this action.',
-            ],
+            'error' => 'You do not have permission to perform this action.',
         ],
         'view' => [
-            'error' => [
-                'You do not have permission to view this resource.',
-            ],
+            'error' => 'You do not have permission to view this resource.',
         ],
         'view_any' => [
-            'error' => [
-                'You do not have permission to view any resources.',
-            ],
+            'error' => 'You do not have permission to view any resources.',
         ],
     ],
 ];

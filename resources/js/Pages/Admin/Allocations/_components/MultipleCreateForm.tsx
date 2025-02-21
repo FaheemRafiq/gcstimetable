@@ -513,7 +513,7 @@ function MultipleCreateForm({ props }: MultipleCreateForm) {
                                                 setValue={(value) => setData('section_id', Number(value))}
                                                 values={props?.sections.map(section => ({
                                                     value: section.id.toString(),
-                                                    label: `${section.SemesterName} (${section.name})`,
+                                                    label: getSectionLabel(section),
                                                 }))}
                                                 isError={Boolean(errors.section_id)}
                                             />

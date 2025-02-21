@@ -2,14 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Room;
 use App\Models\User;
 use Inertia\Inertia;
-use App\Models\Shift;
-use App\Models\Course;
 use App\Models\Student;
 use App\Models\Teacher;
-use App\Models\Semester;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
@@ -66,37 +62,19 @@ class DashboardController extends Controller
 
         return Inertia::render('Admin/Dashboard/index', [
             'statistics'         => $statistics,
-            'courseTypes'        => $this->getCourseTypes(),
-            'shiftCoverage'      => $this->getShiftCoverage(),
             'teacherWorkload'    => $this->getTeacherWorkload(),
-            'roomUtilization'    => $this->getRoomUtilization(),
-            'studentEnrollment'  => $this->getStudentEnrollment(),
-            'semesterProgress'   => $this->getSemesterProgress(),
         ]);
-    }
-
-    protected function getCourseTypes()
-    {
-        return Course::selectRaw('type, count(*) as count')
-            ->groupBy('type')
-            ->get()
-            ->mapWithKeys(fn ($item) => [$item->type => $item->count]);
-    }
-
-    protected function getShiftCoverage()
-    {
-        return Shift::withCount(['slots', 'allocations'])
-            ->get()
-            ->map(fn ($shift): array => [
-                'shift'       => $shift->name,
-                'total_slots' => $shift->slots_count,
-                'allocated'   => $shift->allocations_count,
-            ]);
     }
 
     protected function getTeacherWorkload()
     {
-        return Teacher::withCount('allocations')
+        return Teacher::withCount([
+            'allocations' => function ($query) {
+                $query->whereHas('timetable', function ($query) {
+                    $query->isValidForToday();
+                });
+            },
+        ])
             ->orderByDesc('allocations_count')
             ->limit(10)
             ->get()
@@ -104,42 +82,6 @@ class DashboardController extends Controller
                 'id'          => $teacher->id,
                 'teacher'     => $teacher->name,
                 'allocations' => $teacher->allocations_count,
-            ]);
-    }
-
-    protected function getRoomUtilization()
-    {
-        return Room::with(['allocations' => fn ($q) => $q->select('room_id', 'day_id', 'slot_id')])
-            ->get()
-            ->map(fn ($room): array => [
-                'room'        => $room->name,
-                'utilization' => $room->allocations->groupBy(['day_id', 'slot_id']),
-            ]);
-    }
-
-    protected function getStudentEnrollment()
-    {
-        return Student::with('program')
-            ->selectRaw('program_id, semester_id, count(*) as total')
-            ->groupBy('program_id', 'semester_id')
-            ->get()
-            ->map(fn ($student): array => [
-                'program'  => $student->program->name,
-                'semester' => $student->semester_id,
-                'students' => $student->total,
-            ]);
-    }
-
-    protected function getSemesterProgress()
-    {
-        return Semester::withCount(['courses', 'allocations'])
-            ->orderByDesc('allocations_count') // Sort by allocated courses in descending order
-            ->limit(5) // Limit to top 5 semesters
-            ->get()
-            ->map(fn ($semester): array => [
-                'semester'  => $semester->name,
-                'total'     => $semester->courses_count,
-                'allocated' => $semester->allocations_count,
             ]);
     }
 }

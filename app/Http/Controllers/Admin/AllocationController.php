@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Carbon\Carbon;
 use App\Models\Slot;
 use Inertia\Inertia;
 use App\Models\TimeTable;
 use App\Models\Allocation;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\Exceptions\AllocationException;
 use Illuminate\Database\QueryException;
@@ -20,11 +23,196 @@ use App\Http\Requests\Allocation\AllocationRequest;
 
 class AllocationController extends Controller
 {
-    public const ONLY = ['create', 'store', 'update', 'destroy'];
+    public const ONLY = ['index', 'create', 'store', 'update', 'destroy'];
 
     public function __construct(
         protected SectionRepository $sectionRepository
     ) {}
+
+    /**
+     * Show All Allocations
+     */
+    public function index(Request $request)
+    {
+        $gateResponse = Gate::inspect('viewAny', Allocation::class);
+
+        if (! $gateResponse->allowed()) {
+            return back()->with('error', $gateResponse->message());
+        }
+
+        $admin       = Auth::user();
+        $institution = $admin->institution()->with('shifts', 'days')->first();
+        $now         = Carbon::now();
+        $currentDay  = $now->dayOfWeek;
+        $selectedDay = $request->query('selected_day', $now->dayOfWeek); // 0 (Sunday) through 6 (Saturday)
+        $startTime   = $request->has('start_time') && $request->filled('start_time') ? $request->date('start_time') : $now->copy()->subHours(2); // 2 hours back
+        $endTime     = $request->has('end_time')   && $request->filled('end_time') ? $request->date('end_time') : $now->copy()->addHours(6);   // 6 hours forward
+        $shift_id    = $request->query('shift_id', $institution->shifts->random()->first()->id ?? null);
+
+        // Get departments with allocations in the time window
+        $departments = Department::with([
+                'programs.semesters.sections',
+                'programs.semesters.sections.allocations' => function ($query) use ($selectedDay, $startTime, $endTime, $admin, $shift_id) {
+                    $query->whereHas('day', function ($q) use ($selectedDay) {
+                        $q->where('number', $selectedDay);
+                    })->whereHas('slot', function ($q) use ($startTime, $endTime, $admin, $shift_id) {
+                        $q->timeOverlaps($startTime, $endTime)
+                        ->when(! $admin->isSuperAdmin(), function ($wQuery) use ($admin) {
+                            $wQuery->whereHas('institution', function ($query) use ($admin) {
+                                $query->where('institutions.id', $admin->institution_id);
+                            });
+                        })
+                        ->when($shift_id, function ($query, $shift_id) {
+                            $query->where('shift_id', $shift_id);
+                        });
+                    })
+                    ->whereHas('timetable', function ($q) {
+                        $q->isValidForToday();
+                    })
+                    ->with(['course', 'teacher', 'room', 'slot']);
+                },
+            ])
+            ->whereHas('programs.semesters.sections.allocations', function ($query) use ($selectedDay, $startTime, $endTime, $admin, $shift_id) {
+                $query->whereHas('day', function ($q) use ($selectedDay) {
+                    $q->where('number', $selectedDay);
+                })->whereHas('slot', function ($q) use ($startTime, $endTime, $admin, $shift_id) {
+                    $q->timeOverlaps($startTime, $endTime)
+                    ->when(! $admin->isSuperAdmin(), function ($wQuery) use ($admin) {
+                        $wQuery->whereHas('institution', function ($query) use ($admin) {
+                            $query->where('institutions.id', $admin->institution_id);
+                        });
+                    })
+                    ->when($shift_id, function ($query, $shift_id) {
+                        $query->where('shift_id', $shift_id);
+                    });
+                })
+                ->whereHas('timetable', function ($q) {
+                    $q->isValidForToday();
+                });
+            })
+            ->when($admin->isInstitutionAdmin(), function ($query) use ($admin) {
+                $query->where('institution_id', $admin->institution_id);
+            })
+            ->when($admin->isDepartmentAdmin(), function ($query) use ($admin) {
+                $query->where('id', $admin->department_id);
+            })
+            ->get();
+
+        // Get only slots that fall within our time window
+        $slots = Slot::query()
+            ->when(! $admin->isSuperAdmin(), function ($wQuery) use ($admin) {
+                $wQuery->whereHas('institution', function ($query) use ($admin) {
+                    $query->where('institutions.id', $admin->institution_id);
+                });
+            })
+            ->when($shift_id, function ($query, $shift_id) {
+                $query->where('shift_id', $shift_id);
+            })
+            ->orderBy('start_time')
+            ->get();
+
+        $response = [
+            'selected_day' => $selectedDay,
+            'shift_id'     => $shift_id,
+            'current_time' => $now->toDateTimeString(),
+            'time_window'  => [
+                'start' => $startTime->toDateTimeString(),
+                'end'   => $endTime->toDateTimeString(),
+            ],
+            'departments' => $departments->map(function ($department) {
+                return [
+                    'id'       => $department->id,
+                    'name'     => $department->name,
+                    'programs' => $department->programs->map(function ($program) {
+                        return [
+                            'id'        => $program->id,
+                            'name'      => $program->name,
+                            'semesters' => $program->semesters->map(function ($semester) {
+                                return [
+                                    'id'       => $semester->id,
+                                    'name'     => $semester->name,
+                                    'sections' => $semester->sections->map(function ($section) {
+                                        return [
+                                            'id'          => $section->id,
+                                            'name'        => $section->name,
+                                            'allocations' => $section->allocations->map(function ($allocation) {
+                                                $startDateTime = Carbon::today()->setTimeFromTimeString($allocation->slot->start_time);
+                                                $endDateTime   = Carbon::today()->setTimeFromTimeString($allocation->slot->end_time);
+
+                                                return [
+                                                    'id'      => $allocation->id,
+                                                    'course'  => $allocation->course?->only('id', 'name'),
+                                                    'teacher' => $allocation->teacher?->only('id', 'name'),
+                                                    'room'    => $allocation->room?->only('id', 'name'),
+                                                    'slot'    => [
+                                                        'id'         => $allocation->slot->id,
+                                                        'start_time' => $allocation->slot->start_time,
+                                                        'end_time'   => $allocation->slot->end_time,
+                                                        'datetime'   => [
+                                                            'start' => $startDateTime->toDateTimeString(),
+                                                            'end'   => $endDateTime->toDateTimeString(),
+                                                        ],
+                                                        'status' => $this->getAllocationStatus($startDateTime, $endDateTime),
+                                                    ],
+                                                ];
+                                            })->sortBy('slot.start_time')->values(),
+                                        ];
+                                    })->filter(function ($section) {
+                                        return $section['allocations']->isNotEmpty();
+                                    })->values(),
+                                ];
+                            })->filter(function ($semester) {
+                                return $semester['sections']->isNotEmpty();
+                            })->values(),
+                        ];
+                    })->filter(function ($program) {
+                        return $program['semesters']->isNotEmpty();
+                    })->values(),
+                ];
+            })->values(),
+            'slots' => $slots->map(function ($slot) {
+                $startDateTime = Carbon::today()->setTimeFromTimeString($slot->start_time);
+                $endDateTime   = Carbon::today()->setTimeFromTimeString($slot->end_time);
+
+                return [
+                    'id'         => $slot->id,
+                    'name'       => $slot->name,
+                    'start_time' => $slot->start_time,
+                    'end_time'   => $slot->end_time,
+                    'datetime'   => [
+                        'start' => $startDateTime->toDateTimeString(),
+                        'end'   => $endDateTime->toDateTimeString(),
+                    ],
+                    'status' => $this->getAllocationStatus($startDateTime, $endDateTime),
+                ];
+            })->sortBy('start_time')->values(),
+        ];
+
+        return Inertia::render('Admin/Dashboard/AllocationTimeTable', [
+            'initialData' => $response,
+            'institution' => $institution,
+        ]);
+    }
+
+    /**
+     * Determine the status of an allocation based on current time
+     */
+    private function getAllocationStatus($startDateTime, $endDateTime)
+    {
+        $now                    = Carbon::now();
+        $currentDay             = $now->dayOfWeek;
+        $selectedDay            = request()->query('selected_day', $now->dayOfWeek); // 0 (Sunday) through 6 (Saturday)
+        $isCurrentOrUpcomingDay = $selectedDay >= $currentDay;
+        $isFutureDay            = $currentDay < $selectedDay;
+
+        if (($now->lessThan($startDateTime) && $isCurrentOrUpcomingDay) || $isFutureDay) {
+            return 'upcoming';
+        } elseif ($now->greaterThanOrEqualTo($startDateTime) && $now->lessThanOrEqualTo($endDateTime) && $isCurrentOrUpcomingDay) {
+            return 'ongoing';
+        } else {
+            return 'past';
+        }
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -291,17 +479,16 @@ class AllocationController extends Controller
 
     public function bulkDestroy(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
-            'allocations_data' => 'required|array|min:1',
+            'allocations_data'                 => 'required|array|min:1',
             'allocations_data.*.allocation_id' => 'required|integer|exists:allocations,id',
         ], [
-            'allocations_data.required' => 'Please select at least one allocation',
-            'allocations_data.array' => 'Please select at least one allocation',
-            'allocations_data.min' => 'Please select at least one allocation',
+            'allocations_data.required'                 => 'Please select at least one allocation',
+            'allocations_data.array'                    => 'Please select at least one allocation',
+            'allocations_data.min'                      => 'Please select at least one allocation',
             'allocations_data.*.allocation_id.required' => 'Please select at least one allocation',
-            'allocations_data.*.allocation_id.integer' => 'Please select at least one allocation',
-            'allocations_data.*.allocation_id.exists' => 'Please select at least one allocation',
+            'allocations_data.*.allocation_id.integer'  => 'Please select at least one allocation',
+            'allocations_data.*.allocation_id.exists'   => 'Please select at least one allocation',
         ]);
 
         if ($validator->fails()) {
@@ -316,7 +503,7 @@ class AllocationController extends Controller
 
                 $gateResponse = Gate::inspect('delete', $allocation);
 
-                if(!$gateResponse->allowed()){
+                if (! $gateResponse->allowed()) {
                     throw new AllocationException($gateResponse->message());
                 }
 

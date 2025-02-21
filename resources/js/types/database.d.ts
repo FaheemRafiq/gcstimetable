@@ -40,6 +40,7 @@ export type Department = {
   updated_at: string
 
   institution?: Institution
+  programs?: Program[]
 }
 
 export type Institution = {
@@ -50,6 +51,9 @@ export type Institution = {
   phone: string
   created_at: string
   updated_at: string
+
+  days?: Day[]
+  shifts?: Shift[]
 }
 
 export type Slot = {
@@ -62,6 +66,8 @@ export type Slot = {
   end_time: string
   created_at: string
   updated_at: string
+
+  status?: string
 }
 
 export type Day = {
@@ -133,6 +139,8 @@ export type Section = {
   semester?: Semester
   created_at: string
   updated_at: string
+
+  allocations?: Allocation[]
 }
 
 export type Semester = {

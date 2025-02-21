@@ -18,15 +18,20 @@ import { Teacher } from '@/types/database'
 import { Fragment } from 'react/jsx-runtime'
 import { useState } from 'react'
 import DeleteConfirmationDialog from '@/Components/Dialog/DeleteConfirmationDialog'
+import ConfirmationDialog from '@/Components/Dialog/ConfirmationDialog'
 
 interface DataTableRowActionsProps {
   row: Teacher
 }
 
 export function DataTableRowActions({ row }: DataTableRowActionsProps) {
+  
   // Delete state
   const [openDelete, setOpenDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
+
+  // Status change state
+  const [openStatusChange, setOpenStatusChange] = useState(false)
 
   const handleDelete = (row: Teacher) => {
     setDeleting(true)
@@ -50,6 +55,13 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
     router.get(route('teachers.workload', row.id))
   }
 
+  function handleToggleStatus(row: Teacher) {
+    router.patch(route('teachers.change.status', row.id), {
+      preserveScroll: true,
+      preserveState: true
+    })
+  }
+
   return (
     <Fragment>
       <DropdownMenu>
@@ -64,7 +76,9 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           <DropdownMenuItem onSelect={() => handleWorkload(row)}>View Workload</DropdownMenuItem>
           <DropdownMenuItem onSelect={() => setOpenDelete(true)}>
             Delete
-            {/* <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut> */}
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setOpenStatusChange(true)}>
+            {row.is_active === 'active' ? 'Deactivate' : 'Activate'}
           </DropdownMenuItem>
 
         </DropdownMenuContent>
@@ -82,6 +96,20 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           </p>
         }
         processing={deleting}
+      />
+
+      {/* Status Change Confirmation */}
+      <ConfirmationDialog
+        open={openStatusChange}
+        onClose={() => setOpenStatusChange(false)}
+        onConfirm={() => handleToggleStatus(row)}
+        title={row.is_active === 'active' ? 'Deactivate Teacher?' : 'Activate Teacher?'}
+        message={
+          <p>
+            Are you sure you want to {row.is_active === 'active' ? 'deactivate' : 'activate'}{' '}
+            <strong>{row.name}</strong>?
+          </p>
+        }
       />
     </Fragment>
   )

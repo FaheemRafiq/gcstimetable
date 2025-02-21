@@ -163,15 +163,9 @@ export default function TimeTableView({
                   onClick={() => handleCreateAllocation(slot.id, row.original?.id)}
                 >
                   {allocs.map(alloc => {
-                    if (alloc.days.length > 1) {
                       return (
                         <GroupAllocationCell key={alloc.id} allocation={alloc} />
                       )
-                    }
-
-                    return (
-                      <AllocationCell key={alloc.id} allocation={alloc} />
-                    )
                   })}
                 </div>
               ) : (

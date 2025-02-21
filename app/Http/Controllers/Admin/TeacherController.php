@@ -12,6 +12,7 @@ use App\Enums\TeacherPositionEnum;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\TeacherRequest;
 use App\Enums\TeacherQualificationEnum;
 use App\Http\Resources\TeacherResource;
@@ -93,6 +94,11 @@ class TeacherController extends Controller
     {
         $attributes = $request->validated();
         $message    = '';
+        $response   = Gate::inspect('create', Teacher::class);
+
+        if (! $response->allowed()) {
+            return back()->withErrors(['message' => $response->message()]);
+        }
 
         try {
             Teacher::create($attributes);
@@ -144,6 +150,12 @@ class TeacherController extends Controller
         $attributes = $request->validated();
         $message    = '';
 
+        $response = Gate::inspect('update', $teacher);
+
+        if (! $response->allowed()) {
+            return back()->withErrors(['message' => $response->message()]);
+        }
+
         try {
             $teacher->update($attributes);
 
@@ -165,7 +177,12 @@ class TeacherController extends Controller
      */
     public function destroy(Teacher $teacher)
     {
-        $message = '';
+        $message  = '';
+        $response = Gate::inspect('delete', $teacher);
+
+        if (! $response->allowed()) {
+            return back()->withErrors(['message' => $response->message()]);
+        }
 
         try {
             $teacher->delete();
@@ -187,13 +204,24 @@ class TeacherController extends Controller
     {
         $admin = Auth::user();
 
-        if (!$admin->isSuperAdmin()) {
+        $response = Gate::inspect('view_workload', $teacher);
+
+        if (! $response->allowed()) {
+            $message = $response->message();
+
+            return back()->with('error', $message);
+        }
+
+        if (! $admin->isSuperAdmin()) {
             $days = $admin->institution->days()->get();
         } else {
             $days = Day::all();
         }
 
         $allocations = $teacher->allocations()
+            ->whereHas('timetable', function ($query) {
+                $query->isValidForToday();
+            })
             ->with(['day', 'slot', 'course', 'room', 'section.semester:id,name'])
             ->get();
 
@@ -203,5 +231,18 @@ class TeacherController extends Controller
             'days'        => $days,
             'allocations' => $allocations,
         ]);
+    }
+
+    public function changeStatus(Teacher $teacher)
+    {
+        $response = Gate::inspect('change_status', $teacher);
+
+        if (! $response->allowed()) {
+            return back()->with('error', $response->message());
+        }
+
+        $teacher->update(['is_active' => $teacher->is_active === Day::ACTIVE ? Day::INACTIVE : Day::ACTIVE]);
+
+        return back()->with('success', 'Teacher status successfully changed');
     }
 }

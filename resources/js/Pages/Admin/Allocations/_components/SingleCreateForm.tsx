@@ -356,7 +356,7 @@ function SingleCreateForm({ props }: SingleCreateForm) {
                         setValue={(value) => setData('section_id', Number(value))}
                         values={props?.sections.map(section => ({
                           value: section.id.toString(),
-                          label: `${getNumberWithOrdinal(section.SemesterNo)} - ${section.name}`,
+                          label: getSectionLabel(section),
                         }))}
                         isError={Boolean(errors.section_id)}
                       />

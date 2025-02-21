@@ -24,4 +24,9 @@ class Section extends Model
     {
         return $this->hasMany(Course::class);
     }
+
+    public function allocations()
+    {
+        return $this->hasMany(Allocation::class);
+    }
 }

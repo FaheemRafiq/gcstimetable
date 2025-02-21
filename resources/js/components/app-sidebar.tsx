@@ -25,6 +25,7 @@ import {
   Hotel,
   ShieldCheckIcon,
   KeyIcon,
+  ListTree,
 } from 'lucide-react'
 
 import { NavMain } from '@/components/nav-main'
@@ -77,6 +78,14 @@ export const NavData: NavDataType = [
         icon: LayoutDashboardIcon,
         isActive: route().current('dashboard'),
         permission: PermissionEnum.VIEW_DASHBOARD,
+      },
+      {
+        title: 'Allocations',
+        route: 'allocations',
+        url: route('allocations.index'),
+        icon: ListTree,
+        isActive: route().current('allocations.index'),
+        permission: PermissionEnum.VIEW_ALLOCATIONS,
       },
       {
         title: 'Users',

@@ -44,3 +44,33 @@ export function sortByDays(a: string, b: string) {
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   return days.indexOf(a) - days.indexOf(b)
 }
+
+/**
+ * Given an array of numbers, returns a string representing the ranges of numbers
+ * or single numbers in the array. For example, [1, 2, 3, 5, 6, 7] would return
+ * "1-3, 5-7".
+ */
+export function formatNumberRange(numbers: number[]): string {
+  if (numbers.length === 0) return '';
+
+  let result: string[] = [];
+  let start = numbers[0];
+  let end = start;
+
+  for (let i = 1; i <= numbers.length; i++) {
+    if (i < numbers.length && numbers[i] === end + 1) {
+      end = numbers[i]; // Extend the range
+    } else {
+      // Add the current range or single number to result
+      result.push(start === end ? `${start}` : `${start}-${end}`);
+
+      // If we haven't reached the end of the array, start a new range
+      if (i < numbers.length) {
+        start = numbers[i];
+        end = start;
+      }
+    }
+  }
+
+  return result.join(',');
+}
