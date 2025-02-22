@@ -11,10 +11,10 @@ import { error } from 'console'
 import { toast } from 'react-toastify'
 
 interface FormProps {
-  email: string;
-  password: string;
-  remember: boolean;
-  [key: string] : any;
+  email: string
+  password: string
+  remember: boolean
+  [key: string]: any
 }
 
 export default function Login({

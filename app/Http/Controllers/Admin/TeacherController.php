@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Day;
+use App\Models\Slot;
 use Inertia\Inertia;
+use App\Models\Shift;
 use App\Models\Teacher;
 use App\Models\Department;
 use Illuminate\Http\Request;
@@ -244,5 +246,124 @@ class TeacherController extends Controller
         $teacher->update(['is_active' => $teacher->is_active === Day::ACTIVE ? Day::INACTIVE : Day::ACTIVE]);
 
         return back()->with('success', 'Teacher status successfully changed');
+    }
+
+    public function showTeacherWorkload(Request $request, Department $department)
+    {
+        $admin = Auth::user();
+
+        if ($department->institution_id !== $admin->institution_id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $shiftId = $request->query('shift_id');
+
+        if (is_numeric($shiftId)) {
+            $shiftId = (int) $shiftId;
+        }
+
+        $workloadData = [];
+
+        // Fetch teachers with their allocations for the specified shift
+        $teachers = Teacher::query()
+            ->select('id', 'name', 'rank', 'department_id')
+            ->where('department_id', $department->id)
+            ->where('is_active', 'active')
+            ->with([
+                'allocations' => function ($query) {
+                    $query
+                        ->with([
+                            'course'  => fn ($q) => $q->select('id', 'name', 'display_code', 'credit_hours'),
+                            'day'     => fn ($q) => $q->select('id', 'name', 'number'),
+                            'room'    => fn ($q) => $q->select('id', 'name'),
+                            'slot'    => fn ($q) => $q->select('id', 'code', 'name', 'start_time', 'end_time', 'shift_id')->with('shift:id,name'),
+                            'section' => fn ($q) => $q->select('id', 'name', 'semester_id')->with('semester:id,name'),
+                        ]);
+                },
+            ])
+            ->get();
+
+        if ($teachers->isEmpty()) {
+            return back()->with('error', 'No active teachers found for this department.');
+        }
+
+        // dd($teachers->toArray());
+
+        // Get unique shifts from allocations
+        $uniqueShifts = $teachers->pluck('allocations')
+            ->flatten()
+            ->pluck('slot.shift')
+            ->unique('id')
+            ->values();
+
+        if ($uniqueShifts->isEmpty()) {
+            return back()->with('error', 'No active shifts found for this department.');
+        }
+
+        $shiftId = $shiftId ?? $uniqueShifts->first()->id;
+
+        // Fetch all active slots for the shift, ordered by start time
+        $slots = Slot::where('shift_id', $shiftId)
+            ->orderBy('start_time')
+            ->get(['id', 'name', 'code', 'start_time', 'end_time']);
+
+        if ($slots->isEmpty()) {
+            return back()->with('error', 'No time slots found for this shift.');
+        }
+
+        // Transform data for the table
+        $workloadData = [
+            'department' => [
+                'id'   => $department->id,
+                'name' => $department->name,
+            ],
+            'teachers' => $teachers
+                ->map(function ($teacher) use ($slots, $shiftId) {
+                    $sections = [];
+
+                    // Group allocations by section and semester
+                    foreach ($teacher->allocations as $allocation) {
+                        if ($allocation->slot->shift_id === $shiftId) {
+                            $sectionKey = $allocation->section->id.'-'.$allocation->section->semester->id;
+
+                            if (! isset($sections[$sectionKey])) {
+                                $sections[$sectionKey] = [
+                                    'section_name'  => $allocation->section->name,
+                                    'semester_name' => $allocation->section->semester->name,
+                                    'allocations'   => array_fill_keys($slots->pluck('id')->all(), []),
+                                ];
+                            }
+                            
+                            $sections[$sectionKey]['allocations'][$allocation->slot_id][] = $allocation;
+                        }
+                    }
+
+                    return [
+                        'id'       => $teacher->id,
+                        'name'     => $teacher->name,
+                        'rank'     => $teacher->rank,
+                        'sections' => array_values($sections),
+                    ];
+                })->filter()->values(),
+            'slots' => $slots->map(function ($slot) {
+                return [
+                    'id'         => $slot->id,
+                    'name'       => $slot->name,
+                    'code'       => $slot->code,
+                    'start_time' => $slot->start_time,
+                    'end_time'   => $slot->end_time,
+                ];
+            })->all(),
+            'shifts' => $uniqueShifts->map(fn ($shift) => [
+                'id'   => $shift->id,
+                'name' => $shift->name,
+            ])->all(),
+            'currentShift' => $shiftId,
+            'session'      => date('Y').'-'.(date('Y') + 1), // Current academic year
+        ];
+
+        return Inertia::render('Admin/Departments/TeachersWorkload', [
+            'workloadData' => $workloadData,
+        ]);
     }
 }

@@ -19,6 +19,11 @@ class Teacher extends Model
         'date_of_joining_current_rank'    => 'date',
     ];
 
+    public function scopeWhereActive($query)
+    {
+        return $query->where('is_active', self::ACTIVE);
+    }
+
     // Teacher Belongs to Department
     public function department()
     {

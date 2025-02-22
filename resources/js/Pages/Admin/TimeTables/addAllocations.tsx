@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Head } from '@inertiajs/react'
 import { router, Link } from '@inertiajs/react'
 import { ArrowUpRight, Calendar, Plus } from 'lucide-react'
-import { getRomanNumber } from '@/utils/helper'
+import { getRomanNumber, groupAllocationsByDay } from '@/utils/helper'
 import { PageProps, TimeTable } from '@/types'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Button } from '@/components/ui/button'
@@ -76,30 +76,7 @@ export default function TimeTableView({
       .filter(allocation => allocation.slot_id === slotId && allocation.section_id === sectionId)
       .sort((a, b) => Number(a.day?.number) - Number(b.day?.number))
 
-    return groupAllocations(filteredAllocations)
-  }
-
-  const groupAllocations = (allocations: Allocation[]) => {
-    const groupedMap = allocations.reduce<Record<string, any>>((acc, allocation) => {
-      // Create a unique key based on teacher_id, course_id, and room_id
-      const key = `${allocation.teacher_id}-${allocation.course_id}-${allocation.room_id}`
-
-      // If the key doesn't exist in the map, initialize it with an empty array
-      if (!acc[key]) {
-        acc[key] = {
-          ...allocation,
-          days: [],
-        }
-      }
-
-      // Add the day to the group
-      acc[key].days.push(allocation.day)
-
-      return acc
-    }, {})
-
-    // Convert the map into an array of groups
-    return Object.values(groupedMap)
+    return groupAllocationsByDay(filteredAllocations)
   }
 
   const handleCreateAllocation = (slot_id: number, section_id?: number) => {

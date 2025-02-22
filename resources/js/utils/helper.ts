@@ -1,3 +1,4 @@
+import { Allocation } from '@/types/database'
 import moment from 'moment'
 
 export function getRomanNumber(num: number): string {
@@ -73,4 +74,27 @@ export function formatNumberRange(numbers: number[]): string {
   }
 
   return result.join(',')
+}
+
+export const groupAllocationsByDay = (allocations: Allocation[]) => {
+  const groupedMap = allocations.reduce<Record<string, any>>((acc, allocation) => {
+    // Create a unique key based on teacher_id, course_id, and room_id
+    const key = `${allocation.teacher_id}-${allocation.course_id}-${allocation.room_id}`
+
+    // If the key doesn't exist in the map, initialize it with an empty array
+    if (!acc[key]) {
+      acc[key] = {
+        ...allocation,
+        days: [],
+      }
+    }
+
+    // Add the day to the group
+    acc[key].days.push(allocation.day)
+
+    return acc
+  }, {})
+
+  // Convert the map into an array of groups
+  return Object.values(groupedMap)
 }

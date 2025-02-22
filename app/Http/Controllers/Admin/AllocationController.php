@@ -239,7 +239,7 @@ class AllocationController extends Controller
                         ->available();
                 },
                 'shift.institution.teachers' => function ($query): void {
-                    $query->select('teachers.id', 'teachers.name', 'teachers.email', 'teachers.department_id');
+                    $query->select('teachers.id', 'teachers.name', 'teachers.email', 'teachers.department_id')->whereActive();
                 },
                 'shift.institution.courses' => function ($query): void {
                     $query->with('semesters:id,name');

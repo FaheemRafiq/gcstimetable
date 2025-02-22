@@ -55,10 +55,17 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   }
 
   function handleToggleStatus(row: Teacher) {
-    router.patch(route('teachers.change.status', row.id), {
-      preserveScroll: true,
-      preserveState: true,
-    })
+    router.patch(
+      route('teachers.change.status', row.id),
+      {},
+      {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+          setOpenStatusChange(false)
+        },
+      }
+    )
   }
 
   return (

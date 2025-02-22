@@ -63,6 +63,7 @@ Route::prefix('admin')
 
         // Departments 🏢
         Route::resource('departments', DepartmentController::class)->only(DepartmentController::ONLY);
+        Route::get('/departments/{department}/workload', [TeacherController::class, 'showTeacherWorkload'])->name('departments.teacher-workload');
 
         // Rooms 🏫
         Route::resource('rooms', RoomController::class)->only(RoomController::ONLY);

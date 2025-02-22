@@ -68,4 +68,9 @@ class Shift extends Model
     {
         return $this->hasManyThrough(Allocation::class, TimeTable::class);
     }
+
+    public function timetables()
+    {
+        return $this->hasMany(TimeTable::class);
+    }
 }
