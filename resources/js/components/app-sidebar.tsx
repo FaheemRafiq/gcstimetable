@@ -56,7 +56,7 @@ export type NavItem = {
   isActive: boolean
   collaped?: boolean
   disabled?: boolean
-  permission: string
+  permission: PermissionEnum
   navItems?: NavItem[]
 }
 
