@@ -38,8 +38,8 @@ jobs:
             php artisan optimize:clear
             php artisan optimize
             sudo chown -R www-data:www-data ${{ secrets.REMOTE_DIR }}
-            sudo chmod -R 775 ${{ secrets.REMOTE_DIR }}
-            sudo chmod -R 775 ${{ secrets.REMOTE_DIR }}/storage
-            sudo chmod -R 775 ${{ secrets.REMOTE_DIR }}/storage/app
+            sudo chmod -R 755 ${{ secrets.REMOTE_DIR }}
+            sudo chmod -R 755 ${{ secrets.REMOTE_DIR }}/storage
+            sudo chmod -R 755 ${{ secrets.REMOTE_DIR }}/storage/app
             sudo chmod -R 664 ${{ secrets.REMOTE_DIR }}/storage/logs
             sudo systemctl restart apache2

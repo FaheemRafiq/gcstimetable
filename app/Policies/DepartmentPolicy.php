@@ -58,18 +58,12 @@ class DepartmentPolicy
     }
 
     /**
-     * Determine whether the user can restore the model.
+     * Determine whether the user can view the workload of teachers in the department.
      */
-    public function restore(User $user, Department $department): bool
+    public function view_teachers_workload(User $user, Department $department): Response
     {
-        //
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Department $department): bool
-    {
-        //
+        return $user->can(PermissionEnum::VIEW_TEACHERS_WORKLOAD->value)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.view.error'));
     }
 }

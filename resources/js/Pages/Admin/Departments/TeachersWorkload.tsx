@@ -25,6 +25,8 @@ import { Allocation, Day } from '@/types/database'
 import * as ExcelJS from 'exceljs'
 import { saveAs } from 'file-saver'
 import { Download } from 'lucide-react'
+import { PermissionEnum } from '@/lib/enums'
+import { PermissionWrapper } from '@/Components/AdminWrapper'
 
 // Type definitions updated to match the backend
 interface Slot {
@@ -110,8 +112,8 @@ export default function TeacherWorkload({ auth }: TeacherWorkloadProps) {
         per_week_lectures: Object.values(section.allocations).flat().length
       })),
       total_per_week_lectures: teacher.sections
-      .flatMap(section => Object.values(section.allocations).flat())
-      .length
+        .flatMap(section => Object.values(section.allocations).flat())
+        .length
     }
   })
 
@@ -313,12 +315,14 @@ export default function TeacherWorkload({ auth }: TeacherWorkloadProps) {
               ))}
             </SelectContent>
           </Select>
-          <div className="space-x-2">
-            <Button onClick={exportToExcel} variant="default">
-              <Download className="h-5 w-5" />
-              Export to Excel
-            </Button>
-          </div>
+          <PermissionWrapper permission={PermissionEnum.EXPORT_TEACHERS_WORKLOAD}>
+            <div className="space-x-2">
+              <Button onClick={exportToExcel} variant="default">
+                <Download className="h-5 w-5" />
+                Export to Excel
+              </Button>
+            </div>
+          </PermissionWrapper>
         </div>
 
         {/* Workload Table */}
