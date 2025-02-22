@@ -71,6 +71,7 @@ export default function Departments({
                 autoSearch={true}
                 debounceDelay={500}
                 className="md:shadow-md"
+                autoFocus={true}
               />
             </div>
 

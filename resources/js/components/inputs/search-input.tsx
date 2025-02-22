@@ -14,6 +14,7 @@ interface SearchInputProps {
   className?: string
   autoSearch?: boolean
   debounceDelay?: number
+  autoFocus?: boolean
 }
 
 export default function SearchInput({
@@ -24,6 +25,7 @@ export default function SearchInput({
   className,
   autoSearch = false,
   debounceDelay = 300,
+  autoFocus = false,
 }: SearchInputProps) {
   const id = useId()
   const [isLoading, setIsLoading] = useState(false)
@@ -71,6 +73,7 @@ export default function SearchInput({
             type="search"
             value={search}
             onChange={handleChange}
+            autoFocus={autoFocus}
           />
           <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
             {isLoading ? (

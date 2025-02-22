@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { EllipsisVertical, Eye, Pencil, TentTree, Trash, User as UserIcon } from 'lucide-react'
+import { EllipsisVertical, Eye, Pencil, TentTree, Trash, User as UserIcon, Workflow } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,7 +56,7 @@ export function Actions({ row }: { row: Department }) {
         <DropdownMenuTrigger asChild className="cursor-pointer">
           <EllipsisVertical />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[160px]">
+        <DropdownMenuContent align="end" className="w-[200px]">
           <DropdownMenuLabel>Operations</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
@@ -68,7 +68,7 @@ export function Actions({ row }: { row: Department }) {
               className="cursor-pointer"
               onClick={() => handleTeachersWorkload(row)}
             >
-              <TentTree className="mr-2 h-4 w-4" />
+              <Workflow className="mr-2 h-4 w-4" />
               <span>Teachers Workload</span>
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer" onClick={() => setOpenEdit(true)}>

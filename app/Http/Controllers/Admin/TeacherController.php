@@ -269,9 +269,17 @@ class TeacherController extends Controller
             ->select('id', 'name', 'rank', 'department_id')
             ->where('department_id', $department->id)
             ->where('is_active', 'active')
+            ->whereHas('allocations', function ($query) {
+                $query->whereHas('timetable', function ($q) {
+                    $q->isValidForToday();
+                });
+            })
             ->with([
                 'allocations' => function ($query) {
                     $query
+                        ->whereHas('timetable', function ($q) {
+                            $q->isValidForToday();
+                        })
                         ->with([
                             'course'  => fn ($q) => $q->select('id', 'name', 'display_code', 'credit_hours'),
                             'day'     => fn ($q) => $q->select('id', 'name', 'number'),
@@ -286,8 +294,6 @@ class TeacherController extends Controller
         if ($teachers->isEmpty()) {
             return back()->with('error', 'No active teachers found for this department.');
         }
-
-        // dd($teachers->toArray());
 
         // Get unique shifts from allocations
         $uniqueShifts = $teachers->pluck('allocations')
