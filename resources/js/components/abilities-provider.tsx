@@ -21,7 +21,8 @@ export const AbilitiesProvider: React.FC<{
   const hasRole = (role: RoleEnum) => isRole(user, role)
 
   // Permissions
-  const hasPermission = (permission: string) => isSuperAdmin() || can(user, permission as PermissionEnum)
+  const hasPermission = (permission: string) =>
+    isSuperAdmin() || can(user, permission as PermissionEnum)
 
   return (
     <AbilitiesContext.Provider value={{ isSuperAdmin, isInstitutionAdmin, hasRole, hasPermission }}>

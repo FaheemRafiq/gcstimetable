@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Head } from '@inertiajs/react'
 import { router, Link } from '@inertiajs/react'
-import { ArrowUpRight, Calendar, Plus } from 'lucide-react'
-import { getRomanNumber, groupAllocationsByDay } from '@/utils/helper'
+import { ArrowUpRight, Calendar, Download, Plus } from 'lucide-react'
+import { formatNumberRange, getRomanNumber, groupAllocationsByDay } from '@/utils/helper'
 import { PageProps, TimeTable } from '@/types'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Button } from '@/components/ui/button'
@@ -10,7 +10,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { AllocationCell, GroupAllocationCell } from './_components/AllocationCell'
-import { Allocation, Section } from '@/types/database'
+import { Allocation, Day, Section } from '@/types/database'
 import {
   Column,
   ColumnPinningState,
@@ -23,6 +23,8 @@ import { useBreadcrumb } from '@/components/providers/breadcrum-provider'
 import { random } from 'lodash'
 import { cn } from '@/lib/utils'
 import { useIsMobile } from '@/hooks/use-mobile'
+import * as ExcelJS from 'exceljs'
+import { saveAs } from 'file-saver'
 
 export default function TimeTableView({
   auth,
@@ -190,6 +192,160 @@ export default function TimeTableView({
     onColumnPinningChange: setColumnPinning,
   })
 
+  const exportTimeTableToExcel = async () => {
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('Timetable')
+
+    // Set default styles for the worksheet
+    worksheet.properties.defaultRowHeight = 20
+
+    // Define reusable styles
+    const centerAlign: Partial<ExcelJS.Alignment> = {
+      horizontal: 'center',
+      vertical: 'middle',
+      wrapText: true,
+    }
+    const headerStyle = {
+      font: { bold: true, size: 12, color: { argb: '000000' } },
+      alignment: centerAlign,
+      fill: {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'E9ECEF' },
+      },
+      border: {
+        top: { style: 'thin', color: { argb: 'D1D5DB' } },
+        left: { style: 'thin', color: { argb: 'D1D5DB' } },
+        bottom: { style: 'thin', color: { argb: 'D1D5DB' } },
+        right: { style: 'thin', color: { argb: 'D1D5DB' } },
+      },
+    }
+
+    // Title Section
+    const titleSection = [
+      [''],
+      [`${timetable.title} - ${timetable.shift?.name}`],
+      [timetable.description],
+      [`Period: ${formatDate(timetable.start_date)} - ${formatDate(timetable.end_date)}`],
+      [`Generated on: ${new Date().toLocaleDateString()}`],
+      [''],
+    ]
+
+    titleSection.forEach((row, index) => {
+      const excelRow = worksheet.addRow(row)
+      if (row[0]) {
+        worksheet.mergeCells(
+          `A${index + 1}:${String.fromCharCode(65 + (timetable.shift?.slots?.length || 0))}${index + 1}`
+        )
+        excelRow.getCell(1).alignment = centerAlign
+        if (index === 1) {
+          excelRow.font = { bold: true, size: 14 }
+        } else {
+          excelRow.font = { size: 11 }
+        }
+      }
+    })
+
+    // Add table headers
+    const headers = [
+      'Section',
+      ...(timetable.shift?.slots?.map(
+        (slot, index) => `${getRomanNumber(index + 1)}\n${slot.name}`
+      ) || []),
+    ]
+
+    const headerRow = worksheet.addRow(headers)
+    headerRow.height = 40 // Taller header row for wrapped text
+    headers.forEach((header, i) => {
+      const cell = headerRow.getCell(i + 1)
+      Object.assign(cell, headerStyle)
+    })
+
+    // Set column widths
+    worksheet.getColumn('A').width = 30 // Section column
+
+    // Set slot columns width
+    timetable.shift?.slots?.forEach((_, index) => {
+      worksheet.getColumn(String.fromCharCode(66 + index)).width = 35
+    })
+
+    // Calculate dynamic row height based on content
+    const calculateRowHeight = (allocations: any[]) => {
+      if (allocations.length === 0) return 60 // Default height for empty cells
+
+      // Base height per allocation (accounts for the content and spacing)
+      const baseHeightPerAllocation = 20
+
+      // Additional height for padding and separation between allocations
+      const padding = 20
+
+      // Calculate total height needed
+      const totalHeight = allocations.length * baseHeightPerAllocation + padding
+
+      // Set minimum and maximum heights
+      return Math.max(60, Math.min(300, totalHeight))
+    }
+
+    // Add data rows
+    sections.forEach(section => {
+      let maxAllocations = 1 // Track maximum allocations for this row
+
+      const rowData = [
+        `${section.semester?.name} (${section.name})`,
+        ...(timetable.shift?.slots?.map(slot => {
+          const allocs = getAllocations(slot.id, section.id)
+          maxAllocations = Math.max(maxAllocations, allocs.length || 1)
+
+          if (allocs.length === 0) return '-'
+
+          return allocs
+            .map(allocation => {
+              const dayNumbers = allocation.days?.map((day: Day) => day.number) || []
+              const formattedDays = formatNumberRange(dayNumbers)
+
+              return [
+                allocation.course?.display_code +
+                  ', ' +
+                  allocation.teacher?.name +
+                  ', ' +
+                  allocation.room?.name +
+                  ' ' +
+                  `(${formattedDays})`,
+              ]
+                .filter(Boolean)
+                .join('\n')
+            })
+            .join('\n\n')
+        }) || []),
+      ]
+
+      const row = worksheet.addRow(rowData)
+
+      // Set dynamic row height based on maximum allocations in this row
+      row.height = calculateRowHeight(new Array(maxAllocations))
+
+      // Apply cell styles
+      row.eachCell((cell, colNumber) => {
+        cell.alignment = centerAlign
+        cell.border = {
+          top: { style: 'thin', color: { argb: 'D1D5DB' } },
+          left: { style: 'thin', color: { argb: 'D1D5DB' } },
+          bottom: { style: 'thin', color: { argb: 'D1D5DB' } },
+          right: { style: 'thin', color: { argb: 'D1D5DB' } },
+        }
+      })
+    })
+
+    // Final formatting
+    worksheet.views = [
+      { state: 'frozen', xSplit: 1, ySplit: 7 }, // Freeze header row and first column
+    ]
+
+    // Generate and download the Excel file
+    const buffer = await workbook.xlsx.writeBuffer()
+    saveAs(new Blob([buffer]), `${timetable.title}_${formatDate(timetable.start_date)}.xlsx`)
+  }
+
   return (
     <AuthenticatedLayout user={auth.user}>
       <Head title="Timetable View" />
@@ -223,6 +379,12 @@ export default function TimeTableView({
             </Link>
           </div>
 
+          <div className="mb-2 flex justify-end">
+            <Button variant="outline" onClick={exportTimeTableToExcel}>
+              <Download className="h-5 w-5 animate-bounce" />
+              Export
+            </Button>
+          </div>
           <div className="rounded-md border">
             <div className={cn('overflow-x-auto', { 'max-h-[75vh]': !isMobile })}>
               <table className="w-full border-collapse">

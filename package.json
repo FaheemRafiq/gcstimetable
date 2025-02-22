@@ -4,7 +4,8 @@
     "scripts": {
         "dev": "vite",
         "build": "tsc && vite build && vite build --ssr && vite build && vite build --ssr --ssr",
-        "format": "npx prettier --write 'resources/js/**/*.{js,ts,tsx,vue}'"
+        "format": "npx prettier --write 'resources/js/**/*.{js,ts,tsx,vue}'",
+        "format:check": "npx prettier --check 'resources/js/**/*.{js,ts,tsx,vue}'"
     },
     "devDependencies": {
         "@headlessui/react": "^2.0.0",

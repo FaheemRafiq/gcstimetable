@@ -15,6 +15,8 @@ const buttonVariants = cva(
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'hover:bg-accent text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
+        gradient:
+          'bg-gradient-to-r from-primary to-card-friday text-white shadow-lg transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] hover:from-card-friday hover:to-primary hover:scale-[1.02] hover:shadow-xl',
       },
       size: {
         default: 'h-10 px-4 py-2',

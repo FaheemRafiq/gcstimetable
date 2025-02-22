@@ -31,11 +31,7 @@ interface RolesWrapperPropsWithRoles extends AdminWrapperProps {
   operator?: 'and' | 'or'
 }
 
-const RolesWrapper: React.FC<RolesWrapperPropsWithRoles> = ({
-  roles,
-  operator,
-  children,
-}) => {
+const RolesWrapper: React.FC<RolesWrapperPropsWithRoles> = ({ roles, operator, children }) => {
   const { hasRole } = useAbilities()
 
   if (operator === 'and') {
@@ -74,12 +70,6 @@ const PermissionWrapper: React.FC<PermissionWrapperProps> = ({ permission, child
   return <>{children}</>
 }
 
-export {
-  SuperAdminWrapper,
-  InstitutionAdminWrapper,
-  RolesWrapper,
-  AdminWrapper,
-  PermissionWrapper,
-}
+export { SuperAdminWrapper, InstitutionAdminWrapper, RolesWrapper, AdminWrapper, PermissionWrapper }
 
-export default AdminWrapper;
+export default AdminWrapper
