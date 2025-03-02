@@ -17,7 +17,7 @@ class PermissionGroupRequest extends FormRequest
     {
         return [
             'name'          => ['required', 'string', 'max:255', Rule::unique(PermissionGroup::class)->ignore($this->route('permission_group')->id)],
-            'permissions'   => ['nullable', 'array'],
+            'permissions'   => ['required', 'array'],
             'permissions.*' => ['required', 'exists:permissions,id'],
         ];
     }

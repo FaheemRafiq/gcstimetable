@@ -24,7 +24,7 @@ export function NavMain({ label, items }: { label?: string; items: NavItem[] }) 
           <Collapsible key={item.title} asChild defaultOpen={item.collaped}>
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip={item.title} isActive={item.isActive}>
-                <Link href={item.url}>
+                <Link href={item.url} preserveScroll>
                   <item.icon />
                   <span>{item.title}</span>
                 </Link>
@@ -42,7 +42,7 @@ export function NavMain({ label, items }: { label?: string; items: NavItem[] }) 
                       {item.navItems?.map(subItem => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild isActive={subItem.isActive}>
-                            <Link href={subItem.url}>
+                            <Link href={subItem.url} preserveScroll>
                               <subItem.icon />
                               <span>{subItem.title}</span>
                             </Link>

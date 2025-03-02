@@ -41,5 +41,6 @@ jobs:
             sudo chmod -R 755 ${{ secrets.REMOTE_DIR }}
             sudo chmod -R 755 ${{ secrets.REMOTE_DIR }}/storage
             sudo chmod -R 755 ${{ secrets.REMOTE_DIR }}/storage/app
+            sudo chmod -R 755 ${{ secrets.REMOTE_DIR }}/bootstrap/cache
             sudo chmod -R 664 ${{ secrets.REMOTE_DIR }}/storage/logs
             sudo systemctl restart apache2

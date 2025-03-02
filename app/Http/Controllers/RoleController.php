@@ -81,7 +81,7 @@ class RoleController extends Controller
             if ($response->allowed()) {
                 $role = Role::create($attributes);
 
-                $role->permissions()->syncWithoutDetaching($request->input('permissions'));
+                $role->permissions()->sync($request->input('permissions'));
 
                 return redirect(route('roles.index'))->with('success', 'Role created successfully');
             } else {
@@ -153,7 +153,7 @@ class RoleController extends Controller
             if ($response->allowed()) {
                 $role->update($attributes);
 
-                $role->permissions()->syncWithoutDetaching($request->input('permissions'));
+                $role->permissions()->sync($request->input('permissions'));
 
                 return redirect(route('roles.index'))->with('success', 'Role updated successfully');
             } else {
@@ -234,9 +234,19 @@ class RoleController extends Controller
         if (! $user->isSuperAdmin()) {
             $permissions = $user->getAllPermissions();
 
-            $queryBuilder->whereIn('id', $permissions->pluck('permission_group_id'));
+            $queryBuilder->whereHas('permissions', function ($query) use ($permissions) {
+                $query->whereIn('permissions.id', $permissions->pluck('id'));
+            })
+                ->with(['permissions' => function ($query) use ($permissions) {
+                    $query->whereIn('permissions.id', $permissions->pluck('id'))
+                        ->orderBy('name', 'asc');
+                }]);
+        } else {
+            $queryBuilder->with(['permissions' => function ($query) {
+                $query->orderBy('name', 'asc');
+            }]);
         }
 
-        return $queryBuilder->with('permissions')->get();
+        return $queryBuilder->orderBy('name', 'asc')->get();
     }
 }

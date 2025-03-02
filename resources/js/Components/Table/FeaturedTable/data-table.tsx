@@ -254,7 +254,7 @@ export function DataTable<TData, TValue>({
           <div className="flex items-center space-x-2">
             {isServerSide ? (
               <>
-                <Link href={serverProps?.navigationLinks.first ?? '#'}>
+                <Link href={serverProps?.navigationLinks.first ?? '#'} preserveScroll>
                   <Button
                     variant="outline"
                     className="hidden h-8 w-8 p-0 lg:flex"
@@ -264,7 +264,7 @@ export function DataTable<TData, TValue>({
                     <ChevronsLeft />
                   </Button>
                 </Link>
-                <Link href={serverProps?.navigationLinks.prev ?? '#'}>
+                <Link href={serverProps?.navigationLinks.prev ?? '#'} preserveScroll>
                   <Button
                     variant="outline"
                     className="h-8 w-8 p-0"
@@ -274,7 +274,7 @@ export function DataTable<TData, TValue>({
                     <ChevronLeft />
                   </Button>
                 </Link>
-                <Link href={serverProps?.navigationLinks.next ?? '#'}>
+                <Link href={serverProps?.navigationLinks.next ?? '#'} preserveScroll>
                   <Button
                     variant="outline"
                     className="h-8 w-8 p-0"
@@ -284,7 +284,7 @@ export function DataTable<TData, TValue>({
                     <ChevronRight />
                   </Button>
                 </Link>
-                <Link href={serverProps?.navigationLinks.last ?? '#'}>
+                <Link href={serverProps?.navigationLinks.last ?? '#'} preserveScroll>
                   <Button
                     variant="outline"
                     className="hidden h-8 w-8 p-0 lg:flex"

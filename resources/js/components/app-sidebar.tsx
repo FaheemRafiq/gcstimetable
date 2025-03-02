@@ -33,8 +33,6 @@ import {
 } from 'lucide-react'
 
 import { NavMain } from '@/components/nav-main'
-import { NavProjects } from '@/components/nav-projects'
-import { NavSecondary } from '@/components/nav-secondary'
 import { NavUser } from '@/components/nav-user'
 import {
   Sidebar,
@@ -315,35 +313,31 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="sidebar-scrollbar">
         {NavigationData.map(section => (
           <NavMain key={section.label} label={section.label} items={section.items} />
         ))}
         {/* <NavSecondary items={SecondaryNavData} className="mt-auto" /> */}
-
-        <PermissionWrapper permission={PermissionEnum.VIEW_IMPORT}>
-          <SidebarGroup className="mt-auto">
-            <SidebarContent>
-              <SidebarMenu className="mt-auto">
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    tooltip={'Import'}
-                    asChild
-                    size="default"
-                    className="group relative flex items-center justify-start text-white rounded-lg border border-blue-500 bg-transparent shadow-md transition duration-300 ease-in-out hover:shadow-primary"
-                  >
-                    <Link href={route('import.index')}>
-                      <Import />
-                      <span>Import</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarContent>
-          </SidebarGroup>
-        </PermissionWrapper>
       </SidebarContent>
       <SidebarFooter>
+        <PermissionWrapper permission={PermissionEnum.VIEW_IMPORT}>
+          <SidebarMenu className="mt-auto">
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                tooltip={'Import'}
+                asChild
+                size="default"
+                className="group relative flex items-center justify-start rounded-lg ring-1 bg-transparent shadow-md transition duration-300 ease-in-out hover:shadow-primary"
+              >
+                <Link href={route('import.index')} preserveScroll={true}>
+                  <Import />
+                  <span>Import</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </PermissionWrapper>
+
         <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>

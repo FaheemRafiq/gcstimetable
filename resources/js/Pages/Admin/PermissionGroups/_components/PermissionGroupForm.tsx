@@ -43,7 +43,7 @@ export const PermissionGroupForm: React.FC<RoomFormProps> = ({
     isFetched: false,
   })
 
-  const { data, post, put, errors, processing, reset, setData, setError } = useForm<FormProps>({
+  const { data, post, put, errors, processing, reset, setData, transform } = useForm<FormProps>({
     name: '',
     permissions: [],
   })
@@ -76,6 +76,18 @@ export const PermissionGroupForm: React.FC<RoomFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    if (data.permissions.length === 0) {
+      toast.error('Group must have at least one permission.')
+      return
+    }
+
+    transform((data: FormProps) => {
+      return {
+        name: data.name,
+        permissions: data.permissions.map(permission => permission.value),
+      }
+    })
 
     const fullRoute = isEditForm
       ? route('permission-groups.update', group.id)

@@ -4,7 +4,8 @@
 
 @layer utilities {
     .size-6 {
-        width: 1.5rem; /* or whatever size you want */
+        width: 1.5rem;
+        /* or whatever size you want */
         height: 1.5rem;
     }
 }
@@ -73,6 +74,27 @@
 
         --card-saturday: 0 80% 50%;
         --card-saturday-foreground: 0 0% 100%;
+
+        /* New scrollbar variable and updated values */
+        --scroll-bar: 240 100% 40%;
+        /* Vibrant blue that works well on light background */
+        --scrollbar-thumb: hsl(var(--scroll-bar) / 0.7);
+        --scrollbar-thumb-border: hsl(240 15% 94% / 0.9);
+        /* Matches --border */
+        --scrollbar-track: hsl(240 15% 94% / 0.9);
+        /* Matches --border for subtle contrast */
+
+        /* Dark mode scrollbar values */
+        --scrollbar-thumb-dark: hsl(var(--scroll-bar) / 0.8);
+        --scrollbar-thumb-border-dark: hsl(253 43% 10% / 0.9);
+        /* Matches dark --border */
+        --scrollbar-track-dark: hsl(253 43% 10% / 0.9);
+        /* Matches dark --border */
+
+        /* Sidebar Scrollbar Colors */
+        --sidebar-scrollbar-thumb: hsl(240 15% 94% / 0.8);
+        --sidebar-scrollbar-thumb-border: hsl(240 3.7% 15.9% / 0.9);
+        --sidebar-scrollbar-track: hsl(240 3.7% 15.9% / 0.9);
     }
 
     .dark {
@@ -133,47 +155,88 @@
 
         --card-saturday: 0 80% 50%;
         --card-saturday-foreground: 0 0% 100%;
+
+        /* Apply dark mode scrollbar values */
+        --scrollbar-thumb: var(--scrollbar-thumb-dark);
+        --scrollbar-thumb-border: var(--scrollbar-thumb-border-dark);
+        --scrollbar-track: var(--scrollbar-track-dark);
+
+        /* Dark mode sidebar scrollbar */
+        --sidebar-scrollbar-thumb: hsl(240 100% 40% / 0.8);
+        --sidebar-scrollbar-thumb-border: hsl(240 3.7% 10% / 0.9);
+        --sidebar-scrollbar-track: hsl(240 3.7% 10% / 0.9);
+    }
+
+    * {
+        @apply border-border;
+        scrollbar-width: thin;
+        scrollbar-color: var(--scrollbar-thumb) transparent;
+    }
+
+    body {
+        @apply bg-background text-foreground;
     }
 }
 
 @layer utilities {
     .min-h-screen {
-        min-height: 100vh; /* Fallback */
+        min-height: 100vh;
+        /* Fallback */
         min-height: 100dvh;
     }
+
     .h-screen {
-        height: 100vh; /* Fallback */
+        height: 100vh;
+        /* Fallback */
         height: 100dvh;
     }
 }
 
-/* Scrollbar styles */
-::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background-color: #374151;
-    border-radius: 10px;
-    border: 3px solid rgb(255 255 255 / 0.8);
-}
-
-::-webkit-scrollbar-track {
-    background-color: rgb(255 255 255 / 0.8);
-    border-radius: 10px;
-}
-
-* {
-    scrollbar-width: thin;
-    scrollbar-color: #374151 rgb(255 255 255 / 0.8);
-}
-
-@layer base {
+/* Enhanced Scrollbar Styles */
+@layer utilities {
     * {
-        @apply border-border;
+        scrollbar-width: thin;
+        scrollbar-color: var(--scrollbar-thumb) transparent;
     }
-    body {
-        @apply bg-background text-foreground;
+
+    ::-webkit-scrollbar {
+        width: 0.5rem;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: var(--scrollbar-thumb);
+        border-radius: 9999px;
+        border: 2px solid var(--scrollbar-thumb-border);
+        -webkit-appearance: none;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: linear-gradient(to bottom,
+                transparent 0%,
+                var(--scrollbar-track) 50%,
+                transparent 100%);
+        border-radius: 9999px;
+        -webkit-appearance: none;
+    }
+
+    .ease-custom {
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: var(--sidebar-scrollbar-thumb) var(--sidebar-scrollbar-track);
+    }
+    .sidebar-scrollbar::-webkit-scrollbar {
+        width: 0.5rem;
+    }
+    .sidebar-scrollbar::-webkit-scrollbar-thumb {
+        background-color: var(--sidebar-scrollbar-thumb);
+        border-radius: 9999px;
+        border: 2px solid var(--sidebar-scrollbar-thumb-border);
+    }
+    .sidebar-scrollbar::-webkit-scrollbar-track {
+        background: var(--sidebar-scrollbar-track);
+        border-radius: 9999px;
     }
 }

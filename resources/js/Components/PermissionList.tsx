@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -6,11 +6,26 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Search, Info, Filter, ChevronDown, ChevronUp } from 'lucide-react'
 import { PermissionGroup } from '@/types/database'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface PermissionCheckboxListProps {
   groups: PermissionGroup[]
   selectedPermissions: number[]
   onToggle: (newSelected: number[]) => void
+}
+
+// Animation variants for smooth expansion
+const contentVariants = {
+  expanded: {
+    height: 'auto',
+    opacity: 1,
+    transition: { duration: 0.3, ease: 'easeInOut' },
+  },
+  collapsed: {
+    height: 0,
+    opacity: 0,
+    transition: { duration: 0.3, ease: 'easeInOut' },
+  },
 }
 
 export const PermissionCheckboxList: React.FC<PermissionCheckboxListProps> = ({
@@ -20,6 +35,7 @@ export const PermissionCheckboxList: React.FC<PermissionCheckboxListProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [expandedGroups, setExpandedGroups] = useState<number[]>(groups.map(g => g.id))
+  const cardRefs = useRef<Map<number, HTMLDivElement>>(new Map())
 
   const allPermissionIds = groups.flatMap(group => group.permissions || [])?.map(p => p?.id) ?? []
   const isAllSelected =
@@ -46,31 +62,70 @@ export const PermissionCheckboxList: React.FC<PermissionCheckboxListProps> = ({
     const newSelected = selectedPermissions.includes(id)
       ? selectedPermissions.filter(selectedId => selectedId !== id)
       : [...selectedPermissions, id]
-
     onToggle(newSelected)
   }
 
   const toggleGroupExpansion = (groupId: number) => {
-    setExpandedGroups(prev =>
-      prev.includes(groupId) ? prev.filter(id => id !== groupId) : [...prev, groupId]
-    )
+    const cardRef = cardRefs.current.get(groupId)
+    const scrollPosition = cardRef?.getBoundingClientRect().top ?? 0
+    const scrollOffset = window.scrollY
+
+    setExpandedGroups(prev => {
+      const newExpanded = prev.includes(groupId)
+        ? prev.filter(id => id !== groupId)
+        : [...prev, groupId]
+
+      // Maintain scroll position after animation
+      requestAnimationFrame(() => {
+        const newPosition = cardRef?.getBoundingClientRect().top ?? 0
+        window.scrollTo({
+          top: scrollOffset + (newPosition - scrollPosition),
+          behavior: 'instant',
+        })
+      })
+
+      return newExpanded
+    })
   }
 
-  // Filter groups and permissions based on search term
   const filteredGroups = groups
-    .map(group => ({
-      ...group,
-      permissions: group.permissions?.filter(
-        permission =>
-          permission.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (permission.description &&
-            permission.description.toLowerCase().includes(searchTerm.toLowerCase()))
-      ),
-    }))
+    .reduce((acc: PermissionGroup[], group: PermissionGroup) => {
+      // First, try to match by group name
+      const groupNameMatch = group.name.toLowerCase().includes(searchTerm.toLowerCase())
+
+      if (groupNameMatch) {
+        // If group name matches, include all permissions
+        return [...acc, { ...group }]
+      }
+
+      // If no group name match, filter permissions by name or description
+      const filteredPermissions =
+        group.permissions?.filter(
+          permission =>
+            permission.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (permission.description &&
+              permission.description.toLowerCase().includes(searchTerm.toLowerCase()))
+        ) || []
+
+      // Only include group if it has matching permissions
+      if (filteredPermissions.length > 0) {
+        return [
+          ...acc,
+          {
+            ...group,
+            permissions: filteredPermissions,
+          },
+        ]
+      }
+
+      return acc
+    }, [])
+    // Final filter to ensure we only keep groups with permissions
     .filter(group => (group.permissions?.length || 0) > 0)
 
   return (
     <div className="space-y-6">
+      {/* Search and controls */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between mb-2">
         <div className="relative flex-grow">
           <Input
@@ -102,13 +157,23 @@ export const PermissionCheckboxList: React.FC<PermissionCheckboxListProps> = ({
         const isExpanded = expandedGroups.includes(group.id)
 
         return (
-          <Card key={group.id} className="overflow-hidden transition-all duration-200">
-            <CardHeader className="py-3 px-4 cursor-pointer">
+          <Card
+            key={group.id}
+            className="overflow-hidden transition-all duration-200"
+            ref={el => {
+              if (el) cardRefs.current.set(group.id, el)
+            }}
+          >
+            <CardHeader
+              className="py-3 px-4 cursor-pointer"
+              onClick={e => {
+                if ((e.target as HTMLElement).tagName === 'INPUT') return
+
+                toggleGroupExpansion(group.id)
+              }}
+            >
               <div className="flex items-center justify-between">
-                <div
-                  className="flex items-center space-x-2"
-                  onClick={() => toggleGroupExpansion(group.id)}
-                >
+                <div className="flex items-center space-x-2">
                   {isExpanded ? (
                     <ChevronUp className="h-5 w-5" />
                   ) : (
@@ -130,36 +195,46 @@ export const PermissionCheckboxList: React.FC<PermissionCheckboxListProps> = ({
               </div>
             </CardHeader>
 
-            {isExpanded && (
-              <CardContent className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pt-0 px-4 pb-4">
-                {group?.permissions?.map(permission => (
-                  <div
-                    key={permission.id}
-                    className="flex items-start p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                  >
-                    <Checkbox
-                      id={`permission-${permission.id}`}
-                      checked={selectedPermissions.includes(permission.id)}
-                      onCheckedChange={() => handlePermissionToggle(permission.id)}
-                      className="mt-1"
-                    />
-                    <div className="ml-3">
-                      <label
-                        htmlFor={`permission-${permission.id}`}
-                        className="font-medium cursor-pointer block"
+            <AnimatePresence initial={false}>
+              {isExpanded && (
+                <motion.div
+                  variants={contentVariants}
+                  initial="collapsed"
+                  animate="expanded"
+                  exit="collapsed"
+                  className="overflow-hidden"
+                >
+                  <CardContent className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pt-0 px-4 pb-4">
+                    {group?.permissions?.map(permission => (
+                      <div
+                        key={permission.id}
+                        className="flex items-start p-3 rounded-md transition-colors"
                       >
-                        {permission.name}
-                      </label>
-                      {permission.description && (
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                          {permission.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            )}
+                        <Checkbox
+                          id={`permission-${permission.id}`}
+                          checked={selectedPermissions.includes(permission.id)}
+                          onCheckedChange={() => handlePermissionToggle(permission.id)}
+                          className="mt-1"
+                        />
+                        <div className="ml-3">
+                          <label
+                            htmlFor={`permission-${permission.id}`}
+                            className="font-medium cursor-pointer block"
+                          >
+                            {permission.name}
+                          </label>
+                          {permission.description && (
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                              {permission.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </Card>
         )
       })}
@@ -186,14 +261,31 @@ export const PermissionViewList: React.FC<PermissionViewListProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [expandedGroups, setExpandedGroups] = useState<number[]>(groups.map(g => g.id))
+  const cardRefs = useRef<Map<number, HTMLDivElement>>(new Map())
 
   const toggleGroupExpansion = (groupId: number) => {
-    setExpandedGroups(prev =>
-      prev.includes(groupId) ? prev.filter(id => id !== groupId) : [...prev, groupId]
-    )
+    const cardRef = cardRefs.current.get(groupId)
+    const scrollPosition = cardRef?.getBoundingClientRect().top ?? 0
+    const scrollOffset = window.scrollY
+
+    setExpandedGroups(prev => {
+      const newExpanded = prev.includes(groupId)
+        ? prev.filter(id => id !== groupId)
+        : [...prev, groupId]
+
+      // Maintain scroll position after animation
+      requestAnimationFrame(() => {
+        const newPosition = cardRef?.getBoundingClientRect().top ?? 0
+        window.scrollTo({
+          top: scrollOffset + (newPosition - scrollPosition),
+          behavior: 'instant',
+        })
+      })
+
+      return newExpanded
+    })
   }
 
-  // Filter groups and permissions based on search term and selected permissions
   const filteredGroups = groups
     .map(group => ({
       ...group,
@@ -211,6 +303,7 @@ export const PermissionViewList: React.FC<PermissionViewListProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Search and controls */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between mb-2">
         <div className="relative flex-grow">
           <Input
@@ -231,7 +324,13 @@ export const PermissionViewList: React.FC<PermissionViewListProps> = ({
         const groupSelectedCount = group.permissions?.length || 0
 
         return (
-          <Card key={group.id} className="overflow-hidden transition-all duration-200">
+          <Card
+            key={group.id}
+            className="overflow-hidden transition-all duration-200"
+            ref={el => {
+              if (el) cardRefs.current.set(group.id, el)
+            }}
+          >
             <CardHeader
               className="py-3 px-4 cursor-pointer"
               onClick={() => toggleGroupExpansion(group.id)}
@@ -253,26 +352,33 @@ export const PermissionViewList: React.FC<PermissionViewListProps> = ({
               </div>
             </CardHeader>
 
-            {isExpanded && (
-              <CardContent className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pt-0 px-4 pb-4">
-                {group?.permissions?.map(permission => (
-                  <div
-                    key={permission.id}
-                    className="flex items-start p-3 bg-gray-50 dark:bg-gray-800 rounded-md"
-                  >
-                    <Checkbox checked={true} disabled={true} className="mt-1" />
-                    <div className="ml-3">
-                      <p className="font-medium">{permission.name}</p>
-                      {permission.description && (
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                          {permission.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            )}
+            <AnimatePresence initial={false}>
+              {isExpanded && (
+                <motion.div
+                  variants={contentVariants}
+                  initial="collapsed"
+                  animate="expanded"
+                  exit="collapsed"
+                  className="overflow-hidden"
+                >
+                  <CardContent className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pt-0 px-4 pb-4">
+                    {group?.permissions?.map(permission => (
+                      <div key={permission.id} className="flex items-start p-3 rounded-md">
+                        <Checkbox checked={true} disabled={true} className="mt-1" />
+                        <div className="ml-3">
+                          <p className="font-medium">{permission.name}</p>
+                          {permission.description && (
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                              {permission.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </Card>
         )
       })}

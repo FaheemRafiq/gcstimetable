@@ -6,7 +6,7 @@ function AppTheme({ children }: React.PropsWithChildren<{}>) {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="theme">
       {children}
-      <Toaster position="bottom-right" />
+      <Toaster position="top-center" />
     </ThemeProvider>
   )
 }

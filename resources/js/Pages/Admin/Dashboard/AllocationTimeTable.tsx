@@ -156,7 +156,7 @@ function AllocationTimeTable({
                         <TooltipProvider key={allocation.id}>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <div className="bg-blue-50 border border-blue-100 rounded p-2 hover:bg-blue-100 transition-all duration-200 group relative cursor-pointer">
+                              <div className="bg-card text-card-foreground border border-card-foreground/25 rounded p-2  transition-all duration-200 group relative cursor-pointer">
                                 <Badge
                                   variant={getStatusVariant(allocation.slot?.status ?? '')}
                                   className="absolute top-1 right-1 text-[10px]"
@@ -202,7 +202,7 @@ function AllocationTimeTable({
                                     </span>
                                   </p>
                                   <p className="flex items-center gap-2">
-                                    <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
+                                    <span className="w-2 h-2 rounded-full bg-primary inline-block" />
                                     <span>Status: {allocation.slot?.status}</span>
                                   </p>
                                 </div>
