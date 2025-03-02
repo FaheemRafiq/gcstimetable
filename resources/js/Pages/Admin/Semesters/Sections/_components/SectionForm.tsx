@@ -61,17 +61,6 @@ export const SectionForm: React.FC<SectionFormProps> = ({
     }
   }, [section])
 
-  // Clear errors when data changes
-  useEffect(() => {
-    if (errors && data) {
-      Object.keys(errors).forEach(key => {
-        if (errors[key as keyof FormProps] && data[key as keyof FormProps]) {
-          setError(key as keyof FormProps, '')
-        }
-      })
-    }
-  }, [data])
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 

@@ -17,7 +17,7 @@ class SectionFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->randomElement(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']),
         ];
     }
 }

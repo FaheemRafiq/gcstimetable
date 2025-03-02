@@ -6,11 +6,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class Program extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'code',
+        'duration',
+        'type',
+        'department_id',
+    ];
 
     public const MIN_DURATION_YEARS = 1;
 
@@ -36,9 +45,9 @@ class Program extends Model
         return $this->hasMany(Semester::class);
     }
 
-    public function shift(): BelongsTo
+    public function shifts(): BelongsToMany
     {
-        return $this->belongsTo(Shift::class);
+        return $this->belongsToMany(Shift::class);
     }
 
     public function institution(): HasOneThrough

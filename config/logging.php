@@ -204,6 +204,13 @@ return [
             'level'  => 'debug',
             'days'   => 30,
         ],
+
+        'permission_groups' => [
+            'driver' => 'single',
+            'path'   => storage_path('logs/'.now()->toDateString().'/permission_groups.log'),
+            'level'  => 'debug',
+            'days'   => 30,
+        ],
     ],
 
 ];

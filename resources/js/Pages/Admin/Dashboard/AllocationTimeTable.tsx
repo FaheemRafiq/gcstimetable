@@ -4,7 +4,6 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Clock, BookOpen, User, MapPin, ChevronRight, ChevronLeft, RefreshCw } from 'lucide-react'
 import { Department, Slot, Allocation, Institution } from '@/types/database'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { useBreadcrumb } from '@/components/providers/breadcrum-provider'
 import { Badge } from '@/components/ui/badge'
@@ -24,12 +23,16 @@ import {
 import { Label } from '@/components/ui/label'
 import { format, parse } from 'date-fns'
 import TimeInputField from '@/components/TimeInputField'
+import { SuperAdminWrapper } from '@/Components/AdminWrapper'
+import { cn } from '@/lib/utils'
+import { Separator } from '@/components/ui/separator'
 
 interface FormProps {
   shift_id: number | null
   start_time: string | null
   end_time: string | null
   selected_day: number | null
+  institution_id: number | null
   [key: string]: any
 }
 
@@ -47,6 +50,7 @@ interface TimetableResponse {
   }
   departments: Department[]
   slots: UpdatedSlot[]
+  institutions: Institution[]
 }
 
 function AllocationTimeTable({
@@ -55,7 +59,6 @@ function AllocationTimeTable({
   institution,
 }: PageProps<{ initialData: TimetableResponse; institution: Institution }>) {
   const [data, setData] = useState(initialData)
-  const [activeDepartment, setActiveDepartment] = useState(initialData.departments[0]?.id)
   const { setBreadcrumb } = useBreadcrumb()
 
   const {
@@ -69,6 +72,7 @@ function AllocationTimeTable({
     start_time: format(initialData.time_window.start, 'H:m:s'),
     end_time: format(initialData.time_window.end, 'H:m:s'),
     selected_day: initialData.selected_day,
+    institution_id: institution.id,
   })
 
   useEffect(() => {
@@ -76,10 +80,6 @@ function AllocationTimeTable({
       title: 'Allocations',
     })
   }, [setBreadcrumb])
-
-  const activeDepartmentData = useMemo(() => {
-    return data.departments.find(dept => dept.id === activeDepartment)
-  }, [data, activeDepartment])
 
   const formatTime = (time: string) => {
     return new Date(`2000-01-01T${time}`).toLocaleTimeString([], {
@@ -103,18 +103,17 @@ function AllocationTimeTable({
   }
 
   const handleFilter = ({ refresh = false } = {}) => {
+    transform(data => {
+      return {
+        ...data,
+      }
+    })
+
     get(route('allocations.index'), {
       preserveState: true,
       only: ['initialData'],
       onSuccess: page => {
         setData(page.props.initialData as TimetableResponse)
-        if (
-          !refresh &&
-          !data.departments.some(dept => dept.id === activeDepartment) &&
-          data.departments.length > 0
-        ) {
-          setActiveDepartment(data.departments[0].id)
-        }
       },
     })
   }
@@ -125,9 +124,103 @@ function AllocationTimeTable({
       start_time: null,
       end_time: null,
       selected_day: null,
+      institution_id: null,
     })
     handleFilter({ refresh: true })
   }
+
+  const renderAllocationSection = (department: Department) => (
+    <div key={department.id} className="space-y-6">
+      <div className="border-b pb-2">
+        <h2 className="text-xl font-semibold">{department.name}</h2>
+      </div>
+
+      {/* Allocations */}
+      <div className="space-y-6">
+        {department.programs?.map(program => (
+          <div key={program.id} className="space-y-4">
+            {program.semesters?.map(semester => (
+              <div key={semester.id} className="space-y-2">
+                {semester.sections?.map(section => (
+                  <div key={section.id} className="flex flex-col md:flex-row gap-2">
+                    <div className="w-full md:w-32 md:flex-shrink-0 lg:w-48 bg-muted p-2 rounded">
+                      <div
+                        className="text-sm font-medium truncate"
+                        title={`${program.name} - ${semester.name} - ${section.name}`}
+                      >
+                        {program.name} - {semester.name} - {section.name}
+                      </div>
+                    </div>
+                    <div className="flex-1 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 relative">
+                      {section.allocations?.map((allocation: Allocation) => (
+                        <TooltipProvider key={allocation.id}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="bg-blue-50 border border-blue-100 rounded p-2 hover:bg-blue-100 transition-all duration-200 group relative cursor-pointer">
+                                <Badge
+                                  variant={getStatusVariant(allocation.slot?.status ?? '')}
+                                  className="absolute top-1 right-1 text-[10px]"
+                                >
+                                  {allocation.slot?.status ?? ''}
+                                </Badge>
+                                <div className="space-y-1">
+                                  <div className="text-xs font-medium flex items-center gap-1">
+                                    <BookOpen className="h-3 w-3" />
+                                    <span className="truncate">{allocation?.course?.name}</span>
+                                  </div>
+                                  <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                    <User className="h-3 w-3" />
+                                    <span className="truncate">{allocation?.teacher?.name}</span>
+                                  </div>
+                                  <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                    <MapPin className="h-3 w-3" />
+                                    <span className="truncate">{allocation?.room?.name}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">
+                              <div className="space-y-2">
+                                <h4 className="text-sm font-semibold flex items-center gap-2">
+                                  <BookOpen className="h-4 w-4" />
+                                  {allocation?.course?.name}
+                                </h4>
+                                <div className="text-xs space-y-1">
+                                  <p className="flex items-center gap-2">
+                                    <User className="h-3 w-3" />
+                                    <span>Teacher: {allocation?.teacher?.name}</span>
+                                  </p>
+                                  <p className="flex items-center gap-2">
+                                    <MapPin className="h-3 w-3" />
+                                    <span>Room: {allocation?.room?.name}</span>
+                                  </p>
+                                  <p className="flex items-center gap-2">
+                                    <Clock className="h-3 w-3" />
+                                    <span>
+                                      {formatTime(allocation.slot?.start_time ?? '')} -
+                                      {formatTime(allocation.slot?.end_time ?? '')}
+                                    </span>
+                                  </p>
+                                  <p className="flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
+                                    <span>Status: {allocation.slot?.status}</span>
+                                  </p>
+                                </div>
+                              </div>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 
   return (
     <AuthenticatedLayout user={auth.user}>
@@ -152,7 +245,11 @@ function AllocationTimeTable({
 
         <CardContent>
           {/* Filters Section */}
-          <div className="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div
+            className={cn('mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4', {
+              'grid-cols-1 md:grid-cols-2 lg:grid-cols-5': initialData.institutions.length > 1,
+            })}
+          >
             <div>
               <Label htmlFor="shift_id">Shift</Label>
               <Select
@@ -213,7 +310,30 @@ function AllocationTimeTable({
               </Select>
             </div>
 
-            <div className="ml-auto flex gap-2 md:col-span-4">
+            <SuperAdminWrapper>
+              <div>
+                <Label htmlFor="shift_id">Institution</Label>
+                <Select
+                  value={formData.institution_id?.toString() || ''}
+                  onValueChange={value =>
+                    setFormData('institution_id', value ? parseInt(value) : null)
+                  }
+                >
+                  <SelectTrigger id="institution_id">
+                    <SelectValue placeholder="Select Institution" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {initialData.institutions?.map(item => (
+                      <SelectItem key={item.id} value={item.id.toString()}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </SuperAdminWrapper>
+
+            <div className="ml-auto flex gap-2 col-span-full">
               <Button onClick={() => handleFilter()} disabled={processing}>
                 Apply Filters
               </Button>
@@ -228,147 +348,35 @@ function AllocationTimeTable({
               No allocations found matching the filters
             </div>
           ) : (
-            <Tabs
-              value={activeDepartment?.toString()}
-              onValueChange={value => setActiveDepartment(parseInt(value))}
-              className="w-full"
-            >
-              <ScrollArea className="w-full pb-4">
-                <TabsList className="inline-flex w-full justify-start gap-2">
-                  {data.departments.map(dept => (
-                    <TabsTrigger
-                      key={dept.id}
-                      value={dept.id.toString()}
-                      className="flex-shrink-0 text-xs md:text-sm"
-                    >
-                      {dept.name}
-                    </TabsTrigger>
+            <div className="space-y-12">
+              <Separator />
+              {/* Slots Header */}
+              <ScrollArea className="w-full">
+                <div className="flex items-center gap-10">
+                  {data.slots.map(slot => (
+                    <div key={slot.id} className="text-center">
+                      <div className="text-xs font-medium capitalize">{slot.code}</div>
+                      <div className="text-xs font-medium flex items-center justify-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {formatTime(slot.start_time)} - {formatTime(slot.end_time)}
+                      </div>
+                      <Badge variant={getStatusVariant(slot.status)} className="mt-1 text-xs">
+                        {slot.status}
+                      </Badge>
+                    </div>
                   ))}
-                </TabsList>
+                </div>
                 <ScrollBar orientation="horizontal" />
               </ScrollArea>
 
-              <TabsContent value={activeDepartment?.toString() || ''}>
-                <div className="space-y-4">
-                  {/* Slots Header */}
-                  <ScrollArea className="w-full">
-                    <div className="flex min-w-[800px] md:min-w-0">
-                      <div className="w-32 md:w-48 flex-shrink-0" />
-                      <div className="flex-1 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                        {data.slots.map(slot => (
-                          <div key={slot.id} className="text-center">
-                            <div className="text-xs font-medium flex items-center justify-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {formatTime(slot.start_time)} - {formatTime(slot.end_time)}
-                            </div>
-                            <Badge variant={getStatusVariant(slot.status)} className="mt-1 text-xs">
-                              {slot.status}
-                            </Badge>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <ScrollBar orientation="horizontal" />
-                  </ScrollArea>
-
-                  {/* Allocations */}
-                  <ScrollArea className="h-[400px] md:h-[600px]">
-                    <div className="space-y-6 min-w-[800px] md:min-w-0">
-                      {activeDepartmentData?.programs?.map(program => (
-                        <div key={program.id} className="space-y-4">
-                          {program.semesters?.map(semester => (
-                            <div key={semester.id} className="space-y-2">
-                              {semester.sections?.map(section => (
-                                <div key={section.id} className="flex flex-col md:flex-row gap-2">
-                                  <div className="w-full md:w-32 md:flex-shrink-0 lg:w-48 bg-muted p-2 rounded">
-                                    <div
-                                      className="text-sm font-medium truncate"
-                                      title={`${program.name} - ${semester.name} - ${section.name}`}
-                                    >
-                                      {program.name} - {semester.name} - {section.name}
-                                    </div>
-                                  </div>
-                                  <div className="flex-1 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 relative">
-                                    {section.allocations?.map((allocation: Allocation) => (
-                                      <TooltipProvider key={allocation.id}>
-                                        <Tooltip>
-                                          <TooltipTrigger asChild>
-                                            <div className="bg-blue-50 border border-blue-100 rounded p-2 hover:bg-blue-100 transition-all duration-200 group relative cursor-pointer">
-                                              <Badge
-                                                variant={getStatusVariant(
-                                                  allocation.slot?.status ?? ''
-                                                )}
-                                                className="absolute top-1 right-1 text-[10px]"
-                                              >
-                                                {allocation.slot?.status ?? ''}
-                                              </Badge>
-                                              <div className="space-y-1">
-                                                <div className="text-xs font-medium flex items-center gap-1">
-                                                  <BookOpen className="h-3 w-3" />
-                                                  <span className="truncate">
-                                                    {allocation?.course?.name}
-                                                  </span>
-                                                </div>
-                                                <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                                  <User className="h-3 w-3" />
-                                                  <span className="truncate">
-                                                    {allocation?.teacher?.name}
-                                                  </span>
-                                                </div>
-                                                <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                                  <MapPin className="h-3 w-3" />
-                                                  <span className="truncate">
-                                                    {allocation?.room?.name}
-                                                  </span>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </TooltipTrigger>
-                                          <TooltipContent className="max-w-xs">
-                                            <div className="space-y-2">
-                                              <h4 className="text-sm font-semibold flex items-center gap-2">
-                                                <BookOpen className="h-4 w-4" />
-                                                {allocation?.course?.name}
-                                              </h4>
-                                              <div className="text-xs space-y-1">
-                                                <p className="flex items-center gap-2">
-                                                  <User className="h-3 w-3" />
-                                                  <span>Teacher: {allocation?.teacher?.name}</span>
-                                                </p>
-                                                <p className="flex items-center gap-2">
-                                                  <MapPin className="h-3 w-3" />
-                                                  <span>Room: {allocation?.room?.name}</span>
-                                                </p>
-                                                <p className="flex items-center gap-2">
-                                                  <Clock className="h-3 w-3" />
-                                                  <span>
-                                                    {formatTime(allocation.slot?.start_time ?? '')}{' '}
-                                                    -{formatTime(allocation.slot?.end_time ?? '')}
-                                                  </span>
-                                                </p>
-                                                <p className="flex items-center gap-2">
-                                                  <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
-                                                  <span>Status: {allocation.slot?.status}</span>
-                                                </p>
-                                              </div>
-                                            </div>
-                                          </TooltipContent>
-                                        </Tooltip>
-                                      </TooltipProvider>
-                                    ))}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          ))}
-                        </div>
-                      ))}
-                    </div>
-                    <ScrollBar orientation="vertical" />
-                  </ScrollArea>
+              <ScrollArea className="w-full">
+                <div className="grid grid-cols-1 gap-10">
+                  {data.departments.map(department => renderAllocationSection(department))}
                 </div>
-              </TabsContent>
-            </Tabs>
+
+                <ScrollBar orientation="vertical" />
+              </ScrollArea>
+            </div>
           )}
         </CardContent>
       </Card>

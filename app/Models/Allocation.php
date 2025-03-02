@@ -21,6 +21,17 @@ class Allocation extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'course_id',
+        'teacher_id',
+        'room_id',
+        'day_id',
+        'slot_id',
+        'section_id',
+        'time_table_id',
+        'name',
+    ];
+
     // Custom Methods
 
     public function hasTeacher(): bool

@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('code');
             
             // belongs to some institution
-            $table->foreignId('institution_id')->constrained()->onDelete('cascade');
+            $table->foreignIdFor(\App\Models\Institution::class)->constrained()->cascadeOnDelete();
 
             // Define a unique constraint for 'code' and 'institution_id' combination
             $table->unique(['code', 'institution_id']);

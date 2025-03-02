@@ -17,14 +17,15 @@ import InputError from '@/Components/InputError'
 import { Shift } from '@/types'
 import { fetchWrapper } from '@/lib/fetchWrapper'
 import { AutoCompleteSelect } from '@/components/combobox'
+import MultipleSelector from '@/components/ui/multi-select'
 
 interface FormProps {
   name: string
   code: string
   duration: number
   type: string
-  shift_id: number | null
   department_id: number | null
+  shifts: { value: number; label: string }[]
   [key: string]: any
 }
 
@@ -67,8 +68,8 @@ export const ProgramForm: React.FC<RoomFormProps> = ({
     code: '',
     duration: 1,
     type: '',
-    shift_id: null,
     department_id: null,
+    shifts: [],
   })
 
   const filteredShifts = React.useMemo(() => {
@@ -95,26 +96,11 @@ export const ProgramForm: React.FC<RoomFormProps> = ({
         code: program.code,
         duration: program.duration,
         type: program.type,
-        shift_id: program.shift_id,
         department_id: program.department_id,
+        shifts: program.shifts?.map(shift => ({ value: shift.id, label: shift.name })) ?? [],
       }))
     }
   }, [program])
-
-  // Clear errors when data changes
-  useEffect(() => {
-    if (errors && data) {
-      Object.keys(errors).forEach(key => {
-        if (key === 'duration') {
-          return
-        }
-
-        if (errors[key as keyof FormProps] && data[key as keyof FormProps]) {
-          setError(key as keyof FormProps, '')
-        }
-      })
-    }
-  }, [data])
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -258,25 +244,30 @@ export const ProgramForm: React.FC<RoomFormProps> = ({
 
           {/* Shift Field */}
           <div>
-            <Label htmlFor="shift_id">Shift</Label>
-            <Select
-              value={data.shift_id?.toString() ?? ''}
-              disabled={!Boolean(data.type)}
-              onValueChange={value => setData('shift_id', parseInt(value))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select shift" />
-              </SelectTrigger>
-              <SelectContent>
-                {filteredShifts.length > 0 &&
-                  filteredShifts.map(shift => (
-                    <SelectItem value={shift.id.toString()} key={shift.id}>
-                      {shift.name}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-            <InputError message={errors.shift_id} />
+            <Label htmlFor="shifts">Shifts</Label>
+            <MultipleSelector
+              value={
+                data.shifts?.map(shift => ({
+                  value: shift.value.toString(),
+                  label: shift.label,
+                })) ?? []
+              }
+              className="w-full z-50"
+              placeholder="Select Shifts"
+              onChange={value =>
+                setData(
+                  'shifts',
+                  value.map(shift => {
+                    return { value: Number(shift.value), label: shift.label }
+                  })
+                )
+              }
+              options={filteredShifts?.map(shift => {
+                return { value: String(shift.id), label: shift.name }
+              })}
+              disabled={filteredShifts?.length === 0}
+            />
+            <InputError message={errors.shifts} />
           </div>
 
           {/* Department Field */}

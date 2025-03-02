@@ -32,7 +32,8 @@ class PermissionController extends Controller
     public function store(Request $request)
     {
         $attributes = $request->validate([
-            'name' => 'required',
+            'name'        => 'required',
+            'description' => 'nullable|string',
         ]);
 
         Permission::create($attributes);
@@ -46,7 +47,8 @@ class PermissionController extends Controller
     public function update(Request $request, Permission $permission)
     {
         $attributes = $request->validate([
-            'name' => 'required',
+            'name'        => 'required',
+            'description' => 'nullable|string',
         ]);
 
         $permission->update($attributes);

@@ -19,6 +19,7 @@ class DaySeeder extends Seeder
             ['name' => 'Thursday', 'code' => 'THU', 'number' => 4],
             ['name' => 'Friday', 'code' => 'FRI', 'number' => 5],
             ['name' => 'Saturday', 'code' => 'SAT', 'number' => 6],
+            ['name' => 'Sunday', 'code' => 'SUN', 'number' => 7],
         ];
 
         foreach ($days as $dayData) {

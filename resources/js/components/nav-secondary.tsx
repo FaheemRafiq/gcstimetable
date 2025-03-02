@@ -8,6 +8,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { Link } from '@inertiajs/react'
+import { cn } from '@/lib/utils'
 
 export function NavSecondary({
   items,
@@ -17,6 +19,7 @@ export function NavSecondary({
     title: string
     url: string
     icon: LucideIcon
+    isExport?: boolean // Optional flag to identify export buttons
   }[]
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   return (
@@ -25,11 +28,11 @@ export function NavSecondary({
         <SidebarMenu>
           {items.map(item => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild size="sm">
-                <a href={item.url}>
+              <SidebarMenuButton asChild size="lg">
+                <Link href={item.url}>
                   <item.icon />
                   <span>{item.title}</span>
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

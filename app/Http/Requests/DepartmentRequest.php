@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
 
@@ -9,7 +10,7 @@ class DepartmentRequest extends FormRequest
 {
     public function prepareForValidation()
     {
-        $auth = auth()->user();
+        $auth = Auth::user();
 
         if (! $auth->isSuperAdmin()) {
             $this->merge([

@@ -10,6 +10,7 @@ import { Permission, Role, Shift } from '@/types'
 
 interface FormProps {
   name: string
+  description: string
   [key: string]: any
 }
 
@@ -32,6 +33,7 @@ export const PermissionForm: React.FC<PermissionFormProps> = ({
 
   const { data, post, put, errors, processing, reset, setData, setError } = useForm<FormProps>({
     name: '',
+    description: '',
   })
 
   useEffect(() => {
@@ -42,24 +44,13 @@ export const PermissionForm: React.FC<PermissionFormProps> = ({
 
   useEffect(() => {
     if (isEditForm && permission) {
-      setData('name', permission.name)
+      setData(data => ({
+        ...data,
+        name: permission.name,
+        description: permission.description,
+      }))
     }
   }, [permission])
-
-  // Clear errors when data changes
-  useEffect(() => {
-    if (errors && data) {
-      Object.keys(errors).forEach(key => {
-        if (key === 'duration') {
-          return
-        }
-
-        if (errors[key as keyof FormProps] && data[key as keyof FormProps]) {
-          setError(key as keyof FormProps, '')
-        }
-      })
-    }
-  }, [data])
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -129,6 +120,18 @@ export const PermissionForm: React.FC<PermissionFormProps> = ({
               onChange={e => setData('name', e.target.value)}
             />
             <InputError message={errors.name} />
+          </div>
+
+          {/* Description Field */}
+          <div>
+            <Label htmlFor="description">Description</Label>
+            <Input
+              id="description"
+              value={data.description}
+              placeholder="Enter permission description"
+              onChange={e => setData('description', e.target.value)}
+            />
+            <InputError message={errors.description} />
           </div>
         </form>
       </FormSheet>

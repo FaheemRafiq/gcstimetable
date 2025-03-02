@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\TimeTable;
+use App\Models\Institution;
 use Illuminate\Database\Seeder;
 
 class TimeTableSeeder extends Seeder
@@ -12,31 +12,46 @@ class TimeTableSeeder extends Seeder
      */
     public function run(): void
     {
+        $years = date('Y').'-'.now()->addYear()->format('Y');
+
         $timeTables = [
             [
-                'id'          => 1,
-                'title'       => '1st Year Morning Shift College Time Table 2024-2025',
-                'description' => 'This time table is only for the college students.',
-                'start_date'  => '2024-10-13',
-                'end_date'    => '2025-10-13',
-                'shift_id'    => 1,
-                'created_at'  => '2024-10-13 13:18:38',
-                'updated_at'  => '2024-10-15 18:41:43',
+                'title'       => '1st Year Morning Shift College Time Table '.$years,
+                'description' => 'This time table is only for the Intermediate Programs.',
             ],
             [
-                'id'          => 2,
-                'title'       => 'BS College Time Table 2024-2025',
-                'description' => 'This time table is only for BS Evening Students',
-                'start_date'  => '2024-10-13',
-                'end_date'    => '2025-10-13',
-                'shift_id'    => 4,
-                'created_at'  => '2024-10-16 02:03:07',
-                'updated_at'  => '2024-10-16 02:04:01',
+                'title'       => 'BS College Time Table '.$years,
+                'description' => 'This time table is only for BS Programs.',
+            ],
+            [
+                'title'       => 'ADP College Time Table '.$years,
+                'description' => 'This time table is only for ADP Programs.',
             ],
         ];
 
-        foreach ($timeTables as $key => $table) {
-            TimeTable::create($table);
+        $institutions = Institution::with('shifts')->get();
+
+        foreach ($institutions as $institution) {
+            foreach ($institution->shifts as $shift) {
+                $datesData = [
+                    'start_date'  => now()->subMonth()->format('Y-m-d'),
+                    'end_date'    => now()->addMonths(5)->format('Y-m-d'),
+                    'created_at'  => now(),
+                    'updated_at'  => now(),
+                ];
+
+                if (str_contains($shift->program_type, 'INTER')) {
+                    $shift->timetables()->create(array_merge($timeTables[0], $datesData));
+                }
+
+                if (str_contains($shift->program_type, 'BS')) {
+                    $shift->timetables()->create(array_merge($timeTables[1], $datesData));
+                }
+
+                if (str_contains($shift->program_type, 'ADP')) {
+                    $shift->timetables()->create(array_merge($timeTables[2], $datesData));
+                }
+            }
         }
     }
 }

@@ -9,6 +9,13 @@ use Illuminate\Contracts\Validation\ValidationRule;
 
 class ProgramRequest extends FormRequest
 {
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'shifts' => $this->has('shifts') && $this->filled('shifts') ? collect($this->shifts)->pluck('value')->toArray() : [],
+        ]);
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -19,9 +26,10 @@ class ProgramRequest extends FormRequest
         $types = array_keys(Program::TYPES);
 
         return [
-            'name'     => ['required', 'string', 'max:255'],
-            'type'     => ['bail', 'required', 'string', Rule::in($types)],
-            'duration' => [
+            'name'          => ['required', 'string', 'max:255'],
+            'type'          => ['bail', 'required', 'string', Rule::in($types)],
+            'department_id' => ['bail', 'required', 'integer', 'exists:departments,id'],
+            'duration'      => [
                 'bail',
                 'required',
                 'integer',
@@ -35,10 +43,11 @@ class ProgramRequest extends FormRequest
                 Rule::unique(Program::class)
                     ->where('code', $this->code)
                     ->where('type', $this->type)
+                    ->where('department_id', $this->department_id)
                     ->ignore($this->route('program')->id ?? null),
             ],
-            'shift_id'      => ['required', 'integer', 'exists:shifts,id'],
-            'department_id' => ['required', 'integer', 'exists:departments,id'],
+            'shifts'        => ['nullable', 'array'],
+            'shifts.*'      => ['required', 'integer', 'exists:shifts,id'],
         ];
     }
 

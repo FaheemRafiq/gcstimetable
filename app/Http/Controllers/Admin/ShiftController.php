@@ -21,7 +21,6 @@ class ShiftController extends Controller
     {
         $admin      = Auth::user();
         $shiftQuery = Shift::query();
-        $shifts     = [];
 
         if ($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()) {
             $shiftQuery->whereInstitution($admin->institution_id);

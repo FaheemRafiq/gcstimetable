@@ -16,14 +16,15 @@ import {
 } from '@/components/ui/select'
 import { PermissionCheckboxList } from '@/Components/PermissionList'
 import { cn } from '@/lib/utils'
+import { PermissionGroup } from '@/types/database'
 
 interface RoleFormProps {
   role?: Role
-  permissions: Permission[]
+  groups: PermissionGroup[]
   institutions?: { key: number; value: string }[]
 }
 
-function RoleForm({ role, permissions, institutions }: RoleFormProps) {
+function RoleForm({ role, groups, institutions }: RoleFormProps) {
   const { isSuperAdmin } = useAbilities()
   const isEditForm = !!role
 
@@ -75,7 +76,7 @@ function RoleForm({ role, permissions, institutions }: RoleFormProps) {
 
             {isSuperAdmin() ? (
               <div className="col-span-2 md:col-span-1">
-                <Label className="text-sm font-medium">Select Type</Label>
+                <Label className="text-sm font-medium">Select Institution</Label>
                 <Select
                   value={data.institution_id?.toString() ?? 'null'}
                   onValueChange={value => setData('institution_id', Number(value))}
@@ -99,7 +100,7 @@ function RoleForm({ role, permissions, institutions }: RoleFormProps) {
             <div className="col-span-2">
               <Label className="text-sm font-medium">Assign Permissions</Label>
               <PermissionCheckboxList
-                permissions={permissions}
+                groups={groups}
                 selectedPermissions={data.permissions}
                 onToggle={ids => setData('permissions', ids)}
               />

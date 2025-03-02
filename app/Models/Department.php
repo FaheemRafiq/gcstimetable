@@ -11,7 +11,11 @@ class Department extends Model
 {
     use HasFactory;
 
-    // guarded
+    protected $fillable = [
+        'name',
+        'code',
+        'institution_id',
+    ];
 
     // Department has many teachers
     public function teachers(): HasMany

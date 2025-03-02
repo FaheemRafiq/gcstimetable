@@ -4,15 +4,16 @@ import { PageProps, Role, Permission } from '@/types'
 import { useEffect } from 'react'
 import { useBreadcrumb } from '@/components/providers/breadcrum-provider'
 import RoleForm from './_components/RoleForm'
+import { PermissionGroup } from '@/types/database'
 
 interface RolePageProps
   extends PageProps<{
     role?: Role
-    permissions: Permission[]
+    groups: PermissionGroup[]
     institutions?: { key: number; value: string }[]
   }> {}
 
-function RolePage({ auth, role, permissions, institutions }: RolePageProps) {
+function RolePage({ auth, role, groups, institutions }: RolePageProps) {
   const { setBreadcrumb } = useBreadcrumb()
   const isEditForm = !!role
 
@@ -27,7 +28,7 @@ function RolePage({ auth, role, permissions, institutions }: RolePageProps) {
     <AuthenticatedLayout user={auth.user}>
       <Head title={isEditForm ? 'Edit Role' : 'Create Role'} />
 
-      <RoleForm role={role} permissions={permissions} institutions={institutions} />
+      <RoleForm role={role} groups={groups} institutions={institutions} />
     </AuthenticatedLayout>
   )
 }

@@ -12,15 +12,6 @@ class SectionSeeder extends Seeder
      */
     public function run(): void
     {
-        // create one section against every Semester
-        $semesters = Semester::all();
-
-        foreach ($semesters as $semester) {
-            $semester->sections()->create([
-                'name' => 'A',
-            ]);
-        }
-
         // for BBA and BSCS  Semesters 1 to 3  create two Sections and name them G1 and G2
 
         $semesters = Semester::where(function ($query) {

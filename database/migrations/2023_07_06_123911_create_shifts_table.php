@@ -1,9 +1,10 @@
 <?php
 
-use App\Models\Institution;
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use App\Models\Program;
+use App\Models\Shift;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -17,11 +18,11 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             // shifts of institution
-            $table->foreignIdFor(Institution::class)->constrained()->cascadeOnDelete();
-            $table->enum('type', ['Morning', 'Afternoon', 'Evening'])->nullable();
+            $table->foreignIdFor(\App\Models\Institution::class)->constrained()->cascadeOnDelete();
+            $table->enum('type', [array_keys(Shift::TYPES)])->nullable();
             $table->is_active();
             // program type
-            $table->enum('program_type', ['ADP', 'INTER', 'BS'])->default('BS');
+            $table->enum('program_type', [array_keys(Program::TYPES)])->default('BS');
 
             $table->timestamps();
         });

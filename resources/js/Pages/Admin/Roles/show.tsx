@@ -6,14 +6,14 @@ import { Button } from '@/components/ui/button'
 import { useBreadcrumb } from '@/components/providers/breadcrum-provider'
 import { useEffect } from 'react'
 import { PermissionViewList } from '@/Components/PermissionList'
-import { Institution } from '@/types/database'
+import { Institution, PermissionGroup } from '@/types/database'
 import { SuperAdminWrapper } from '@/Components/AdminWrapper'
 
 function ShowPage({
   auth,
   role,
-  permissions,
-}: PageProps<{ role: Role & { institution: Institution | null }; permissions: Permission[] }>) {
+  groups,
+}: PageProps<{ role: Role & { institution: Institution | null }; groups: PermissionGroup[] }>) {
   const { setBreadcrumb } = useBreadcrumb()
 
   useEffect(() => {
@@ -68,7 +68,7 @@ function ShowPage({
             <div className="bg-background text-foreground p-6 sm:rounded-lg shadow-lg">
               <div className="mb-4">
                 <PermissionViewList
-                  permissions={permissions}
+                  groups={groups}
                   selectedPermissions={role?.permissions?.map(p => p.id) || []}
                 />
               </div>

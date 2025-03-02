@@ -25,8 +25,8 @@ return new class extends Migration
             $table->string('phone_number')->unique()->nullable();
             // teacher bank IBAN
             $table->string('bank_iban')->unique()->nullable();
-            // teacher gender  isMale  by default true
-            $table->boolean('isMale')->default(true);
+            // teacher gender  is_male  by default true
+            $table->boolean('is_male')->default(true);
             // teacher date of birth
             $table->date('date_of_birth')->nullable();
             // teacher date of joining in this college
@@ -57,9 +57,9 @@ return new class extends Migration
             $table->enum('position', ['HOD', 'Regular', 'Vice Principal', 'Principal'])->nullable()->default('Regular');
 
             // teacher belongs to some department
-            $table->foreignId('department_id')->constrained('departments');
-            // isvisiting
-            $table->boolean('isvisiting')->default(false);
+            $table->foreignIdFor(\App\Models\Department::class)->constrained();
+            // is_visiting
+            $table->boolean('is_visiting')->default(false);
 
             // isActive
             $table->is_active();

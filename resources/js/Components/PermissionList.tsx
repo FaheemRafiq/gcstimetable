@@ -1,45 +1,27 @@
+import { useState } from 'react'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-
-interface Permission {
-  id: number
-  name: string
-}
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { Search, Info, Filter, ChevronDown, ChevronUp } from 'lucide-react'
+import { PermissionGroup } from '@/types/database'
 
 interface PermissionCheckboxListProps {
-  permissions: Permission[]
+  groups: PermissionGroup[]
   selectedPermissions: number[]
   onToggle: (newSelected: number[]) => void
 }
 
-const GROUPS = ['create', 'edit', 'view', 'delete', 'others']
-
-const getGroupName = (name: string) => {
-  const lowerName = name.toLowerCase()
-  const matchedGroup = GROUPS.find(group => lowerName.includes(group.toLowerCase()))
-  return matchedGroup || 'Others'
-}
-
-const groupPermissions = (permissions: Permission[]) => {
-  return permissions.reduce<Record<string, Permission[]>>((groupedData, perm) => {
-    const category = getGroupName(perm.name)
-    if (!groupedData[category]) groupedData[category] = []
-    groupedData[category].push(perm)
-    return groupedData
-  }, {})
-}
-
 export const PermissionCheckboxList: React.FC<PermissionCheckboxListProps> = ({
-  permissions,
+  groups,
   selectedPermissions,
   onToggle,
 }) => {
-  const groupedPermissions = groupPermissions(
-    [...permissions].sort((a, b) => a.name.localeCompare(b.name))
-  )
+  const [searchTerm, setSearchTerm] = useState('')
+  const [expandedGroups, setExpandedGroups] = useState<number[]>(groups.map(g => g.id))
 
-  const allPermissionIds = permissions.map(p => p.id)
+  const allPermissionIds = groups.flatMap(group => group.permissions || [])?.map(p => p?.id) ?? []
   const isAllSelected =
     allPermissionIds.length > 0 && allPermissionIds.every(id => selectedPermissions.includes(id))
 
@@ -68,86 +50,244 @@ export const PermissionCheckboxList: React.FC<PermissionCheckboxListProps> = ({
     onToggle(newSelected)
   }
 
+  const toggleGroupExpansion = (groupId: number) => {
+    setExpandedGroups(prev =>
+      prev.includes(groupId) ? prev.filter(id => id !== groupId) : [...prev, groupId]
+    )
+  }
+
+  // Filter groups and permissions based on search term
+  const filteredGroups = groups
+    .map(group => ({
+      ...group,
+      permissions: group.permissions?.filter(
+        permission =>
+          permission.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (permission.description &&
+            permission.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      ),
+    }))
+    .filter(group => (group.permissions?.length || 0) > 0)
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
-        <Button
-          variant={isAllSelected ? 'destructive' : 'default'}
-          onClick={handleSelectAll}
-          className="mb-4"
-          type="button"
-        >
-          {isAllSelected ? 'Deselect All' : 'Select All'}
-        </Button>
+      <div className="flex flex-col sm:flex-row gap-4 justify-between mb-2">
+        <div className="relative flex-grow">
+          <Input
+            placeholder="Search permissions..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+        </div>
+        <div className="flex gap-2">
+          <Badge className="flex items-center h-9">{selectedPermissions.length} Selected</Badge>
+          <Button
+            variant={isAllSelected ? 'destructive' : 'default'}
+            onClick={handleSelectAll}
+            type="button"
+          >
+            {isAllSelected ? 'Deselect All' : 'Select All'}
+          </Button>
+        </div>
       </div>
 
-      {Object.entries(groupedPermissions).map(([category, perms]) => {
-        const categoryIds = perms.map(p => p.id)
-        const isCategorySelected = categoryIds.every(id => selectedPermissions.includes(id))
+      {filteredGroups.map(group => {
+        const categoryIds = group?.permissions?.map(p => p.id) || []
+        const isCategorySelected =
+          categoryIds.length > 0 && categoryIds?.every(id => selectedPermissions.includes(id))
+        const isPartiallySelected =
+          categoryIds.some(id => selectedPermissions.includes(id)) && !isCategorySelected
+        const isExpanded = expandedGroups.includes(group.id)
 
         return (
-          <Card key={category} className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-semibold capitalize">{category}</h2>
-              <Checkbox
-                checked={isCategorySelected}
-                onCheckedChange={() => handleCategoryToggle(categoryIds)}
-              />
-            </div>
-            <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              {perms.map(permission => (
-                <label key={permission.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={selectedPermissions.includes(permission.id)}
-                    onCheckedChange={() => handlePermissionToggle(permission.id)}
-                  />
-                  <span>{permission.name}</span>
-                </label>
-              ))}
-            </CardContent>
+          <Card key={group.id} className="overflow-hidden transition-all duration-200">
+            <CardHeader className="py-3 px-4 cursor-pointer">
+              <div className="flex items-center justify-between">
+                <div
+                  className="flex items-center space-x-2"
+                  onClick={() => toggleGroupExpansion(group.id)}
+                >
+                  {isExpanded ? (
+                    <ChevronUp className="h-5 w-5" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5" />
+                  )}
+                  <CardTitle className="text-lg font-semibold capitalize flex items-center gap-2">
+                    {group.name}
+                    <Badge variant="secondary" className="ml-2">
+                      {group.permissions?.length || 0}
+                    </Badge>
+                  </CardTitle>
+                </div>
+                <Checkbox
+                  checked={isPartiallySelected ? 'indeterminate' : isCategorySelected}
+                  onCheckedChange={() => handleCategoryToggle(categoryIds)}
+                  onClick={e => e.stopPropagation()}
+                  aria-label={`Select all permissions in ${group.name}`}
+                />
+              </div>
+            </CardHeader>
+
+            {isExpanded && (
+              <CardContent className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pt-0 px-4 pb-4">
+                {group?.permissions?.map(permission => (
+                  <div
+                    key={permission.id}
+                    className="flex items-start p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    <Checkbox
+                      id={`permission-${permission.id}`}
+                      checked={selectedPermissions.includes(permission.id)}
+                      onCheckedChange={() => handlePermissionToggle(permission.id)}
+                      className="mt-1"
+                    />
+                    <div className="ml-3">
+                      <label
+                        htmlFor={`permission-${permission.id}`}
+                        className="font-medium cursor-pointer block"
+                      >
+                        {permission.name}
+                      </label>
+                      {permission.description && (
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                          {permission.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            )}
           </Card>
         )
       })}
+
+      {filteredGroups.length === 0 && (
+        <div className="text-center py-12">
+          <Filter className="mx-auto h-12 w-12 text-gray-400" />
+          <h3 className="mt-2 text-lg font-medium">No permissions found</h3>
+          <p className="mt-1 text-gray-500">Try adjusting your search terms.</p>
+        </div>
+      )}
     </div>
   )
 }
 
 interface PermissionViewListProps {
-  permissions: Permission[]
+  groups: PermissionGroup[]
   selectedPermissions: number[]
 }
 
 export const PermissionViewList: React.FC<PermissionViewListProps> = ({
-  permissions,
+  groups,
   selectedPermissions,
 }) => {
-  const groupedPermissions = groupPermissions(
-    [...permissions].sort((a, b) => a.name.localeCompare(b.name))
-  )
+  const [searchTerm, setSearchTerm] = useState('')
+  const [expandedGroups, setExpandedGroups] = useState<number[]>(groups.map(g => g.id))
+
+  const toggleGroupExpansion = (groupId: number) => {
+    setExpandedGroups(prev =>
+      prev.includes(groupId) ? prev.filter(id => id !== groupId) : [...prev, groupId]
+    )
+  }
+
+  // Filter groups and permissions based on search term and selected permissions
+  const filteredGroups = groups
+    .map(group => ({
+      ...group,
+      permissions: group.permissions?.filter(
+        permission =>
+          (permission.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (permission.description &&
+              permission.description.toLowerCase().includes(searchTerm.toLowerCase()))) &&
+          selectedPermissions.includes(permission.id)
+      ),
+    }))
+    .filter(group => (group.permissions?.length || 0) > 0)
+
+  const totalSelected = selectedPermissions.length
 
   return (
     <div className="space-y-6">
-      {Object.entries(groupedPermissions).map(([category, perms]) => (
-        <Card key={category} className="p-4">
-          <h2 className="text-lg font-semibold mb-2 capitalize">{category}</h2>
-          <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-2">
-            {perms.map(permission => {
-              const isSelected = selectedPermissions.includes(permission.id)
-              return (
-                <label
-                  key={permission.id}
-                  className={`flex items-center space-x-2 transition-opacity ${
-                    isSelected ? 'opacity-100 font-semibold' : 'opacity-50'
-                  }`}
-                >
-                  <Checkbox checked={isSelected} disabled={isSelected} />
-                  <span>{permission.name}</span>
-                </label>
-              )
-            })}
-          </CardContent>
-        </Card>
-      ))}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between mb-2">
+        <div className="relative flex-grow">
+          <Input
+            placeholder="Search assigned permissions..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+        </div>
+        <Badge className="flex items-center h-9">
+          {totalSelected} Permission{totalSelected !== 1 ? 's' : ''} Assigned
+        </Badge>
+      </div>
+
+      {filteredGroups.map(group => {
+        const isExpanded = expandedGroups.includes(group.id)
+        const groupSelectedCount = group.permissions?.length || 0
+
+        return (
+          <Card key={group.id} className="overflow-hidden transition-all duration-200">
+            <CardHeader
+              className="py-3 px-4 cursor-pointer"
+              onClick={() => toggleGroupExpansion(group.id)}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  {isExpanded ? (
+                    <ChevronUp className="h-5 w-5" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5" />
+                  )}
+                  <CardTitle className="text-lg font-semibold capitalize flex items-center gap-2">
+                    {group.name}
+                    <Badge variant="outline" className="ml-2">
+                      {groupSelectedCount}
+                    </Badge>
+                  </CardTitle>
+                </div>
+              </div>
+            </CardHeader>
+
+            {isExpanded && (
+              <CardContent className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pt-0 px-4 pb-4">
+                {group?.permissions?.map(permission => (
+                  <div
+                    key={permission.id}
+                    className="flex items-start p-3 bg-gray-50 dark:bg-gray-800 rounded-md"
+                  >
+                    <Checkbox checked={true} disabled={true} className="mt-1" />
+                    <div className="ml-3">
+                      <p className="font-medium">{permission.name}</p>
+                      {permission.description && (
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                          {permission.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            )}
+          </Card>
+        )
+      })}
+
+      {filteredGroups.length === 0 && (
+        <div className="text-center py-12">
+          <Info className="mx-auto h-12 w-12 text-gray-400" />
+          <h3 className="mt-2 text-lg font-medium">No permissions assigned</h3>
+          <p className="mt-1 text-gray-500">
+            {searchTerm
+              ? 'No matching permissions found.'
+              : 'This role has no permissions assigned.'}
+          </p>
+        </div>
+      )}
     </div>
   )
 }

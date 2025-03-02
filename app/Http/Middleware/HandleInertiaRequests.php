@@ -56,7 +56,7 @@ class HandleInertiaRequests extends Middleware
             $cacheKey = sprintf('user_%s_with_relations', $userId);
 
             return cache()->remember($cacheKey, 60, function () use ($user): UserResource {
-                $user->load(['institution:id,name', 'roles', 'permissions']);
+                $user->load(['institution:id,name', 'roles.permissions']);
 
                 return new UserResource($user);
             });

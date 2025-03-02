@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Shift;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -27,7 +26,7 @@ return new class extends Migration
             $table->boolean('is_practical')->default(false);
 
             // shift_id is foreign key
-            $table->foreignIdFor(Shift::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\Shift::class)->constrained()->cascadeOnDelete();
 
             $table->timestamps();
         });

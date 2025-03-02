@@ -67,7 +67,7 @@ export default function TimeTables({
                         >
                           {timetable.title}
                         </h2>
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary" className="text-xs text-nowrap">
                           {timetable.shift?.name || 'No Shift'}
                         </Badge>
                       </div>
@@ -96,7 +96,7 @@ export default function TimeTables({
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 justify-end">
                       <Tooltip title="Edit Table">
                         <Button
                           variant="outline"

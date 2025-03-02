@@ -13,6 +13,24 @@ class Semester extends Model
     use HasFactory;
     use IsActiveTrait;
 
+    protected $fillable = [
+        'name',
+        'number',
+        'is_active',
+        'program_id',
+    ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($semester) {
+            $semester->sections()->create([
+                'name' => 'A',
+            ]);
+        });
+    }
+
     // Semester Has Many Sections
     public function sections(): HasMany
     {

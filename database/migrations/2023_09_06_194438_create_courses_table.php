@@ -12,11 +12,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        /* TODO: Course can be taught by different department
-             so that only the relevant teachers are displayed against the course   and it will also help in getting the department related courses
-            It will be a many to many relation
-        */
-
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
             // course name

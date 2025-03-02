@@ -11,6 +11,17 @@ class Room extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'code',
+        'capacity',
+        'type',
+        'is_available',
+        'institution_id',
+    ];
+
+    public const TYPES = ['INTER', 'BS', 'BOTH'];
+
     public function isBsRoom(): bool
     {
         return $this->type === 'BS';
@@ -33,7 +44,7 @@ class Room extends Model
 
     public function scopeAvailable($query)
     {
-        return $query->where('isavailable', 1);
+        return $query->where('is_available', 1);
     }
 
     public function scopeWhereInstitution($query, int $institutionId)

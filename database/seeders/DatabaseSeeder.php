@@ -12,11 +12,13 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call(RoleAndPermissionSeeder::class);
+        $this->call(PermissionGroupSeeder::class);
 
-        $superadmin_role       = Role::where('name', RoleEnum::SUPER_ADMIN->value)->first();
-        $institute_admin_role  = Role::where('name', RoleEnum::INSTITUTION_ADMIN->value)->first();
-        $department_admin_role = Role::where('name', RoleEnum::DEPARTMENT_ADMIN->value)->first();
+        $this->call(RoleSeeder::class);
+
+        $superadmin_role         = Role::where('name', RoleEnum::SUPER_ADMIN->value)->first();
+        $institution_admin_role  = Role::where('name', RoleEnum::INSTITUTION_ADMIN->value)->first();
+        $department_admin_role   = Role::where('name', RoleEnum::DEPARTMENT_ADMIN->value)->first();
 
         // Institutions
         $this->call(InstitutionSeeder::class);
@@ -41,7 +43,7 @@ class DatabaseSeeder extends Seeder
             'institution_id' => 1,
         ]);
 
-        $institutionAdmin->assignRole($institute_admin_role);
+        $institutionAdmin->assignRole($institution_admin_role);
         $institutionAdmin->markEmailAsVerified();
 
         $lastInstitution   = Institution::with(['departments' => fn ($q) => $q->limit(1)])->find(2);
@@ -52,7 +54,7 @@ class DatabaseSeeder extends Seeder
             'institution_id' => 2,
         ]);
 
-        $institutionAdmin2->assignRole($institute_admin_role);
+        $institutionAdmin2->assignRole($institution_admin_role);
         $institutionAdmin2->markEmailAsVerified();
 
         $this->call(DepartmentSeeder::class);
@@ -91,6 +93,8 @@ class DatabaseSeeder extends Seeder
         $this->call(DayInstitutionSeeder::class);
 
         $this->call(ProgramSeeder::class);
+
+        $this->call(ProgramShiftSeeder::class);
 
         $this->call(TeacherSeeder::class);
 

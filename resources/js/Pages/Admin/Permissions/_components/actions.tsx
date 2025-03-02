@@ -56,13 +56,6 @@ export function Actions({ row }: { row: Permission }) {
           <DropdownMenuLabel>Operations</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            {/* <DropdownMenuItem
-                            className="cursor-pointer"
-                            onClick={() => handleView(row)}
-                        >
-                            <Eye className="mr-2 h-4 w-4" />
-                            <span>View</span>
-                        </DropdownMenuItem> */}
             <DropdownMenuItem className="cursor-pointer" onClick={() => setOpenEdit(true)}>
               <Pencil className="mr-2 h-4 w-4" />
               <span>Edit</span>

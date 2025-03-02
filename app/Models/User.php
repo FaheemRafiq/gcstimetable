@@ -23,6 +23,17 @@ class User extends Authenticatable implements MustVerifyEmail
     use Notifiable;
     use RoleTrait;
 
+    protected $fillable = [
+        'name',
+        'email',
+        'email_verified_at',
+        'password',
+        'profile_photo_path',
+        'institution_id',
+        'department_id',
+        'remember_token',
+    ];
+
     /**
      * The attributes that should be hidden for serialization.
      *

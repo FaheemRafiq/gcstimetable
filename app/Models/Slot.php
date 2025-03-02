@@ -23,6 +23,15 @@ class Slot extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'code',
+        'name',
+        'start_time',
+        'end_time',
+        'is_practical',
+        'shift_id',
+    ];
+
     // Scopes
 
     public function scopeTimeOverlaps(Builder $query, string $startTime, string $endTime)

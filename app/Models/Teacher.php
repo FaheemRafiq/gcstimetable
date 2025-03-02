@@ -12,6 +12,33 @@ class Teacher extends Model
     use HasFactory;
     use IsActiveTrait;
 
+    protected $fillable = [
+        'name',
+        'personnel_number',
+        'email',
+        'cnic',
+        'phone_number',
+        'bank_iban',
+        'is_male',
+        'date_of_birth',
+        'date_of_joining_in_this_college',
+        'date_of_joining_govt_service',
+        'date_of_joining_current_rank',
+        'father_name',
+        'seniority_number',
+        'qualification',
+        'highest_degree_awarding_institute',
+        'highest_degree_awarding_country',
+        'highest_degree_awarding_year',
+        'degree_title',
+        'rank',
+        'position',
+        'department_id',
+        'is_visiting',
+        'is_active',
+        'user_id',
+    ];
+
     protected $casts = [
         'date_of_birth'                   => 'date',
         'date_of_joining_in_this_college' => 'date',

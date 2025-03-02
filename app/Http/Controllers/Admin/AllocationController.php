@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use App\Models\TimeTable;
 use App\Models\Allocation;
 use App\Models\Department;
+use App\Models\Institution;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -41,25 +42,38 @@ class AllocationController extends Controller
         }
 
         $admin       = Auth::user();
-        $institution = $admin->institution()->with('shifts', 'days')->first();
+
+        if ($admin->isSuperAdmin()) {
+            $institution = Institution::with('shifts', 'days')->first();
+        } else {
+            $institution = $admin->institution()->with('shifts', 'days')->first();
+        }
+
         $now         = Carbon::now();
-        $currentDay  = $now->dayOfWeek;
-        $selectedDay = $request->query('selected_day', $now->dayOfWeek); // 0 (Sunday) through 6 (Saturday)
+        $currentDay  = $now->dayOfWeek == 0 ? 7 : $now->dayOfWeek;
+        $selectedDay = $request->query('selected_day', $currentDay); // 0 (Sunday) through 6 (Saturday)
         $startTime   = $request->has('start_time') && $request->filled('start_time') ? $request->date('start_time') : $now->copy()->subHours(2); // 2 hours back
         $endTime     = $request->has('end_time')   && $request->filled('end_time') ? $request->date('end_time') : $now->copy()->addHours(6);   // 6 hours forward
-        $shift_id    = $request->query('shift_id', $institution->shifts->random()->first()->id ?? null);
+
+        $institution_id = $institution?->id ?? null;
+
+        if ($request->has('institution_id') && $request->filled('institution_id')) {
+            $institution_id = $request->query('institution_id');
+        }
+
+        $shift_id    = $request->query('shift_id', $institution?->shifts?->random()->first()->id ?? null);
 
         // Get departments with allocations in the time window
         $departments = Department::with([
             'programs.semesters.sections',
-            'programs.semesters.sections.allocations' => function ($query) use ($selectedDay, $startTime, $endTime, $admin, $shift_id) {
+            'programs.semesters.sections.allocations' => function ($query) use ($selectedDay, $startTime, $endTime, $admin, $shift_id, $institution_id) {
                 $query->whereHas('day', function ($q) use ($selectedDay) {
                     $q->where('number', $selectedDay);
-                })->whereHas('slot', function ($q) use ($startTime, $endTime, $admin, $shift_id) {
+                })->whereHas('slot', function ($q) use ($startTime, $endTime, $admin, $shift_id, $institution_id) {
                     $q->timeOverlaps($startTime, $endTime)
-                        ->when(! $admin->isSuperAdmin(), function ($wQuery) use ($admin) {
-                            $wQuery->whereHas('institution', function ($query) use ($admin) {
-                                $query->where('institutions.id', $admin->institution_id);
+                        ->when(! $admin->isSuperAdmin() || $institution_id, function ($wQuery) use ($institution_id) {
+                            $wQuery->whereHas('institution', function ($query) use ($institution_id) {
+                                $query->where('institutions.id', $institution_id);
                             });
                         })
                         ->when($shift_id, function ($query, $shift_id) {
@@ -72,14 +86,14 @@ class AllocationController extends Controller
                     ->with(['course', 'teacher', 'room', 'slot']);
             },
         ])
-            ->whereHas('programs.semesters.sections.allocations', function ($query) use ($selectedDay, $startTime, $endTime, $admin, $shift_id) {
+            ->whereHas('programs.semesters.sections.allocations', function ($query) use ($selectedDay, $startTime, $endTime, $admin, $shift_id, $institution_id) {
                 $query->whereHas('day', function ($q) use ($selectedDay) {
                     $q->where('number', $selectedDay);
-                })->whereHas('slot', function ($q) use ($startTime, $endTime, $admin, $shift_id) {
+                })->whereHas('slot', function ($q) use ($startTime, $endTime, $admin, $shift_id, $institution_id) {
                     $q->timeOverlaps($startTime, $endTime)
-                        ->when(! $admin->isSuperAdmin(), function ($wQuery) use ($admin) {
-                            $wQuery->whereHas('institution', function ($query) use ($admin) {
-                                $query->where('institutions.id', $admin->institution_id);
+                        ->when(! $admin->isSuperAdmin(), function ($wQuery) use ($institution_id) {
+                            $wQuery->whereHas('institution', function ($query) use ($institution_id) {
+                                $query->where('institutions.id', $institution_id);
                             });
                         })
                         ->when($shift_id, function ($query, $shift_id) {
@@ -177,6 +191,7 @@ class AllocationController extends Controller
                 return [
                     'id'         => $slot->id,
                     'name'       => $slot->name,
+                    'code'       => $slot->code,
                     'start_time' => $slot->start_time,
                     'end_time'   => $slot->end_time,
                     'datetime'   => [
@@ -186,6 +201,7 @@ class AllocationController extends Controller
                     'status' => $this->getAllocationStatus($startDateTime, $endDateTime),
                 ];
             })->sortBy('start_time')->values(),
+            'institutions' => $admin->isSuperAdmin() ? Institution::orderByDesc('created_at')->get() : [],
         ];
 
         return Inertia::render('Admin/Dashboard/AllocationTimeTable', [

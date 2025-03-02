@@ -1,6 +1,10 @@
-import { IsActive, Shift } from '.'
+import { IsActive, Permission, Shift } from '.'
 
 export type ClassType = 'CLASS' | 'LAB'
+export type Timestamps = {
+  created_at: string
+  updated_at: string
+}
 
 export type Teacher = {
   id: number
@@ -10,7 +14,7 @@ export type Teacher = {
   cnic: string | null
   phone_number: string
   bank_iban: string
-  isMale: boolean
+  is_male: boolean
   date_of_birth: string
   date_of_joining_in_this_college: string
   date_of_joining_govt_service: string
@@ -25,7 +29,7 @@ export type Teacher = {
   rank: string
   position: string
   department_id: number | null
-  isvisiting: boolean
+  is_visiting: boolean
   is_active: IsActive
   created_at: string
   updated_at: string
@@ -125,7 +129,7 @@ export type Room = {
   name: string
   type: string
   capacity: number
-  isavailable: boolean
+  is_available: boolean
   institution_id: number
   created_at: string
   updated_at: string
@@ -166,16 +170,24 @@ export type Program = {
   code: string
   duration: number
   type: 'ADP' | 'INTER' | 'BS'
-  shift_id: number
   department_id: number
   created_at: string
   updated_at: string
 
   // Relations
-  shift?: Shift
+  shifts?: Shift[]
   department?: Department
   semesters?: Semester[]
 }
+
+export type PermissionGroup = {
+  id: number
+  name: string
+
+  // Relations
+  permissions?: Permission[]
+  permissions_count?: number
+} & Timestamps
 
 export type StringObject = {
   [key: string]: string

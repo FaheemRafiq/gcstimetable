@@ -12,6 +12,13 @@ class Institution extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'address',
+        'phone',
+        'email',
+    ];
+
     // Institution has many Departments
     public function departments(): HasMany
     {

@@ -23,7 +23,7 @@ return new class extends Migration
             $table->is_active();
 
             // foreign key to program
-            $table->foreignId('program_id')->constrained()->onDelete('cascade');
+            $table->foreignIdFor(\App\Models\Program::class)->constrained()->cascadeOnDelete();
 
             $table->timestamps();
         });

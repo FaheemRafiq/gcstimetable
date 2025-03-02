@@ -29,10 +29,10 @@ const columns: ColumnDef<Room>[] = [
     },
   },
   {
-    accessorKey: 'isavailable',
+    accessorKey: 'is_available',
     header: 'Is Available',
     cell: ({ row }) => {
-      const isAvailable = row.original.isavailable
+      const isAvailable = row.original.is_available
 
       return (
         <Tooltip title={isAvailable ? 'Available' : 'Not Available'}>

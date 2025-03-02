@@ -2,10 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Admin\DayController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\SlotController;
 use App\Http\Controllers\Admin\ShiftController;
 use App\Http\Controllers\Admin\CourseController;
+use App\Http\Controllers\Admin\ImportController;
 use App\Http\Controllers\Admin\ProgramController;
 use App\Http\Controllers\Admin\SectionController;
 use App\Http\Controllers\Admin\StudentController;
@@ -93,4 +95,12 @@ Route::prefix('admin')
             Route::get('attach/{course}', [CourseController::class, 'attachSemester'])->name('courses.attach.semester');
             Route::post('attach/{course}', [CourseController::class, 'attach'])->name('courses.attach');
         });
+
+        // Days 📆
+        Route::get('days', [DayController::class, 'index'])->name('days.index');
+        Route::patch('days/{day}', [DayController::class, 'change_status'])->name('days.change.status');
+
+        Route::get('import', [ImportController::class, 'index'])->name('import.index');
+        Route::post('import', [ImportController::class, 'store'])->name('import.store');
+        Route::get('export/template', [ImportController::class, 'exportTemplate'])->name('export.template');
     });

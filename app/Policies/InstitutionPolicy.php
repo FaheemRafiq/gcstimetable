@@ -22,7 +22,7 @@ class InstitutionPolicy
      */
     public function view(User $user, Institution $institution): Response
     {
-        return $user->can(PermissionEnum::VIEW_INSTITUTE->value)
+        return $user->can(PermissionEnum::VIEW_INSTITUTION->value)
             ? Response::allow()
             : Response::deny(config('providers.permission.view.error'));
     }
@@ -32,7 +32,7 @@ class InstitutionPolicy
      */
     public function create(User $user): Response
     {
-        return $user->can(PermissionEnum::CREATE_INSTITUTE->value)
+        return $user->can(PermissionEnum::CREATE_INSTITUTION->value)
             ? Response::allow()
             : Response::deny(config('providers.permission.action.error'));
     }
@@ -42,7 +42,7 @@ class InstitutionPolicy
      */
     public function update(User $user, Institution $institution): Response
     {
-        return $user->can(PermissionEnum::EDIT_INSTITUTE->value)
+        return $user->can(PermissionEnum::EDIT_INSTITUTION->value)
             ? Response::allow()
             : Response::deny(config('providers.permission.action.error'));
     }
@@ -52,7 +52,7 @@ class InstitutionPolicy
      */
     public function delete(User $user, Institution $institution): Response
     {
-        return $user->can(PermissionEnum::DELETE_INSTITUTE->value)
+        return $user->can(PermissionEnum::DELETE_INSTITUTION->value)
             ? Response::allow()
             : Response::deny(config('providers.permission.action.error'));
     }

@@ -2,16 +2,20 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Room;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
 
-class StoreRoomRequest extends FormRequest
+class RoomRequest extends FormRequest
 {
     protected function prepareForValidation(): void
     {
-        $this->merge([
-            'institution_id' => $this->user()->institution_id ?? null,
-        ]);
+        if ($this->isMethod('post')) { // Only merge institution_id when storing
+            $this->merge([
+                'institution_id' => $this->user()->institution_id ?? null,
+            ]);
+        }
     }
 
     /**
@@ -25,9 +29,9 @@ class StoreRoomRequest extends FormRequest
             'name'           => ['required', 'string', 'max:255'],
             'code'           => ['required', 'string', 'max:255'],
             'capacity'       => ['required', 'integer', 'min:1'],
-            'isavailable'    => ['required', 'boolean'],
-            'type'           => ['required', 'string', 'in:INTER,BS,BOTH'],
-            'institution_id' => ['required', 'integer'],
+            'is_available'   => ['required', 'boolean'],
+            'type'           => ['required', 'string', Rule::in(Room::TYPES ?? ['INTER', 'BS', 'BOTH'])],
+            'institution_id' => $this->isMethod('post') ? ['required', 'integer'] : [], // Only required on store
         ];
     }
 }

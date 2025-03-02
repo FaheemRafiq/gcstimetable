@@ -3,97 +3,120 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Day;
+use Inertia\Inertia;
+use App\Models\Institution;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\DayCollection;
-use App\Http\Requests\StoreDayRequest;
-use App\Http\Requests\UpdateDayRequest;
-use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class DayController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Displays a list of all days for an institution, or all days if user is super admin.
+     *
+     * @return \Inertia\Response
      */
     public function index()
     {
-        // get the institution id from the request
-        $institutionId = request()->input('institutionid');
-
-        // return all days by institution
         try {
-            $days = new DayCollection(Day::all()->where('institution_id', $institutionId)->sortByDesc('updated_at'));
+            // Authorization check
+            $this->authorize('viewAny', Day::class);
 
-            return response()->json($days, 200); // 200 OK
-        } catch (QueryException $queryException) {
-            return response()->json(['error' => 'Database error'.$queryException->getMessage()], 500);
+            $admin = Auth::user();
+            $days  = collect(); // Default empty collection
+
+            if ($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()) {
+                // Fetch days via institution relationship
+                $days = $admin->institution?->days()
+                    ->get() ?? collect();
+            } else {
+                // Fetch institutions and selected institution_id
+                $institutions   = Institution::select('id', 'name')->get();
+                $institution_id = request()->input('institution_id', $institutions->first()?->id);
+
+                // Fetch days via relationship
+                $institution = Institution::with('days')->find($institution_id);
+
+                if ($institution) {
+                    $days = $institution->days ?? collect();
+                }
+            }
+
+            return Inertia::render('Admin/Days/index', [
+                'days'         => $days,
+                'institutions' => $institutions ?? [],
+            ]);
+        } catch (AuthorizationException $e) {
+            return back()->with('error', $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error('Error fetching days', ['error' => $e->getMessage()]);
+
+            return back()->with('error', 'An unexpected error occurred. Please try again.');
         }
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Change the status of a given day for an institution.
+     *
+     * This method checks the user's authorization to change the day status
+     * and logs the attempt. It validates the request data, ensuring the
+     * 'is_active' field is appropriately set. If the user is a super admin,
+     * it also validates the 'institution_id'. It then updates the status of
+     * the day in the institution's pivot table. Handles validation,
+     * authorization, and general exceptions, logging errors and returning
+     * appropriate responses.
+     *
+     * @param  \Illuminate\Http\Request  $request  The HTTP request object containing the 'is_active' status and optionally 'institution_id'.
+     * @param  \App\Models\Day  $day  The day model whose status is to be changed.
+     * @return \Illuminate\Http\RedirectResponse Redirects back with success or error messages based on the operation outcome.
+     *
+     * @throws \Illuminate\Validation\ValidationException If validation fails.
+     * @throws \Illuminate\Auth\Access\AuthorizationException If the user is not authorized to change the day status.
      */
-    public function create(): void
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreDayRequest $request)
+    public function change_status(Request $request, Day $day)
     {
         try {
-            $day = Day::create($request->all());
+            // Check authorization
+            $this->authorize('change_status', $day);
 
-            return response()->json($day, 201); // 201 Created
-        } catch (QueryException $queryException) {
-            return response()->json(['error' => 'Constraint violation or other database error'.$queryException->getMessage()], 422);
+            Log::channel('days')->info('Day status update attempt', [
+                'day_id'    => $day->id,
+                'is_active' => $request->is_active,
+            ]);
+
+            // Validation rules
+            $rules = [
+                'is_active'      => ['required', Rule::in([Day::ACTIVE, Day::INACTIVE])],
+                'institution_id' => ['required', Rule::exists('institutions', 'id')],
+            ];
+
+            $validated = $request->validate($rules);
+
+            $institution_id = $validated['institution_id'];
+
+            // Find the pivot record using Eloquent relationship
+            $dayInstitution = $day->institutions()->where('institution_id', $institution_id)->first();
+
+            if (! $dayInstitution) {
+                return back()->with('error', 'Day not found for the given institution.');
+            }
+
+            // Update the pivot record
+            $day->institutions()->updateExistingPivot($institution_id, ['is_active' => $validated['is_active']]);
+
+            return back()->with('success', 'Day status updated successfully.');
+        } catch (ValidationException $e) {
+            return back()->withErrors($e->validator);
+        } catch (AuthorizationException $e) {
+            return back()->with('error', $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error('Error updating day status', ['error' => $e->getMessage()]);
+
+            return back()->with('error', 'An unexpected error occurred. Please try again.');
         }
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Day $day)
-    {
-        if (! $day) {
-            return response()->json(['message' => 'Day not found'], 404);
-        }
-
-        return response()->json($day);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Day $day): void
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateDayRequest $request, Day $day): Day
-    {
-        // save the request data and return it
-        $day->update($request->all());
-
-        return $day;
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Day $day)
-    {
-        if (! $day) {
-            return response()->json(['message' => 'Day not found'], 404);
-        }
-
-        $day->delete();
-
-        // return response()->json($day);
-        return response()->json(['day' => $day, 'message' => 'Resource successfully deleted'], 200);
     }
 }

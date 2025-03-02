@@ -26,8 +26,8 @@ class RoomSeeder extends Seeder
                 // type would be random
                 'type' => $faker->randomElement(['INTER', 'BS', 'BOTH']),
 
-                'isavailable'    => true,
-                'institution_id' => $institution_id,
+                'is_available'    => true,
+                'institution_id'  => $institution_id,
             ]);
         }
 
@@ -42,8 +42,8 @@ class RoomSeeder extends Seeder
                 // type would be random
                 'type' => $faker->randomElement(['INTER', 'BS', 'BOTH']),
 
-                'isavailable'    => true,
-                'institution_id' => $institution_id,
+                'is_available'    => true,
+                'institution_id'  => $institution_id,
             ]);
         }
     }

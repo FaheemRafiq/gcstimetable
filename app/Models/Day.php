@@ -11,6 +11,12 @@ class Day extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'number',
+        'name',
+        'code',
+    ];
+
     public const ACTIVE = 'active';
 
     public const INACTIVE = 'inactive';
@@ -22,7 +28,7 @@ class Day extends Model
     }
 
     // Day belongs to an Institution
-    public function institution(): BelongsToMany
+    public function institutions(): BelongsToMany
     {
         return $this->belongsToMany(Institution::class);
     }

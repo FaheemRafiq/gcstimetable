@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -20,12 +20,13 @@ return new class extends Migration
             $table->integer('capacity');
             // create a column so it could be either Intermediate , BS or both   enum
             $table->enum('type', ['INTER', 'BS', 'BOTH']);
-            // isavailable
-            $table->boolean('isavailable');
+            // is_available
+            $table->boolean('is_available');
 
-            $institution_id = 1;
             // belongs to some institution
-            $table->foreignId('institution_id')->default($institution_id)->constrained()->onDelete('cascade');
+            $table->foreignIdFor(\App\Models\Institution::class)->constrained()->cascadeOnDelete();
+
+            $table->unique(['code', 'institution_id']);
 
             $table->timestamps();
         });

@@ -1,5 +1,5 @@
 import { Config } from 'ziggy-js'
-import { Allocation, Institution, Slot } from './database'
+import { Allocation, Institution, PermissionGroup, Slot } from './database'
 
 export type IsActive = 'active' | 'inactive'
 
@@ -16,8 +16,14 @@ interface Role {
 interface Permission {
   id: number
   name: string
+  guard_name: string
+  permission_group_id: number
+  description: string
 
+  // relations
+  roles?: Role[]
   roles_count?: number
+  permission_group?: PermissionGroup
 }
 
 export interface User {

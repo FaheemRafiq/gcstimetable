@@ -6,8 +6,8 @@ use App\Models\Role;
 use App\Models\User;
 use Inertia\Inertia;
 use App\Enums\RoleEnum;
-use App\Models\Permission;
 use App\Models\Institution;
+use App\Models\PermissionGroup;
 use App\Http\Requests\RoleRequest;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -57,14 +57,14 @@ class RoleController extends Controller
         }
 
         $user         = Auth::user();
-        $permissions  = $this->getPermissions();
+        $groups       = $this->getPermissionGroups();
         $institutions = [];
 
         if ($user->isSuperAdmin()) {
             $institutions = Institution::select(['id as key', 'name as value'])->get();
         }
 
-        return Inertia::render('Admin/Roles/rolePage', compact('permissions', 'institutions'));
+        return Inertia::render('Admin/Roles/rolePage', compact('groups', 'institutions'));
     }
 
     /**
@@ -81,7 +81,7 @@ class RoleController extends Controller
             if ($response->allowed()) {
                 $role = Role::create($attributes);
 
-                $role->permissions()->sync($request->input('permissions'));
+                $role->permissions()->syncWithoutDetaching($request->input('permissions'));
 
                 return redirect(route('roles.index'))->with('success', 'Role created successfully');
             } else {
@@ -107,9 +107,9 @@ class RoleController extends Controller
         }
 
         $role->load('permissions', 'institution:id,name');
-        $permissions  = $this->getPermissions();
+        $groups  = $this->getPermissionGroups();
 
-        return Inertia::render('Admin/Roles/show', compact('role', 'permissions'));
+        return Inertia::render('Admin/Roles/show', compact('role', 'groups'));
     }
 
     public function edit(Role $role)
@@ -122,14 +122,14 @@ class RoleController extends Controller
         }
 
         $role->load('permissions');
-        $permissions  = $this->getPermissions();
+        $groups       = $this->getPermissionGroups();
         $institutions = [];
 
         if ($user->isSuperAdmin()) {
             $institutions = Institution::select(['id as key', 'name as value'])->get();
         }
 
-        return Inertia::render('Admin/Roles/rolePage', compact('role', 'permissions', 'institutions'));
+        return Inertia::render('Admin/Roles/rolePage', compact('role', 'groups', 'institutions'));
     }
 
     /**
@@ -153,7 +153,7 @@ class RoleController extends Controller
             if ($response->allowed()) {
                 $role->update($attributes);
 
-                $role->permissions()->sync($request->input('permissions'));
+                $role->permissions()->syncWithoutDetaching($request->input('permissions'));
 
                 return redirect(route('roles.index'))->with('success', 'Role updated successfully');
             } else {
@@ -226,15 +226,17 @@ class RoleController extends Controller
         return null;
     }
 
-    public function getPermissions()
+    public function getPermissionGroups()
     {
         $user         = Auth::user();
-        $queryBuilder = Permission::query();
+        $queryBuilder = PermissionGroup::query();
 
         if (! $user->isSuperAdmin()) {
-            $queryBuilder->whereNotLike('name', '%institute%')->whereNotLike('name', '%permission%');
+            $permissions = $user->getAllPermissions();
+
+            $queryBuilder->whereIn('id', $permissions->pluck('permission_group_id'));
         }
 
-        return $queryBuilder->get();
+        return $queryBuilder->with('permissions')->get();
     }
 }

@@ -13,6 +13,12 @@ class Section extends Model
     use HasFactory;
     use IsActiveTrait;
 
+    protected $fillable = [
+        'name',
+        'is_active',
+        'semester_id',
+    ];
+
     // Section Belongs to a Semester
     public function semester(): BelongsTo
     {

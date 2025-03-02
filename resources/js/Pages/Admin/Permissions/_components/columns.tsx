@@ -14,6 +14,10 @@ const columns: ColumnDef<Permission>[] = [
     header: 'Name',
   },
   {
+    accessorKey: 'description',
+    header: 'Description',
+  },
+  {
     accessorKey: 'roles_count',
     header: 'Roles',
     cell: ({ row }) => {

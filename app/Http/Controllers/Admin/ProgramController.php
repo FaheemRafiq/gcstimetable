@@ -33,7 +33,7 @@ class ProgramController extends Controller
             $programs = $builder->where('department_id', $admin->department_id);
         }
 
-        $programs = $builder->with('shift:id,name')->latest()->get();
+        $programs = $builder->with('shifts:id,name')->latest()->get();
 
         return inertia()->render('Admin/Programs/index', [
             'programs' => new ProgramCollection($programs),
@@ -62,7 +62,11 @@ class ProgramController extends Controller
         $message    = '';
         try {
             if ($response->allowed()) {
-                Program::create($attributes);
+                $program = Program::create($attributes);
+
+                if ($request->input('shifts') && $program) {
+                    $program->shifts()->attach($request->shifts);
+                }
 
                 return back()->with('success', 'Program successfully created');
             } else {
@@ -89,7 +93,7 @@ class ProgramController extends Controller
             return back()->with('error', $response->message());
         }
 
-        $program->load(['semesters' => fn ($q) => $q->withCount('sections'), 'shift']);
+        $program->load(['semesters' => fn ($q) => $q->withCount('sections'), 'shifts']);
 
         return inertia()->render('Admin/Programs/show', [
             'program' => $program,
@@ -107,6 +111,10 @@ class ProgramController extends Controller
         try {
             if ($response->allowed()) {
                 $program->update($attributes);
+
+                if ($request->input('shifts') && $program) {
+                    $program->shifts()->sync($request->shifts);
+                }
 
                 return back()->with('success', 'Program successfully updated');
             } else {

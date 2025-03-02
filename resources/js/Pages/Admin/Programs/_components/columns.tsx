@@ -1,7 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { Badge } from '@/components/ui/badge'
 import { Actions } from './actions'
-import { Shift } from '@/types'
 import { Program } from '@/types/database'
 
 const columns: ColumnDef<Program>[] = [
@@ -35,8 +34,20 @@ const columns: ColumnDef<Program>[] = [
     },
   },
   {
-    accessorKey: 'shift.name',
-    header: 'Shift',
+    accessorKey: 'shifts_name',
+    header: 'Shifts',
+    cell: ({ row }) => {
+      const shifts = row.original.shifts
+      return (
+        <div className="space-x-1">
+          {shifts?.map(shift => (
+            <Badge variant={'secondary'} className="capitalize">
+              {shift.name}
+            </Badge>
+          ))}
+        </div>
+      )
+    },
   },
   {
     accessorKey: 'id',

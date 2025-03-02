@@ -7,11 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Shift extends Model
 {
     use HasFactory;
     use IsActiveTrait;
+
+    protected $fillable = [
+        'name',
+        'institution_id',
+        'type',
+        'is_active',
+        'program_type',
+    ];
 
     public const TYPES = [
         'Morning'   => 'Morning',
@@ -49,19 +58,14 @@ class Shift extends Model
     }
 
     // has many programs
-    public function programs(): HasMany
+    public function programs(): BelongsToMany
     {
-        return $this->hasMany(Program::class);
+        return $this->belongsToMany(Program::class);
     }
 
     public function institution(): BelongsTo
     {
         return $this->belongsTo(Institution::class);
-    }
-
-    public function semesters()
-    {
-        return $this->hasManyThrough(Semester::class, Program::class);
     }
 
     public function allocations()

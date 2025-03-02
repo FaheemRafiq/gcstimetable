@@ -12,7 +12,7 @@ import { useBreadcrumb } from '@/components/providers/breadcrum-provider'
 import { Button } from '@/components/ui/button'
 import { PermissionForm } from './_components/PermissionForm'
 
-export default function Rooms({ auth, permissions }: PageProps<{ permissions: Permission[] }>) {
+export default function Index({ auth, permissions }: PageProps<{ permissions: Permission[] }>) {
   // state
   const [openCreate, setOpenCreate] = useState(false)
 

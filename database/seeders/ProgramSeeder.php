@@ -13,7 +13,6 @@ class ProgramSeeder extends Seeder
      */
     public function run(): void
     {
-        // BS Morning Shift = 2
         $programs = [
             ['name' => 'BS BSCS', 'pcode' => 'BSCS', 'dcode' => 'BSCS'],
             ['name' => 'BS BBA', 'pcode' => 'BBA', 'dcode' => 'BBA'],
@@ -70,14 +69,12 @@ class ProgramSeeder extends Seeder
 
     protected function createPrograms($programs, $institution_id)
     {
-        $institution = Institution::with(['shifts', 'departments'])->find($institution_id);
+        $institution = Institution::with(['departments'])->find($institution_id);
 
         foreach ($programs as $programData) {
-            $pcode = $programData['pcode'];
-            $pname = $programData['name'];
-            $pType = $programData['type'] ?? 'BS';
-            // get a random shift
-            $shift      = $institution->shifts->random();
+            $pcode      = $programData['pcode'];
+            $pname      = $programData['name'];
+            $pType      = $programData['type'] ?? 'BS';
             $department = $institution->departments->where('institution_id', $institution_id)->whereIn('code', [$programData['dcode']])->first();
 
             if (str_contains($pcode, 'Inter')) {
@@ -90,7 +87,6 @@ class ProgramSeeder extends Seeder
                 'code'          => $pcode,
                 'department_id' => $department->id,
                 'type'          => $pType,
-                'shift_id'      => $shift->id,
             ]);
         }
     }

@@ -4,62 +4,25 @@ namespace App\Policies;
 
 use App\Models\Day;
 use App\Models\User;
+use App\Enums\PermissionEnum;
+use Illuminate\Auth\Access\Response;
 
 class DayPolicy
 {
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(User $user): Response
     {
-        //
+        return $user->can(PermissionEnum::VIEW_DAYS)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.view_any.error'));
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, Day $day): bool
+    public function change_status(User $user, Day $day): Response
     {
-        //
-    }
-
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Day $day): bool
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Day $day): bool
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Day $day): bool
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Day $day): bool
-    {
-        //
+        return $user->can(PermissionEnum::CHANGE_DAY_STATUS)
+            ? Response::allow()
+            : Response::deny(config('providers.permission.action.error'));
     }
 }

@@ -12,6 +12,16 @@ class Course extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'is_default',
+        'display_code',
+        'code',
+        'credit_hours',
+        'type',
+        'institution_id',
+    ];
+
     public const TYPES = [
         'CLASS' => 'Class',
         'LAB'   => 'Lab',

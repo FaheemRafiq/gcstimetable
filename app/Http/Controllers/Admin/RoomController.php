@@ -5,15 +5,13 @@ namespace App\Http\Controllers\Admin;
 use stdClass;
 use App\Models\Room;
 use Inertia\Inertia;
+use App\Http\Requests\RoomRequest;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\RoomCollection;
-use App\Http\Services\DateTimeService;
-use App\Http\Requests\StoreRoomRequest;
 use Illuminate\Database\QueryException;
-use App\Http\Requests\UpdateRoomRequest;
 
 class RoomController extends Controller
 {
@@ -43,7 +41,7 @@ class RoomController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRoomRequest $request)
+    public function store(RoomRequest $request)
     {
         $admin      = Auth::user();
         $attributes = $request->validated();
@@ -76,7 +74,7 @@ class RoomController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($room, DateTimeService $dateTimeService)
+    public function show($room)
     {
         $room = Room::whereKey($room)
             ->with([
@@ -120,7 +118,7 @@ class RoomController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRoomRequest $request, Room $room)
+    public function update(RoomRequest $request, Room $room)
     {
         $admin      = Auth::user();
         $attributes = $request->validated();

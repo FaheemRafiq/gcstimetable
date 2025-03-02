@@ -67,7 +67,13 @@ function ShowPage({ auth, program }: PageProps<ShowRoomProps>) {
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-2">Shift</h3>
-                <p>{program?.shift?.name}</p>
+                <span>
+                  {program.shifts?.map(shift => (
+                    <Badge variant={'secondary'} className="capitalize">
+                      {shift.name}
+                    </Badge>
+                  ))}
+                </span>
               </div>
             </div>
 

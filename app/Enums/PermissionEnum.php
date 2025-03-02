@@ -30,11 +30,11 @@ enum PermissionEnum: string
     case DELETE_STUDENT = 'delete student';
     case VIEW_STUDENT   = 'view student';
 
-    case VIEW_INSTITUTES  = 'view institutes';
-    case CREATE_INSTITUTE = 'create institute';
-    case EDIT_INSTITUTE   = 'edit institute';
-    case DELETE_INSTITUTE = 'delete institute';
-    case VIEW_INSTITUTE   = 'view institute';
+    case VIEW_INSTITUTIONS  = 'view institutions';
+    case CREATE_INSTITUTION = 'create institution';
+    case EDIT_INSTITUTION   = 'edit institution';
+    case DELETE_INSTITUTION = 'delete institution';
+    case VIEW_INSTITUTION   = 'view institution';
 
     case VIEW_DEPARTMENTS         = 'view departments';
     case CREATE_DEPARTMENT        = 'create department';
@@ -93,11 +93,8 @@ enum PermissionEnum: string
     case DELETE_SEMESTER = 'delete semester';
     case VIEW_SEMESTER   = 'view semester';
 
-    case VIEW_DAYS  = 'view days';
-    case CREATE_DAY = 'create day';
-    case EDIT_DAY   = 'edit day';
-    case DELETE_DAY = 'delete day';
-    case VIEW_DAY   = 'view day';
+    case VIEW_DAYS          = 'view days';
+    case CHANGE_DAY_STATUS  = 'change day status';
 
     case VIEW_SECTIONS  = 'view sections';
     case CREATE_SECTION = 'create section';
@@ -116,4 +113,14 @@ enum PermissionEnum: string
     case EDIT_PERMISSION   = 'edit permission';
     case DELETE_PERMISSION = 'delete permission';
     case VIEW_PERMISSION   = 'view permission';
+
+    case VIEW_IMPORT        = 'view import';
+    case IMPORT_DATA        = 'import data';
+    case EXPORT_TEMPLATE    = 'export template';
+
+    case VIEW_PERMISSION_GROUPS  = 'view permission groups';
+    case VIEW_PERMISSION_GROUP   = 'view permission group';
+    case CREATE_PERMISSION_GROUP = 'create permission group';
+    case EDIT_PERMISSION_GROUP   = 'edit permission group';
+    case DELETE_PERMISSION_GROUP = 'delete permission group';
 }

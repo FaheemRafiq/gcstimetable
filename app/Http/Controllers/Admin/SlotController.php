@@ -4,12 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Slot;
 use App\Exceptions\SlotException;
+use App\Http\Requests\SlotRequest;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
-use App\Http\Requests\StoreSlotRequest;
 use Illuminate\Database\QueryException;
-use App\Http\Requests\UpdateSlotRequest;
 
 class SlotController extends Controller
 {
@@ -18,7 +17,7 @@ class SlotController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreSlotRequest $request)
+    public function store(SlotRequest $request)
     {
         $attributes = $request->validated();
         $response   = Gate::inspect('create', Slot::class);
@@ -49,7 +48,7 @@ class SlotController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSlotRequest $request, Slot $slot)
+    public function update(SlotRequest $request, Slot $slot)
     {
         $attributes = $request->validated();
         $response   = Gate::inspect('update', $slot);

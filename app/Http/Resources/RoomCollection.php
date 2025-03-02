@@ -22,7 +22,7 @@ class RoomCollection extends ResourceCollection
                 'capacity'       => $room->capacity,
                 'institution_id' => $room->institution_id,
                 'type'           => $room->type,
-                'isavailable'    => $room->isavailable,
+                'is_available'   => $room->is_available,
                 'createdAt'      => $room->created_at?->format(config('providers.date.readable')),
             ];
         })->all();

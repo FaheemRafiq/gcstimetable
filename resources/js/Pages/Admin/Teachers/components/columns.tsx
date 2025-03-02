@@ -81,9 +81,9 @@ export const columns: ColumnDef<Teacher>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title="CNIC" />,
   },
   {
-    accessorKey: 'isMale',
+    accessorKey: 'is_male',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Gender" />,
-    cell: ({ row }) => (row.original.isMale ? 'Male' : 'Female'),
+    cell: ({ row }) => (row.original.is_male ? 'Male' : 'Female'),
   },
   {
     accessorKey: 'date_of_birth',
@@ -150,14 +150,14 @@ export const columns: ColumnDef<Teacher>[] = [
     size: 300,
   },
   {
-    accessorKey: 'isvisiting',
+    accessorKey: 'is_visiting',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Visiting" />,
     cell: ({ row }) => {
-      const isVisiting = Boolean(row.original.isvisiting)
+      const is_visiting = Boolean(row.original.is_visiting)
 
       return (
-        <Badge variant={'outline'} className={isVisiting ? 'text-green-500' : 'text-red-500'}>
-          {isVisiting ? 'Yes' : 'No'}
+        <Badge variant={'outline'} className={is_visiting ? 'text-green-500' : 'text-red-500'}>
+          {is_visiting ? 'Yes' : 'No'}
         </Badge>
       )
     },

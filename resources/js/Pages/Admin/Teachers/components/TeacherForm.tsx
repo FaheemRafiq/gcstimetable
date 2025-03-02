@@ -56,7 +56,7 @@ export function TeacherForm({
     cnic: initialData?.cnic ?? null,
     phone_number: initialData?.phone_number ?? '',
     bank_iban: initialData?.bank_iban ?? '',
-    isMale: initialData?.isMale ?? true,
+    is_male: initialData?.is_male ?? true,
     date_of_birth: initialData?.date_of_birth ?? '',
     date_of_joining_in_this_college: initialData?.date_of_joining_in_this_college ?? '',
     date_of_joining_govt_service: initialData?.date_of_joining_govt_service ?? '',
@@ -72,7 +72,7 @@ export function TeacherForm({
     rank: initialData?.rank ?? '',
     position: initialData?.position ?? '',
     department_id: initialData?.department_id ?? null,
-    isvisiting: initialData?.isvisiting ?? true,
+    is_visiting: initialData?.is_visiting ?? true,
     is_active: initialData?.is_active ?? 'active',
   })
 
@@ -134,11 +134,11 @@ export function TeacherForm({
           <InputError message={errors.father_name} />
         </div>,
         <div key="gender">
-          <InputLabel htmlFor="isMale" value="Gender" aria-required />
+          <InputLabel htmlFor="is_male" value="Gender" aria-required />
           <Select
-            name="isMale"
-            value={data.isMale ? '1' : '0'}
-            onValueChange={value => setData('isMale', value == '1')}
+            name="is_male"
+            value={data.is_male ? '1' : '0'}
+            onValueChange={value => setData('is_male', value == '1')}
             required
           >
             <SelectTrigger>
@@ -149,7 +149,7 @@ export function TeacherForm({
               <SelectItem value="0">Female</SelectItem>
             </SelectContent>
           </Select>
-          <InputError message={errors.isMale} />
+          <InputError message={errors.is_male} />
         </div>,
         <div key="date_of_birth" ref={dateOfBirth}>
           <InputLabel htmlFor="date_of_birth" value="Date of Birth" aria-required />
@@ -420,12 +420,12 @@ export function TeacherForm({
         <div key="status" className="grid grid-cols-2 gap-4">
           <div className="items-top flex items-center space-x-2">
             <Checkbox
-              id="isvisiting"
-              name="isvisiting"
-              checked={data.isvisiting}
-              onCheckedChange={checked => setData('isvisiting', Boolean(checked))}
+              id="is_visiting"
+              name="is_visiting"
+              checked={data.is_visiting}
+              onCheckedChange={checked => setData('is_visiting', Boolean(checked))}
             />
-            <Label htmlFor="isvisiting" className="text-sm font-medium leading-none">
+            <Label htmlFor="is_visiting" className="text-sm font-medium leading-none">
               Is Visiting
             </Label>
           </div>
@@ -462,7 +462,7 @@ export function TeacherForm({
       onFinish: () => {
         if (
           dateOfBirth.current &&
-          (errors.date_of_birth || errors.personnel_number || errors.isMale || errors.cnic)
+          (errors.date_of_birth || errors.personnel_number || errors.is_male || errors.cnic)
         ) {
           dateOfBirth.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
         }

@@ -51,17 +51,23 @@ class SectionRepository
 
     public function getAllByShiftId($shiftId, $sectionid = null)
     {
-        return $this->model->join('semesters', 'sections.semester_id', '=', 'semesters.id')
+        return $this->model
+            ->join('semesters', 'sections.semester_id', '=', 'semesters.id')
             ->join('programs', 'semesters.program_id', '=', 'programs.id')
-            ->join('shifts', function ($query): void {
-                $query->on('programs.shift_id', '=', 'shifts.id')
-                    ->on('programs.type', '=', 'shifts.program_type');
-            })
+            ->join('program_shift', 'programs.id', '=', 'program_shift.program_id') // Pivot table
+            ->join('shifts', 'program_shift.shift_id', '=', 'shifts.id') // Join shifts through pivot
             ->where('shifts.id', $shiftId)
             ->when($sectionid, function ($query, $sectionid) {
                 return $query->where('sections.id', $sectionid);
             })
-            ->select(['sections.id', 'sections.name', 'semesters.id as SemesterId', 'semesters.name as SemesterName', 'semesters.number as SemesterNo', 'programs.type as ProgramType'])
+            ->select([
+                'sections.id',
+                'sections.name',
+                'semesters.id as SemesterId',
+                'semesters.name as SemesterName',
+                'semesters.number as SemesterNo',
+                'programs.type as ProgramType',
+            ])
             ->get();
     }
 }

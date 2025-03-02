@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->is_active();
             // Section belongs to  a Semester
-            $table->foreignId('semester_id')->constrained();
+            $table->foreignIdFor(\App\Models\Semester::class)->constrained()->cascadeOnDelete();
 
             $table->timestamps();
         });

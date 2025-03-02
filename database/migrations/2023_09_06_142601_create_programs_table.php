@@ -1,7 +1,6 @@
 <?php
 
-use App\Models\Department;
-use App\Models\Shift;
+use App\Models\Program;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,12 +12,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        /* TODO:  Instead of an attribute   it is better to create shifts
-            and a program belongs to shift and a shift has many programs
-
-
-*/
-
         Schema::create('programs', function (Blueprint $table) {
             $table->id();
             // program name
@@ -28,13 +21,10 @@ return new class extends Migration
             // program duration
             $table->integer('duration')->default(4);
             // program type
-            $table->enum('type', ['ADP', 'INTER', 'BS'])->default('BS');
-
-            // belongs to some shift
-            $table->foreignIdFor(Shift::class)->nullable()->constrained()->nullOnDelete();
+            $table->enum('type', [array_keys(Program::TYPES)])->default('BS');
 
             // Offered by which department
-            $table->foreignIdFor(Department::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\Department::class)->constrained()->cascadeOnDelete();
 
             $table->timestamps();
         });

@@ -58,21 +58,6 @@ export const InstituionForm: React.FC<RoomFormProps> = ({
     }
   }, [institution])
 
-  // Clear errors when data changes
-  useEffect(() => {
-    if (errors && data) {
-      Object.keys(errors).forEach(key => {
-        if (key === 'duration') {
-          return
-        }
-
-        if (errors[key as keyof FormProps] && data[key as keyof FormProps]) {
-          setError(key as keyof FormProps, '')
-        }
-      })
-    }
-  }, [data])
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 

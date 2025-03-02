@@ -26,6 +26,10 @@ import {
   ShieldCheckIcon,
   KeyIcon,
   ListTree,
+  CalendarDaysIcon,
+  ArrowDownUp,
+  Import,
+  GroupIcon,
 } from 'lucide-react'
 
 import { NavMain } from '@/components/nav-main'
@@ -36,6 +40,7 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -45,6 +50,8 @@ import { User } from '@/types'
 import ApplicationLogo from '@/Components/ApplicationLogo'
 import { useAbilities } from './abilities-provider'
 import { PermissionEnum } from '@/lib/enums'
+import { Link } from '@inertiajs/react'
+import { PermissionWrapper } from '@/Components/AdminWrapper'
 
 export type Icon = LucideIcon
 
@@ -151,7 +158,7 @@ export const NavData: NavDataType = [
         url: route('institutions.index'),
         isActive: route().current('institutions.index'),
         icon: Landmark,
-        permission: PermissionEnum.VIEW_INSTITUTES,
+        permission: PermissionEnum.VIEW_INSTITUTIONS,
       },
       {
         title: 'Departments',
@@ -185,6 +192,14 @@ export const NavData: NavDataType = [
         icon: Hourglass,
         permission: PermissionEnum.VIEW_SHIFTS,
       },
+      {
+        title: 'Days',
+        route: 'days.index',
+        url: route('days.index'),
+        isActive: route().current('days.index'),
+        icon: CalendarDaysIcon,
+        permission: PermissionEnum.VIEW_DAYS,
+      },
     ],
   },
   {
@@ -198,6 +213,7 @@ export const NavData: NavDataType = [
         isActive: route().current('roles.index'),
         permission: PermissionEnum.VIEW_ROLES,
       },
+
       {
         title: 'Permissions',
         route: 'permissions.index',
@@ -205,6 +221,14 @@ export const NavData: NavDataType = [
         icon: KeyIcon,
         isActive: route().current('permissions.index'),
         permission: PermissionEnum.VIEW_PERMISSIONS,
+      },
+      {
+        title: 'Permission Groups',
+        route: 'permission-groups.index',
+        url: route('permission-groups.index'),
+        icon: GroupIcon,
+        isActive: route().current('permission-groups.index'),
+        permission: PermissionEnum.VIEW_PERMISSION_GROUPS,
       },
     ],
   },
@@ -295,7 +319,29 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
         {NavigationData.map(section => (
           <NavMain key={section.label} label={section.label} items={section.items} />
         ))}
-        <NavSecondary items={SecondaryNavData} className="mt-auto" />
+        {/* <NavSecondary items={SecondaryNavData} className="mt-auto" /> */}
+
+        <PermissionWrapper permission={PermissionEnum.VIEW_IMPORT}>
+          <SidebarGroup className="mt-auto">
+            <SidebarContent>
+              <SidebarMenu className="mt-auto">
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    tooltip={'Import'}
+                    asChild
+                    size="default"
+                    className="group relative flex items-center justify-start text-white rounded-lg border border-blue-500 bg-transparent shadow-md transition duration-300 ease-in-out hover:shadow-primary"
+                  >
+                    <Link href={route('import.index')}>
+                      <Import />
+                      <span>Import</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarContent>
+          </SidebarGroup>
+        </PermissionWrapper>
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />

@@ -22,7 +22,7 @@ interface FormProps {
   code: string
   capacity: number
   type: string
-  isavailable: boolean
+  is_available: boolean
   [key: string]: any
 }
 
@@ -54,7 +54,7 @@ export const RoomForm: React.FC<RoomFormProps> = ({
     code: '',
     capacity: 0,
     type: '',
-    isavailable: true,
+    is_available: true,
   })
 
   React.useEffect(() => {
@@ -65,7 +65,7 @@ export const RoomForm: React.FC<RoomFormProps> = ({
         code: room.code || '',
         capacity: room.capacity || 0,
         type: room.type || '',
-        isavailable: room.isavailable ?? true,
+        is_available: room.is_available ?? true,
       }))
     }
   }, [room])
