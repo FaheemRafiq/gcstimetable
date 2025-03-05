@@ -3,7 +3,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "tsc && vite build && vite build --ssr && vite build && vite build --ssr --ssr",
+        "build": "tsc && vite build",
         "format": "npx prettier --write 'resources/js/**/*.{js,ts,tsx,vue}'",
         "format:check": "npx prettier --check 'resources/js/**/*.{js,ts,tsx,vue}'"
     },
@@ -74,6 +74,7 @@
         "tailwind-merge": "^2.5.2",
         "tailwindcss-animate": "^1.0.7",
         "xlsx": "^0.18.5",
+        "ziggy-js": "^2.5.2",
         "zustand": "^5.0.2"
     },
     "volta": {
