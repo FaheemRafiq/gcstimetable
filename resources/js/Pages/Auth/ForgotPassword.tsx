@@ -62,13 +62,13 @@ export default function ForgotPassword({ status }: { status?: string }) {
             Send Reset Link
           </Button>
 
-          <Link
+          {/* <Link
             href={route('login')}
             className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to login
-          </Link>
+          </Link> */}
         </form>
 
         <div className="mt-6 p-4 bg-muted/50 rounded-lg">
