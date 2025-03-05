@@ -20,9 +20,6 @@ jobs:
       - name: Install Composer Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Generate Ziggy Routes
-        run: php artisan ziggy:generate
-
       # Setup Node.js and build assets
       - name: Setup Node.js
         uses: actions/setup-node@v4

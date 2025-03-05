@@ -24,3 +24,4 @@ composer.lock
 *.lock
 /composer.lock
 *.lock
+config.bat
