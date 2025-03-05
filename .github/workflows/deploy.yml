@@ -14,7 +14,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3' # Adjust to your PHP version
+          php-version: '8.2'
           tools: composer:v2
 
       - name: Install Composer Dependencies
@@ -41,7 +41,21 @@ jobs:
         run: npm ci
 
       - name: Build Assets
-        run: npm run build
+        run: |
+          NODE_OPTIONS="--max-old-space-size=2024" npm run build
+          chmod -R 755 public/build
+
+      # Prepare server directory permissions
+      - name: Prepare Server Directory
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          timeout: 30m
+          script: |
+            sudo chown -R ${{ secrets.EC2_USERNAME }}:${{ secrets.EC2_USERNAME }} ${{ secrets.REMOTE_DIR }}
+            sudo chmod -R 755 ${{ secrets.REMOTE_DIR }}
 
       # Copy files to EC2 using SCP
       - name: Copy to EC2
@@ -52,7 +66,8 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           source: ".,!node_modules,!tests,!.git,!storage,!bootstrap"
           target: ${{ secrets.REMOTE_DIR }}
-          strip_components: 1 # Places files directly in REMOTE_DIR
+          strip_components: 1
+          overwrite: true
 
       # Deploy to server via SSH
       - name: Deploy to Server
@@ -64,7 +79,6 @@ jobs:
           timeout: 30m
           script: |
             cd ${{ secrets.REMOTE_DIR }}
-            sudo chown -R $USER:$USER .
             composer install --no-interaction --prefer-dist --optimize-autoloader
             php artisan migrate --force
             php artisan config:cache
