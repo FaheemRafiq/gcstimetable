@@ -17,9 +17,6 @@ class ProgramController extends Controller
 {
     public const ONLY = ['index', 'create', 'store', 'show', 'update', 'destroy'];
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $admin   = Auth::user();
