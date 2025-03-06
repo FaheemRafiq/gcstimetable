@@ -1,6 +1,6 @@
 type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday'
 
-let dayCardClasses: {
+const dayCardClasses: {
   background: Record<DayOfWeek, string>
   border: Record<DayOfWeek, string>
   shadow: Record<DayOfWeek, string>

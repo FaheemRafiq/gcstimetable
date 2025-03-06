@@ -1,8 +1,8 @@
-name: Deploy QA
+name: Deploy To Production
 
 on:
   push:
-    branches: [ without_filament_institution ]
+    branches: [ main ]
 
 jobs:
   deploy:

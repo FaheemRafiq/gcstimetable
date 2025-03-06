@@ -31,8 +31,7 @@ class DayController extends Controller
 
             if ($admin->isInstitutionAdmin() || $admin->isDepartmentAdmin()) {
                 // Fetch days via institution relationship
-                $days = $admin->institution?->days()
-                    ->get() ?? collect();
+                $days = $admin->institution?->days()->get() ?? collect();
             } else {
                 // Fetch institutions and selected institution_id
                 $institutions   = Institution::select('id', 'name')->get();

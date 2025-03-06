@@ -56,7 +56,7 @@ export function UserForm({ user, roles, departments, institutions }: UserFormPro
 
   React.useEffect(() => {
     if (user && user?.roles.length > 0) {
-      let values = user.roles.map(role => {
+      const values = user.roles.map(role => {
         return {
           value: role.id.toString(),
           label: role.name,

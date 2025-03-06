@@ -112,7 +112,7 @@ function MultipleCreateForm({ props }: MultipleCreateForm) {
   function handleOpenDelete() {
     console.log('delete')
     if (data.allocations_data.length > 0) {
-      let validAllocations = data.allocations_data.filter(
+      const validAllocations = data.allocations_data.filter(
         allocation => allocation.allocation_id !== undefined && allocation.allocation_id !== null
       )
 
@@ -168,7 +168,7 @@ function MultipleCreateForm({ props }: MultipleCreateForm) {
           const { data } = response
 
           if (data.success && data.success.length > 0) {
-            let messages: ResponseMessage[] = data.success.map((res: SuccessResponse) => {
+            const messages: ResponseMessage[] = data.success.map((res: SuccessResponse) => {
               return {
                 success: true,
                 day_id: res.allocation.day_id,
@@ -200,7 +200,7 @@ function MultipleCreateForm({ props }: MultipleCreateForm) {
           }
 
           if (response.data.failed && response.data.failed.length > 0) {
-            let messages: ResponseMessage[] = response.data.failed.map((res: FailedResponse) => {
+            const messages: ResponseMessage[] = response.data.failed.map((res: FailedResponse) => {
               return {
                 success: false,
                 day_id: res.day_id,
@@ -277,7 +277,7 @@ function MultipleCreateForm({ props }: MultipleCreateForm) {
       }
     }
 
-    let allocations_data = alreadySelectedDay
+    const allocations_data = alreadySelectedDay
       ? data.allocations_data.filter(allocation => allocation.day_id !== day.id)
       : [
           ...data.allocations_data,

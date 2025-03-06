@@ -252,7 +252,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
   const { isSuperAdmin, hasPermission } = useAbilities()
 
   const checkActivity = React.useCallback((item: NavItem) => {
-    let NewItem = {
+    const NewItem = {
       ...item,
       isActive: route().current(item.route),
     }

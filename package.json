@@ -4,8 +4,15 @@
     "scripts": {
         "dev": "vite",
         "build": "tsc && vite build",
+        "build:analyze": "tsc && vite build --report",
+        "preview": "vite preview",
+        "clean": "rimraf public/build dist",
         "format": "npx prettier --write 'resources/js/**/*.{js,ts,tsx,vue}'",
-        "format:check": "npx prettier --check 'resources/js/**/*.{js,ts,tsx,vue}'"
+        "format:check": "npx prettier --check 'resources/js/**/*.{js,ts,tsx,vue}'",
+        "typecheck": "tsc --noEmit",
+        "optimize:deps": "npm dedupe && npm prune",
+        "update": "npm update && npm install",
+        "generate-routes": "php artisan ziggy:generate"
     },
     "devDependencies": {
         "@headlessui/react": "^2.0.0",

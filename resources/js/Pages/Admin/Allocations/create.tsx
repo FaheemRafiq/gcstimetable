@@ -168,7 +168,7 @@ export default function CreateAllocation({ auth, props }: PageProps & CreateAllo
 
   const filteredCourse: Course[] | [] = useMemo(() => {
     if (data.section_id) {
-      let semester = props?.sections?.find(
+      const semester = props?.sections?.find(
         (section: ModifiedSection) => section.id === data.section_id
       )
       return props?.courses?.filter(course =>
@@ -181,7 +181,7 @@ export default function CreateAllocation({ auth, props }: PageProps & CreateAllo
 
   const filteredRooms: Room[] | [] = useMemo(() => {
     if (data.section_id) {
-      let semester = props?.sections?.find(
+      const semester = props?.sections?.find(
         (section: ModifiedSection) => section.id === data.section_id
       )
 

@@ -22,8 +22,6 @@ import { useBreadcrumb } from '@/components/providers/breadcrum-provider'
 import { GroupAllocationCell } from '../TimeTables/_components/AllocationCell'
 import { formatNumberRange, groupAllocationsByDay } from '@/utils/helper'
 import { Allocation, Day } from '@/types/database'
-import * as ExcelJS from 'exceljs'
-import { saveAs } from 'file-saver'
 import { Download } from 'lucide-react'
 import { PermissionEnum } from '@/lib/enums'
 import { PermissionWrapper } from '@/Components/AdminWrapper'
@@ -55,7 +53,7 @@ interface Shift {
   name: string
 }
 
-interface WorkloadData {
+export interface WorkloadData {
   department: {
     id: number
     name: string
@@ -119,178 +117,9 @@ export default function TeacherWorkload({ auth }: TeacherWorkloadProps) {
     }
   })
 
-  const exportToExcel = async () => {
-    const workbook = new ExcelJS.Workbook()
-    const worksheet = workbook.addWorksheet('TeacherWorkload')
-
-    // Set default styles for the worksheet
-    worksheet.properties.defaultRowHeight = 20
-
-    // Define reusable styles
-    const centerAlign: Partial<ExcelJS.Alignment> = {
-      horizontal: 'center',
-      vertical: 'middle',
-      wrapText: true,
-    }
-    const headerStyle = {
-      font: { bold: true, size: 12, color: { argb: '000000' } },
-      alignment: centerAlign,
-      fill: {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'E9ECEF' },
-      },
-      border: {
-        top: { style: 'thin', color: { argb: 'D1D5DB' } },
-        left: { style: 'thin', color: { argb: 'D1D5DB' } },
-        bottom: { style: 'thin', color: { argb: 'D1D5DB' } },
-        right: { style: 'thin', color: { argb: 'D1D5DB' } },
-      },
-    }
-
-    // Title Section with better formatting
-    const titleSection = [
-      [''],
-      [`Teachers Workload Report - ${workloadData.department.name}`],
-      [`Session: ${workloadData.session}`],
-      [`Generated on: ${new Date().toLocaleDateString()}`],
-      [''],
-    ]
-
-    titleSection.forEach((row, index) => {
-      const excelRow = worksheet.addRow(row)
-      if (row[0]) {
-        worksheet.mergeCells(`A${index + 1}:K${index + 1}`)
-        excelRow.getCell(1).alignment = centerAlign
-        if (index === 1) {
-          excelRow.font = { bold: true, size: 14 }
-        } else {
-          excelRow.font = { size: 11 }
-        }
-      }
-    })
-
-    // Add table headers
-    const headers = [
-      'Teacher Name (Rank)',
-      'Semester & Section',
-      ...workloadData.slots.map(
-        slot => `${slot.code}\n${slot.start_time.slice(0, 5)} - ${slot.end_time.slice(0, 5)}`
-      ),
-      'Credit Hours',
-      'Per Week Lectures',
-      'Total Lectures',
-    ]
-
-    const headerRow = worksheet.addRow(headers)
-    headerRow.height = 40 // Taller header row for wrapped text
-    headers.forEach((header, i) => {
-      const cell = headerRow.getCell(i + 1)
-      Object.assign(cell, headerStyle)
-    })
-
-    // Set column widths
-    const columnWidths = {
-      A: 30, // Teacher Name
-      B: 25, // Semester & Section
-      K: 15, // Credit Hours
-      L: 15, // Per Week Lectures
-      M: 15, // Total Lectures
-    }
-
-    // Set slot columns width (columns C to J)
-    for (let i = 0; i < workloadData.slots.length; i++) {
-      ;(columnWidths as Record<string, number>)[String.fromCharCode(67 + i)] = 35 // Start from 'C'
-    }
-
-    Object.entries(columnWidths).forEach(([col, width]) => {
-      worksheet.getColumn(col).width = width
-    })
-
-    // Add data rows with improved formatting
-    let rowNumber = 7 // Start after headers
-    groupedData.forEach(teacherGroup => {
-      const startRow = rowNumber
-
-      teacherGroup.sections.forEach((section, sectionIndex) => {
-        const rowData = [
-          sectionIndex === 0 ? `${teacherGroup.teacher.name}\n(${teacherGroup.teacher.rank})` : '',
-          `${section.semester}\n(${section.section})`,
-          ...workloadData.slots.map(slot => {
-            const allocations = section.allocations[slot.id] || []
-            const groupedAllocations = groupAllocationsByDay(
-              allocations.sort((a, b) => Number(a.day?.number) - Number(b.day?.number))
-            )
-
-            return (
-              groupedAllocations
-                .map(allocation => {
-                  const dayNumbers = allocation.days?.map((day: Day) => day.number) || []
-                  const formattedDays = formatNumberRange(dayNumbers)
-                  return [
-                    allocation.course.display_code,
-                    allocation.teacher?.name ? `${allocation.teacher.name}` : '',
-                    `Room: ${allocation.room.name || ''}`,
-                    `(${formattedDays})`,
-                  ]
-                    .filter(Boolean)
-                    .join('\n')
-                })
-                .join('\n\n') || '-'
-            )
-          }),
-          section.credit_hours,
-          section.per_week_lectures,
-          sectionIndex === 0 ? teacherGroup.total_per_week_lectures : '',
-        ]
-
-        const row = worksheet.addRow(rowData)
-        row.height = 60 // Higher rows for wrapped content
-
-        // Apply cell styles
-        row.eachCell((cell, colNumber) => {
-          cell.alignment = centerAlign
-          cell.border = {
-            top: { style: 'thin', color: { argb: 'D1D5DB' } },
-            left: { style: 'thin', color: { argb: 'D1D5DB' } },
-            bottom: { style: 'thin', color: { argb: 'D1D5DB' } },
-            right: { style: 'thin', color: { argb: 'D1D5DB' } },
-          }
-        })
-
-        rowNumber++
-      })
-
-      // Merge cells for teacher name and total lectures if multiple sections
-      if (teacherGroup.sections.length > 1) {
-        worksheet.mergeCells(`A${startRow}:A${rowNumber - 1}`)
-        worksheet.mergeCells(
-          `${String.fromCharCode(64 + headers.length)}${startRow}:${String.fromCharCode(64 + headers.length)}${rowNumber - 1}`
-        )
-      }
-
-      // Add a subtle separator after each teacher group
-      const separatorRow = worksheet.addRow([])
-      separatorRow.height = 3
-      separatorRow.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'F3F4F6' },
-      }
-      rowNumber++
-    })
-
-    // Final formatting pass
-    worksheet.views = [
-      { state: 'frozen', xSplit: 2, ySplit: 6 }, // Freeze header row and first two columns
-    ]
-
-    // Generate and download the Excel file
-    const buffer = await workbook.xlsx.writeBuffer()
-    saveAs(
-      new Blob([buffer]),
-      `Teacher_Workload_${workloadData.department.name}_${workloadData.session}.xlsx`
-    )
+  async function handleExport() {
+    const { exportTeachersWorkloadToExcel } = await import('@/lib/helpers/ExportJs')
+    exportTeachersWorkloadToExcel({ workloadData, groupedData })
   }
 
   return (
@@ -328,7 +157,7 @@ export default function TeacherWorkload({ auth }: TeacherWorkloadProps) {
           </Select>
           <PermissionWrapper permission={PermissionEnum.EXPORT_TEACHERS_WORKLOAD}>
             <div className="space-x-2">
-              <Button onClick={exportToExcel} variant="outline">
+              <Button onClick={() => handleExport()} variant="outline">
                 <Download className="h-5 w-5 animate-bounce" />
                 Export
               </Button>
@@ -392,16 +221,14 @@ export default function TeacherWorkload({ auth }: TeacherWorkloadProps) {
                             <TableCell key={slot.id} className="text-center">
                               {section.allocations[slot.id] &&
                               section.allocations[slot.id].length > 0
-                                ? groupAllocationsByDay(
-                                    section.allocations[slot.id].sort(
-                                      (a, b) => Number(a.day?.number) - Number(b.day?.number)
+                                ? groupAllocationsByDay(section.allocations[slot.id]).map(
+                                    allocation => (
+                                      <GroupAllocationCell
+                                        allocation={allocation}
+                                        key={allocation.id}
+                                      />
                                     )
-                                  ).map(allocation => (
-                                    <GroupAllocationCell
-                                      allocation={allocation}
-                                      key={allocation.id}
-                                    />
-                                  ))
+                                  )
                                 : '-'}
                             </TableCell>
                           ))}

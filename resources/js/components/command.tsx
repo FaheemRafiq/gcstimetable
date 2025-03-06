@@ -63,7 +63,7 @@ export function CommandDialogDemo() {
   }
 
   const resolveSideBarNavs = (item: NavItem, index: number) => {
-    let NavItems: React.ReactNode[] = []
+    const NavItems: React.ReactNode[] = []
     if (item.navItems?.length) {
       item.navItems.forEach((subItem, index) => {
         NavItems.push(

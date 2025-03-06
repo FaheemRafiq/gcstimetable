@@ -1,4 +1,5 @@
 import { Allocation } from '@/types/database'
+import { format } from 'date-fns'
 import moment from 'moment'
 
 export function getRomanNumber(num: number): string {
@@ -54,7 +55,7 @@ export function sortByDays(a: string, b: string) {
 export function formatNumberRange(numbers: number[]): string {
   if (numbers.length === 0) return ''
 
-  let result: string[] = []
+  const result: string[] = []
   let start = numbers[0]
   let end = start
 
@@ -77,24 +78,30 @@ export function formatNumberRange(numbers: number[]): string {
 }
 
 export const groupAllocationsByDay = (allocations: Allocation[]) => {
-  const groupedMap = allocations.reduce<Record<string, any>>((acc, allocation) => {
-    // Create a unique key based on teacher_id, course_id, and room_id
-    const key = `${allocation.teacher_id}-${allocation.course_id}-${allocation.room_id}`
+  const groupedMap = allocations
+    .sort((a, b) => Number(a.day?.number) - Number(b.day?.number))
+    .reduce<Record<string, any>>((acc, allocation) => {
+      // Create a unique key based on teacher_id, course_id, and room_id
+      const key = `${allocation.teacher_id}-${allocation.course_id}-${allocation.room_id}`
 
-    // If the key doesn't exist in the map, initialize it with an empty array
-    if (!acc[key]) {
-      acc[key] = {
-        ...allocation,
-        days: [],
+      // If the key doesn't exist in the map, initialize it with an empty array
+      if (!acc[key]) {
+        acc[key] = {
+          ...allocation,
+          days: [],
+        }
       }
-    }
 
-    // Add the day to the group
-    acc[key].days.push(allocation.day)
+      // Add the day to the group
+      acc[key].days.push(allocation.day)
 
-    return acc
-  }, {})
+      return acc
+    }, {})
 
   // Convert the map into an array of groups
   return Object.values(groupedMap)
+}
+
+export const formatDateString = (dateString: string) => {
+  return format(new Date(dateString), 'MMM d, yyyy')
 }
