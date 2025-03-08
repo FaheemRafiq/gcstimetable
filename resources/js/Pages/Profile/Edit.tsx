@@ -4,8 +4,9 @@ import DeleteUserForm from './Partials/DeleteUserForm'
 import UpdatePasswordForm from './Partials/UpdatePasswordForm'
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm'
 import { Head } from '@inertiajs/react'
-import { PageProps } from '@/types'
+import { type PageProps } from '@/types'
 import { useBreadcrumb } from '@/components/providers/breadcrum-provider'
+import ToggleAppearanceTabs from './Partials/ToggleAppearanceTabs'
 
 export default function Edit({
   auth,
@@ -25,6 +26,10 @@ export default function Edit({
       <Head title="Profile" />
 
       <div className="space-y-5">
+        <div className="p-4 sm:p-8 bg-card text-card-foreground border border-border shadow sm:rounded-lg">
+          <ToggleAppearanceTabs className="max-w-xl" />
+        </div>
+
         <div className="p-4 sm:p-8 bg-card text-card-foreground border border-border shadow sm:rounded-lg">
           <UpdateProfileInformationForm
             mustVerifyEmail={mustVerifyEmail}

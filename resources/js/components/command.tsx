@@ -1,14 +1,5 @@
 import * as React from 'react'
-import {
-  Settings,
-  GraduationCap,
-  User,
-  ChartNoAxesCombined,
-  Users,
-  CalendarDays,
-  Building,
-  LayoutDashboardIcon,
-} from 'lucide-react'
+import { Settings, User } from 'lucide-react'
 
 import {
   CommandDialog,
@@ -22,11 +13,12 @@ import {
 } from '@/components/ui/command'
 import { router } from '@inertiajs/react'
 import { Button } from '@/components/ui/button'
-import { NavData, NavDataType, NavItem } from './app-sidebar'
+import { useSidebarMenuItems, type NavItem } from '@/hooks/use-side-bar-menu-items'
 
 export function CommandDialogDemo() {
   const [open, setOpen] = React.useState(false)
   const superKey = 'CTRL+'
+  const NavigationData = useSidebarMenuItems()
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -116,7 +108,7 @@ export function CommandDialogDemo() {
         />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
-          {NavData.map(section => {
+          {NavigationData.map(section => {
             return (
               <CommandGroup key={section.label} heading={section.label}>
                 {section.items.map((item, index) => resolveSideBarNavs(item, index))}
@@ -130,7 +122,7 @@ export function CommandDialogDemo() {
               <span>Profile</span>
               <CommandShortcut>{superKey}P</CommandShortcut>
             </CommandItem>
-            <CommandItem>
+            <CommandItem onSelect={handleProfileNavigation}>
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
               <CommandShortcut>{superKey}S</CommandShortcut>
