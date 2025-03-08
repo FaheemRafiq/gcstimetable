@@ -10,7 +10,6 @@ import {
   Star,
   Users,
 } from 'lucide-react'
-import { ModeToggle } from '@/components/mode-toggle'
 import { PageProps } from '@/types'
 import { useIsMobile } from '@/hooks/use-mobile'
 
@@ -35,7 +34,6 @@ function LandingPage({ auth }: PageProps) {
                 <span className="text-2xl font-bold text-primary">TimeTable</span>
               </div>
               <div className="flex items-center gap-4">
-                {!isMobile && <ModeToggle variant="outline" size="default" />}
                 {auth.user ? (
                   <Link
                     href={route('dashboard')}
@@ -68,7 +66,7 @@ function LandingPage({ auth }: PageProps) {
         <section className="pt-32 pb-16 px-4">
           <div className="max-w-6xl mx-auto text-center">
             <div className="inline-block mb-4 px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
-              ✨ Your Time, Optimized
+              ✨ <span className="text-foreground">Your Time,</span> Optimized
             </div>
             <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
               Transform Your Schedule with
@@ -177,7 +175,7 @@ function LandingPage({ auth }: PageProps) {
         {/* Footer */}
         <footer className="py-8 border-t border-border">
           <div className="max-w-6xl mx-auto px-4 text-center text-muted-foreground">
-            <p>© 2024 Timetable Generator. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} Timetable Generator. All rights reserved.</p>
           </div>
         </footer>
       </div>

@@ -1,9 +1,10 @@
-import { PropsWithChildren } from 'react'
+import { type PropsWithChildren } from 'react'
 import { Separator } from '@/components/ui/separator'
-import { ModeToggle } from '@/components/mode-toggle'
 import { CommandDialogDemo } from '@/components/command'
 import { PageBreadcrums } from './page-breadcrum'
 import Tooltip from '@/components/ui/tooltip'
+import { HeaderProfile } from './header-profile'
+import MobileView from '@/components/mobile-view'
 
 export default function Header({ SidebarTrigger }: PropsWithChildren<{ SidebarTrigger: any }>) {
   return (
@@ -14,10 +15,13 @@ export default function Header({ SidebarTrigger }: PropsWithChildren<{ SidebarTr
         </Tooltip>
         <Separator orientation="vertical" className="mr-2 h-4" />
         <PageBreadcrums />
-        <div className="ml-auto">
+        <div className="ml-auto" />
+        <div className="hidden md:block">
           <CommandDialogDemo />
         </div>
-        <ModeToggle />
+        <MobileView>
+          <HeaderProfile />
+        </MobileView>
       </div>
     </header>
   )
